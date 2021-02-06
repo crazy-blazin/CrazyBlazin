@@ -1,1 +1,1 @@
-[["larvefant", "larvestol"],["toppers", "ubefinne"]]
+[["larvefant", "larvestol", 5200], ["larvesneip", "stump", 10]]
