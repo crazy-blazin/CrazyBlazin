@@ -1,3 +1,4 @@
 {
- "users":[["larvefant", "larvestol"],["toppers", "ubefinne"]] 
+ "users":[["larvefant", "larvestol"],["toppers", "ubefinne"]],
+ "balance": [["larvefant", 200]]
 }
