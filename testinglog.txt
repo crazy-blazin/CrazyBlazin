@@ -1,4 +1,3 @@
 {
- "username":"larvefant", 
- "password":"larvestol"
+ "users":[["larvefant", "larvestol"],["toppers", "ubefinne"]] 
 }
