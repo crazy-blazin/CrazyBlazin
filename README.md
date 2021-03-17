@@ -35,9 +35,9 @@
   <p align="center">
     Crazy Blazin official repo
 	 <br />
-	   <a href="https://discord.gg/BRBShe32Sg">Discord server »</strong></a>
+	   <a href="https://discord.gg/BRBShe32Sg"><strong>Discord server »</strong></a>
 	   <br />
-    <a href="https://github.com/MartinRovang/CrazyBlazin"><strong>Explore the docs »</strong></a>
+    <a href="https://github.com/MartinRovang/CrazyBlazin"><strong>Explore the docs »</strong>></a>
 	<br />
 	<a href="https://www.overleaf.com/read/gbqpypxhrbrk"><strong>White paper »</strong></a>
 	<br />
