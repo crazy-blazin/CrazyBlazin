@@ -30,7 +30,7 @@
 <br />
 <p align="center">
   <a href="https://github.com/MartinRovang/CrazyBlazin">
-    <img src="images/ff2.png" alt="Logo" width="168" height="98">
+    <img src="images/ff3.gif" alt="Logo" width="640" height="414">
   </a>
 
   <h3 align="center">Crazy Blazin</h3>
