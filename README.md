@@ -40,7 +40,7 @@
     <br />
     <a href="https://github.com/MartinRovang/CrazyBlazin"><strong>Explore the docs »</strong></a>
 	<br />
-	<a href="https://www.overleaf.com/project/60141795cd512ea36be35ff2"><strong>White paper »</strong></a>
+	<a href="https://www.overleaf.com/read/gbqpypxhrbrk"><strong>White paper »</strong></a>
 	<br />
     <br />
     <br />
