@@ -23,8 +23,6 @@
 [![Issues][issues-shield]][issues-url]
 -->
 
-    <a href="https://discord.gg/BRBShe32Sg"><Discord server »</strong></a>
-
 
 <!-- PROJECT LOGO -->
 <br />
