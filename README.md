@@ -37,6 +37,9 @@
 
   <p align="center">
     Crazy Blazin official repo
+	    <br />
+    <a href="https://discord.gg/BRBShe32Sg"><Discord server »</strong></a>
+	<br />
     <br />
     <a href="https://github.com/MartinRovang/CrazyBlazin"><strong>Explore the docs »</strong></a>
 	<br />
@@ -49,7 +52,6 @@
     <a href="https://github.com/MartinRovang/CrazyBlazin/issues">Request Feature</a>
   </p>
 </p>
-
 
 <!-- TABLE OF CONTENTS -->
 <details open="open">
