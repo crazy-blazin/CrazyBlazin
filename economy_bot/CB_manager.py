@@ -7,12 +7,9 @@ from discord.ext import commands
 import matplotlib.pyplot as plt
 import time
 import threading
-from discord.utils import get
-
 client = commands.Bot(command_prefix='!')
 
 #https://discordapp.com/developers
-
 
 
 class EventHandler:
@@ -34,31 +31,21 @@ class EventHandler:
         return winner
 
     def coin_aggregation(self):
-
         with open('crazy_blazin_database.txt', 'r') as f:
             users = eval(f.read())
-            
-        for member in self.coin_aggregation_members:
-            state = self.coin_aggregation_members[member]
+        for members in self.coin_aggregation_members:
+            state = self.coin_aggregation_members[members]
             channel_state = str(state.channel)
             stream_state = state.self_stream
 
-            if member not in users:
-                users[member] = {'Coins': 25, 'Tickets': 50}
-                with open('crazy_blazin_database.txt', 'w') as f:
-                    f.write(str(users))
-
-                with open('crazy_blazin_database.txt', 'r') as f:
-                    users = eval(f.read())
-
             if channel_state != 'None':
                 if stream_state:
-                    users[member]['Coins'] += 15
-                    print(f'Stream activity: {member}')
+                    users[members]['Coins'] += 15
+                    print(f'Stream activity: {members}')
                 else:
-                    users[member]['Coins'] += 5
+                    users[members]['Coins'] += 5
 
-                print(f'Coins to : {member}')
+                print(f'Coins to : {members}')
 
         with open('crazy_blazin_database.txt', 'w') as f:
             f.write(str(users))
@@ -109,14 +96,14 @@ async def on_message(message):
         users = eval(f.read())
 
     if message.author.name not in users:
-        users[message.author.name] = {'Coins': 25, 'Tickets': 1}
+        users[message.author.name] = {'Coins': 25, 'Tickets': 50}
         with open('crazy_blazin_database.txt', 'w') as f:
             f.write(str(users))
 
     if message.content.startswith('!bal'):
         value = users[message.author.name]['Coins']
         ticket = users[message.author.name]['Tickets']
-        await message.channel.send(f'{message.author.name} \n {value} <:CBCcoin:831506214659293214> (CBC) \n {ticket} :tickets: (tickets)')
+        await message.channel.send(f'{message.author.name}: {value} <:CBCcoin:831506214659293214> (CBC), {ticket} :tickets: (tickets)')
 
 
     if message.content.startswith('!raffle'):
@@ -131,17 +118,13 @@ async def on_message(message):
         for idx in range(2, len(str_split)):
             description += str_split[idx] + ' '
 
-        role_names = [role.name for role in message.author.roles]
-        if 'Crazy Blazin Gold' in role_names or 'Admin' in role_names:
-            ticket = Ticket(price, description, len(events_handler.events)+1, message.author.name)
-            events_handler.add_event(ticket)
-            await message.channel.send(f'Raffle startet! [ID {ticket.id}]')
-            await message.channel.send(f'Description:')
-            await message.channel.send(f'{description}')
-            await message.channel.send(f'Tickets needed to join raffle: {price} :tickets: ')
-            await message.channel.send(f'To join raffle use !join raffleID ')
-        else:
-            await message.channel.send(f'You have to be admin or have Crazy Blazin Gold account to start raffles!')
+        ticket = Ticket(price, description, len(events_handler.events)+1, message.author.name)
+        events_handler.add_event(ticket)
+        await message.channel.send(f'Raffle startet! [ID {ticket.id}]')
+        await message.channel.send(f'Description:')
+        await message.channel.send(f'{description}')
+        await message.channel.send(f'Tickets needed to join raffle: {price} :tickets: ')
+        await message.channel.send(f'To join raffle use !join raffleID ')
 
     
     if message.content.startswith('!events'):
@@ -216,33 +199,18 @@ async def on_message(message):
             users[message.author.name]['Coins'] -= 100*amount
             with open('crazy_blazin_database.txt', 'w') as f:
                 f.write(str(users))
-            await message.channel.send(f'{message.author.name} Bought {amount} :tickets: (tickets)')
-            
-
         else:
             await message.channel.send(f'{message.author.name} does not have enough <:CBCcoin:831506214659293214> (CBC) to buy {amount} tickets!')
             await message.channel.send(f'Price: <:CBCcoin:831506214659293214> (CBC) per :tickets: .')
 
-
-    if message.content.startswith('!buy CBCGold'):
-        str_split = message.content.split(' ')
-        if len(str_split) > 2 or len(str_split) < 1:
-            await message.channel.send(f'Too many or few arguments. Use !buy CBCGold')
-
-        if 500 <= users[message.author.name]['Coins']:
-            users[message.author.name]['Coins'] -= 500
-
-            member = message.author
-            role = get(member.guild.roles, name='Crazy Blazin Gold')
-            await member.add_roles(role)
-            with open('crazy_blazin_database.txt', 'w') as f:
-                f.write(str(users))
-            await message.channel.send(f'{message.author.name} Bought Crazy Blazin Gold Role!')
-        else:
-            await message.channel.send(f'{message.author.name} does not have enough <:CBCcoin:831506214659293214> (CBC) to buy Crazy Blazin Gold!')
-            await message.channel.send(f' Price:Crazy Blazin Gold! <:CBCcoin:831506214659293214> (CBC).')
-
-
+    if message.content.startsWith('!leader'):
+        with open('crazy_blazin_database.txt', 'r') as f:
+            users = eval(f.read())
+        for key, index in sorted(users, key=users.get, reverse=True):
+            if (index < 10):
+                await message.channel.send(f'{index, '. ', key, ' coins: ', users[key]['Coins']}')
+            else: 
+                return
 
     if message.content.startswith('!giveCBC'):
         str_split = message.content.split(' ')
