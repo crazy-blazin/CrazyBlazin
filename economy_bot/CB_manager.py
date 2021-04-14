@@ -11,11 +11,36 @@ client = commands.Bot(command_prefix='!')
 
 #https://discordapp.com/developers
 
+# class User:
+#     def __init__(self, name, coins, tickets):
+#         self.name = name
+#         self.coins = coins
+#         self.tickets = tickets
+
+class Ticket:
+    def __init__(self, price, description, id, creator):
+        self.price = price
+        self.description = description
+        self.id = id
+        self.participants = []
+        self.creator = creator
+
+class Database:
+    def __init__(self):
+        self.dbName = 'crazy_blazin_database.txt' 
+    def read(self):
+        with open(self.dbName, 'r') as f:
+            return eval(f.read())
+
+    def write(self, users):
+        with open(self.dbName, 'w') as f:
+            f.write(str(users))
 
 class EventHandler:
     def __init__(self):
         self.events = []
         self.coin_aggregation_members = {}
+        self.db = Database()
     
     def current_events(self):
         if len(self.events) < 1:
@@ -31,8 +56,8 @@ class EventHandler:
         return winner
 
     def coin_aggregation(self):
-        with open('crazy_blazin_database.txt', 'r') as f:
-            users = eval(f.read())
+        users = self.db.read()
+
         for members in self.coin_aggregation_members:
             state = self.coin_aggregation_members[members]
             channel_state = str(state.channel)
@@ -47,9 +72,7 @@ class EventHandler:
 
                 print(f'Coins to : {members}')
 
-        with open('crazy_blazin_database.txt', 'w') as f:
-            f.write(str(users))
-
+        db.write(users)
 
 
 events_handler = EventHandler()
@@ -64,19 +87,8 @@ def add_coins_after_time():
     except KeyboardInterrupt:
         exit()
 
-
 thread_timer = threading.Thread(target = add_coins_after_time)
 thread_timer.start()
-
-
-class Ticket:
-    def __init__(self, price, description, id, creator):
-        self.price = price
-        self.description = description
-        self.id = id
-        self.participants = []
-        self.creator = creator
-
 
 
 @client.event
@@ -84,8 +96,6 @@ async def on_voice_state_update(member, before, after):
     member = str(member).split("#")[0]
     print('Changed state: ' + member)
     events_handler.coin_aggregation_members[member] = after
-
-
 
 @client.event
 async def on_message(message):
@@ -101,9 +111,9 @@ async def on_message(message):
             f.write(str(users))
 
     if message.content.startswith('!bal'):
-        value = users[message.author.name]['Coins']
-        ticket = users[message.author.name]['Tickets']
-        await message.channel.send(f'{message.author.name}: {value} <:CBCcoin:831506214659293214> (CBC), {ticket} :tickets: (tickets)')
+        coins = users[message.author.name]['Coins']
+        tickets = users[message.author.name]['Tickets']
+        await message.channel.send(f'{message.author.name}: {coins} <:CBCcoin:831506214659293214> (CBC), {tickets} :tickets: (tickets)')
 
 
     if message.content.startswith('!raffle'):
@@ -254,49 +264,4 @@ async def on_message(message):
             with open('crazy_blazin_database.txt', 'w') as f:
                 f.write(str(users))
 
-
-
-
-        
-
-        
-
-
-
-
-    
-
-
-        
-        
-    
-        
-
-
-
-
-
-
-
-
-
-
-
-        
-
-        # role_names = [role.name for role in message.author.roles]
-        # if 'Cheeki Breeki Gold' in role_names:
-        #     await message.channel.send('Beeb boob, i change backgrounds!')
-
-        # else:
-        #     await message.channel.send('Only users with Cheeki Breeki Gold can use this function.')
-
-            
 client.run(k)
-
-
-# fig, ax = plt.subplots(1, 3)
-# ax[0].imshow(input_image_)
-# ax[1].imshow(input_image_masked)
-# ax[2].imshow(r)
-# plt.show()
