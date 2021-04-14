@@ -8,10 +8,14 @@ import matplotlib.pyplot as plt
 import time
 import threading
 from discord.utils import get
+from collections import Counter
+import asyncio
+from discord.ext import tasks
 
-client = commands.Bot(command_prefix='!')
+# client = commands.Bot(command_prefix='!')
 
 #https://discordapp.com/developers
+k = 'ODMxOTE4MjA5NDA4OTU4NTE0.YHcONQ.efkZDQPUUIP-8E2SjyMdgO1-QwM'
 
 
 class Database:
@@ -26,53 +30,59 @@ class Database:
             f.write(str(users))
 
 
-# class EventHandler:
-#     def __init__(self):
-#         self.events = []
-#         self.coin_aggregation_members = {}
-    
-#     def current_events(self):
-#         if len(self.events) < 1:
-#             return 'No events active'
-#         else:
-#             return self.events
+class MyClient(discord.Client):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # an attribute we can access from our task
+        self.counter = 0
+        # start the task to run in the background
+        self.add_coins_after_time.start()
 
-#     def add_event(self, ticket):
-#         self.events.append(ticket)
+    async def on_ready(self):
+        print(f'Logged in as {self.user} (ID: {self.user.id})')
+        print('------')
 
-#     def raffle_machine(self, event):
-#         winner = np.random.choice(event.participants, 1)
-#         return winner
+    @tasks.loop(seconds=900) # task runs every 60 seconds
+    async def add_coins_after_time(self):
+        users = events_handler.db.read()
+        events_handler.coin_aggregation()
+        print('Coins distributed!')
+        member = False
+        members = self.get_all_members()
+        for key in users:
+            if 'Timer' in users[key]:
+                if users[key]['Timer'] > 0:
+                    users[key]['Timer'] -= 900
+                else:
+                    users[key]['Timer'] = 0
+                    # next(user for user in client.users if user.name == key)
+                    for mem in members:
+                        if mem.name == key:
+                            member = mem
+                            break
+                    if not member:
+                        continue
+                    role_names = [role.name for role in member.roles]
+                    if 'Crazy Blazin Gold' in role_names:
+                        role = get(member.guild.roles, name='Crazy Blazin Gold')
+                        await member.remove_roles(role)
+                events_handler.db.write(users)
 
-#     def coin_aggregation(self):
+    @add_coins_after_time.after_loop
+    async def after_my_task(self):
+        print('help im being violated')
+        if (self.add_coins_after_time.is_being_cancelled()):
+            print('cancelled')
 
-#         with open('crazy_blazin_database.txt', 'r') as f:
-#             users = eval(f.read())
-            
-#         for member in self.coin_aggregation_members:
-#             state = self.coin_aggregation_members[member]
-#             channel_state = str(state.channel)
-#             stream_state = state.self_stream
+    @add_coins_after_time.before_loop
+    async def before_my_task(self):
+        await self.wait_until_ready() # wait until the bot logs in
 
-#             if member not in users:
-#                 users[member] = {'Coins': 25, 'Tickets': 50}
-#                 with open('crazy_blazin_database.txt', 'w') as f:
-#                     f.write(str(users))
+intents = discord.Intents.default()
+intents.members = True
+client = MyClient(intents = intents)
 
-#                 with open('crazy_blazin_database.txt', 'r') as f:
-#                     users = eval(f.read())
 
-#             if channel_state != 'None':
-#                 if stream_state:
-#                     users[member]['Coins'] += 15
-#                     print(f'Stream activity: {member}')
-#                 else:
-#                     users[member]['Coins'] += 5
-
-#                 print(f'Coins to : {member}')
-
-#         with open('crazy_blazin_database.txt', 'w') as f:
-#             f.write(str(users))
 class EventHandler:
     def __init__(self):
         self.events = []
@@ -94,7 +104,6 @@ class EventHandler:
 
     def coin_aggregation(self):
         users = self.db.read()
-
         for members in self.coin_aggregation_members:
             state = self.coin_aggregation_members[members]
             channel_state = str(state.channel)
@@ -108,30 +117,14 @@ class EventHandler:
                     users[members]['Coins'] += 5
 
                 print(f'Coins to : {members}')
-
         self.db.write(users)
+        return users
 
 
 events_handler = EventHandler()
 
-
-def add_coins_after_time():
-    try:
-        events_handler.coin_aggregation()
-        print('Coins distributed!')
-        time.sleep(900)
-        add_coins_after_time()
-    except KeyboardInterrupt:
-        exit()
-
-
-thread_timer = threading.Thread(target = add_coins_after_time)
-thread_timer.start()
-
-
 class Ticket:
-    def __init__(self, price, description, id, creator):
-        self.price = price
+    def __init__(self, description, id, creator):
         self.description = description
         self.id = id
         self.participants = []
@@ -185,28 +178,25 @@ async def on_message(message):
     if message.content.startswith('!raffle'):
         str_split = message.content.split(' ')
         if len(str_split) < 2:
-            await message.channel.send(f'Few arguments. Use !raffle price description')
-        try:
-            price = int(str_split[1])
-        except ValueError:
-            await message.channel.send(f'Price needs to be integer!')
+            await message.channel.send(f'Few arguments. Use !raffle description')
+
         description = ''
-        for idx in range(2, len(str_split)):
+        for idx in range(1, len(str_split)):
             description += str_split[idx] + ' '
 
         role_names = [role.name for role in message.author.roles]
         if 'Crazy Blazin Gold' in role_names or 'Admin' in role_names:
-            ticket = Ticket(price, description, len(events_handler.events)+1, message.author.name)
+            ticket = Ticket(description, len(events_handler.events)+1, message.author.name)
+            embed = discord.Embed(title=f"Raffle ----Raffle startet! [ID {ticket.id}]----", description=f"{description}") #,color=Hex code
             events_handler.add_event(ticket)
-            await message.channel.send(f'Raffle startet! [ID {ticket.id}]')
-            await message.channel.send(f'Description:')
-            await message.channel.send(f'{description}')
-            await message.channel.send(f'Tickets needed to join raffle: {price} :tickets: ')
-            await message.channel.send(f'To join raffle use !join raffleID ')
+            embed.add_field(name=f"Info: ", value=f"""
+            1. You need at least 1 :tickets: to join, but adding more ticket increases chance to win.
+            2. To join raffle use !join raffleID amount
+            """)
+            await message.channel.send(embed=embed)
         else:
-            await message.channel.send(f'You have to be admin or have Crazy Blazin Gold account to start raffles!')
+            await message.channel.send(f'You need to be admin or have Crazy Blazin Gold account to start raffles!')
 
-    
     if message.content.startswith('!events'):
         with open('crazy_blazin_database.txt', 'r') as f:
             users = eval(f.read())
@@ -217,10 +207,11 @@ async def on_message(message):
     
     if message.content.startswith('!join'):
         str_split = message.content.split(' ')
-        if len(str_split) > 2 or len(str_split) < 1:
-            await message.channel.send(f'Too many or few arguments. Use !join ID')
+        if len(str_split) > 3 or len(str_split) < 2:
+            await message.channel.send(f'Too many or few arguments. Use !join raffleID ticket_amount')
         try:
             id = int(str_split[1])
+            tickets = int(str_split[2])
         except ValueError:
             await message.channel.send(f'ID needs to be integer!')
         
@@ -228,23 +219,34 @@ async def on_message(message):
         for event in events_handler.events:
             if event.id == id:
                 EVENT_FOUND = False
-                if event.price < users[message.author.name]['Tickets']:
+                if tickets <= users[message.author.name]['Tickets']:
+
+                    users[message.author.name]['Tickets'] -= tickets
+                    with open('crazy_blazin_database.txt', 'w') as f:
+                        f.write(str(users))
                     if message.author.name in event.participants:
-                        await message.channel.send(f'{message.author.name} already participate in the raffle!')
+                        await message.channel.send(f'{message.author.name} added {tickets} :tickets: to the raffle!')
                     else:
-                        users[message.author.name]['Tickets'] -= event.price
-                        with open('crazy_blazin_database.txt', 'w') as f:
-                            f.write(str(users))
+                        await message.channel.send(f'{message.author.name} joined the raffle with {tickets} :tickets:')
+                    for i in range(tickets):
                         event.participants.append(message.author.name)
-                        await message.channel.send(f'{message.author.name} joined the raffle!')
-                    
+                else:
+                    await message.channel.send(f'You do not have enough :tickets: to join raffle!')
+        
+            counted_tickets = Counter(event.participants)
+
+            embed = discord.Embed(title=f"Raffle {id}", description=f"{event.description}") #,color=Hex code
+            for i, key in enumerate(sorted(counted_tickets, key=counted_tickets.get, reverse=True)):
+                embed.add_field(name=f"{1+i} {key}", value=f'{counted_tickets[key]} :tickets: ')
+            await message.channel.send(embed=embed)
+            
         if EVENT_FOUND:
             await message.channel.send(f'This event does not exist!')
 
 
     if message.content.startswith('!startraffle'):
         str_split = message.content.split(' ')
-        if len(str_split) > 2 or len(str_split) < 1:
+        if len(str_split) > 2 or len(str_split) <= 1:
             await message.channel.send(f'Too many or few arguments. Use !startraffle ID')
         try:
             id = int(str_split[1])
@@ -283,7 +285,7 @@ async def on_message(message):
             
 
         else:
-            await message.channel.send(f'{message.author.name} does not have enough <:CBCcoin:831506214659293214> (CBC) to buy {amount} tickets!')
+            await message.channel.send(f'{message.author.name} does not have enough <:CBCcoin:831506214659293214> (CBC) to buy {amount} :tickets:!')
             await message.channel.send(f'Price: <:CBCcoin:831506214659293214> (CBC) per :tickets: .')
 
 
@@ -294,17 +296,20 @@ async def on_message(message):
 
         if 500 <= users[message.author.name]['Coins']:
             users[message.author.name]['Coins'] -= 500
+            with open('crazy_blazin_database.txt', 'w') as f:
+                f.write(str(users))
 
             member = message.author
             role = get(member.guild.roles, name='Crazy Blazin Gold')
             await member.add_roles(role)
-            with open('crazy_blazin_database.txt', 'w') as f:
-                f.write(str(users))
+            # await bot.remove_roles(user, 'member')
             await message.channel.send(f'{message.author.name} Bought Crazy Blazin Gold Role!')
+
+            users[message.author.name]['Timer'] = 2592000
+
         else:
             await message.channel.send(f'{message.author.name} does not have enough <:CBCcoin:831506214659293214> (CBC) to buy Crazy Blazin Gold!')
             await message.channel.send(f' Price:Crazy Blazin Gold! <:CBCcoin:831506214659293214> (CBC).')
-
 
 
     if message.content.startswith('!giveCBC'):
