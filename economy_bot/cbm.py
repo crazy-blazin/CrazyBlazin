@@ -185,7 +185,7 @@ async def on_message(message):
             description += str_split[idx] + ' '
 
         role_names = [role.name for role in message.author.roles]
-        if 'Crazy Blazin Gold' in role_names or 'Admin' in role_names:
+        if 'SOMEROLE' in role_names or 'Admin' in role_names:
             ticket = Ticket(description, len(events_handler.events)+1, message.author.name)
             embed = discord.Embed(title=f"Raffle ----Raffle startet! [ID {ticket.id}]----", description=f"{description}") #,color=Hex code
             events_handler.add_event(ticket)
@@ -195,7 +195,7 @@ async def on_message(message):
             """)
             await message.channel.send(embed=embed)
         else:
-            await message.channel.send(f'You need to be admin or have Crazy Blazin Gold account to start raffles!')
+            await message.channel.send(f'You need to have admin role to start raffles!')
 
     if message.content.startswith('!events'):
         with open('crazy_blazin_database.txt', 'r') as f:
