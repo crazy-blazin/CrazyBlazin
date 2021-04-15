@@ -42,17 +42,20 @@ class MyClient(discord.Client):
         print(f'Logged in as {self.user} (ID: {self.user.id})')
         print('------')
 
-    @tasks.loop(seconds=900) # task runs every 60 seconds
+    @tasks.loop(seconds=60) # task runs every 60 seconds
     async def add_coins_after_time(self):
         users = events_handler.db.read()
         events_handler.coin_aggregation()
         print('Coins distributed!')
+
         member = False
         members = self.get_all_members()
+
+
         for key in users:
             if 'Timer' in users[key]:
                 if users[key]['Timer'] > 0:
-                    users[key]['Timer'] -= 900
+                    users[key]['Timer'] -= 60
                 else:
                     users[key]['Timer'] = 0
                     # next(user for user in client.users if user.name == key)
@@ -66,7 +69,26 @@ class MyClient(discord.Client):
                     if 'Crazy Blazin Gold' in role_names:
                         role = get(member.guild.roles, name='Crazy Blazin Gold')
                         await member.remove_roles(role)
-                events_handler.db.write(users)
+
+            if 'BoostTimer' in users[key]:
+                if users[key]['BoostTimer'] > 0:
+                    users[key]['BoostTimer'] -= 60
+                else:
+                    users[key]['BoostTimer'] = 0
+                    # next(user for user in client.users if user.name == key)
+                    for mem in members:
+                        if mem.name == key:
+                            member = mem
+                            break
+                    if not member:
+                        continue
+                    role_names = [role.name for role in member.roles]
+                    if 'Booster' in role_names:
+                        role = get(member.guild.roles, name='Booster')
+                        await member.remove_roles(role)
+
+        events_handler.db.write(users)
+                        # To force voice state changes for instant changes in boosting roles
 
     @add_coins_after_time.after_loop
     async def after_my_task(self):
@@ -88,6 +110,7 @@ class EventHandler:
         self.events = []
         self.coin_aggregation_members = {}
         self.db = Database()
+        self.boosted_channels = []
     
     def current_events(self):
         if len(self.events) < 1:
@@ -104,17 +127,39 @@ class EventHandler:
 
     def coin_aggregation(self):
         users = self.db.read()
+
         for members in self.coin_aggregation_members:
+            state = self.coin_aggregation_members[members]
+            if members not in users:
+                users[members] = {'Coins': 25, 'Tickets': 1, 'Timer': 0}
+
+            users[members]['Actives'] = []
+                
+        for members in self.coin_aggregation_members:
+
             state = self.coin_aggregation_members[members]
             channel_state = str(state.channel)
             stream_state = state.self_stream
 
+            if channel_state in self.boosted_channels:
+                users[members]['Actives'].append('Boosted')
+                print(f'{members} is boosted')
+            else:
+                users[members]['Actives'] = '0'
+
             if channel_state != 'None':
                 if stream_state:
-                    users[members]['Coins'] += 15
+                    if 'Boosted' in users[members]['Actives']:
+                        users[members]['Coins'] += 1*1.40
+                    else:
+                        users[members]['Coins'] += 1
+
                     print(f'Stream activity: {members}')
                 else:
-                    users[members]['Coins'] += 5
+                    if 'Boosted' in users[members]['Actives']:
+                        users[members]['Coins'] += 0.33*1.40
+                    else:
+                        users[members]['Coins'] += 0.33
 
                 print(f'Coins to : {members}')
         self.db.write(users)
@@ -137,6 +182,35 @@ async def on_voice_state_update(member, before, after):
     print('Changed state: ' + member)
     events_handler.coin_aggregation_members[member] = after
 
+    members = client.get_all_members()
+    users = events_handler.db.read()
+
+    events_handler.boosted_channels = []
+
+    for mem in members:
+        if str(mem.name) in users:
+            if 'Active' in users[str(mem.name)]:
+                if users[str(mem.name)]['Active'] == 'Booster':
+                    print(users[str(mem.name)]['Active'])
+                    if mem.voice not in events_handler.boosted_channels:
+                        if str(mem.voice) != 'None':
+                            events_handler.boosted_channels.append(str(mem.voice.channel))
+
+    print(events_handler.boosted_channels)
+    members = client.get_all_members()
+    for mem in members:
+        if str(mem.voice) != 'None':
+            print(mem.voice.channel)
+            if str(mem.voice.channel) in events_handler.boosted_channels:
+                role = get(mem.guild.roles, name='Boosted')
+                await mem.add_roles(role)
+            else:
+                role = get(mem.guild.roles, name='Boosted')
+                await mem.remove_roles(role)
+        else:
+            role = get(mem.guild.roles, name='Boosted')
+            await mem.remove_roles(role)
+
 
 @client.event
 async def on_message(message):
@@ -154,7 +228,14 @@ async def on_message(message):
     if message.content.startswith('!bal'):
         value = users[message.author.name]['Coins']
         ticket = users[message.author.name]['Tickets']
-        await message.channel.send(f'{message.author.name} \n {value} <:CBCcoin:831506214659293214> (CBC) \n {ticket} :tickets: (tickets)')
+        boosts = users[message.author.name]['Boosters']
+        embed = discord.Embed(title=f"Balance", description=f"{message.author.name} current balance") #,color=Hex code
+
+        embed.add_field(name=f"<:CBCcoin:831506214659293214> (CBC)", value=f'{value}')
+        embed.add_field(name=f":tickets: (tickets)", value=f'{ticket}')
+        embed.add_field(name=f":pill: (boosts)", value=f'{boosts}')
+        await message.channel.send(embed=embed)
+
 
 
     if message.content.startswith('!top'):
@@ -309,7 +390,7 @@ async def on_message(message):
 
         else:
             await message.channel.send(f'{message.author.name} does not have enough <:CBCcoin:831506214659293214> (CBC) to buy Crazy Blazin Gold!')
-            await message.channel.send(f' Price:Crazy Blazin Gold! <:CBCcoin:831506214659293214> (CBC).')
+            await message.channel.send(f' Price: 500 <:CBCcoin:831506214659293214> (CBC).')
 
 
     if message.content.startswith('!giveCBC'):
@@ -354,44 +435,59 @@ async def on_message(message):
             with open('crazy_blazin_database.txt', 'w') as f:
                 f.write(str(users))
 
-
-
-
-        
-
-        
-
-
-
-
     
+    if message.content.startswith('!buy boost'):
+        str_split = message.content.split(' ')
+        print(str_split)
+        print(len(str_split))
+        if len(str_split) > 3 or len(str_split) < 2:
+            await message.channel.send(f'Too many or few arguments. Use !buy boost amount')
+        try:
+            amount = int(str_split[2])
+        except ValueError:
+            await message.channel.send(f'value needs to be integer!')
 
+
+        if 300*amount <= users[message.author.name]['Coins']:
+            if 'Boosters' in users[message.author.name]:
+                users[message.author.name]['Boosters'] += amount
+            else:
+                users[message.author.name]['Boosters'] = amount
+            users[message.author.name]['Coins'] -= amount*300
+            await message.channel.send(f'{message.author.name} bought {amount} :pill: boosts!')
+        else:
+            await message.channel.send(f'{message.author.name} does not have enough <:CBCcoin:831506214659293214> (CBC) to buy :pill: boosters!')
+            await message.channel.send(f' Price: 300 <:CBCcoin:831506214659293214> (CBC).')
+        events_handler.db.write(users)
+
+
+    if message.content.startswith('!use boost'):
+        str_split = message.content.split(' ')
+        print(str_split)
+        print(len(str_split))
+        if len(str_split) > 2 or len(str_split) < 1:
+            await message.channel.send(f'Too many or few arguments. Use !buy boost amount')
+
+        if 'Boosters' not in users[message.author.name]:
+                users[message.author.name]['Boosters'] = 0
+
+        if users[message.author.name]['Boosters'] < 1:
+            await message.channel.send(f'{message.author.name} does not have any boosters!')
+        else:
+            users[message.author.name]['Boosters'] -= 1
+            users[message.author.name]['Active'] = 'Booster'
+            users[message.author.name]['BoostTimer'] = 36000
+            member = message.author
+            role = get(member.guild.roles, name='Booster')
+            await member.add_roles(role)
+            await message.channel.send(f'{message.author.name} used a :pill: boost!, the user will be boosted for 5 hours.')
+
+            events_handler.db.write(users)
+            # To force voice state changes for instant changes in boosting roles
+            await member.edit(mute = True)
+            await member.edit(mute = False)
 
         
-        
-    
-        
-
-
-
-
-
-
-
-
-
-
-
-        
-
-        # role_names = [role.name for role in message.author.roles]
-        # if 'Cheeki Breeki Gold' in role_names:
-        #     await message.channel.send('Beeb boob, i change backgrounds!')
-
-        # else:
-        #     await message.channel.send('Only users with Cheeki Breeki Gold can use this function.')
-
-            
 client.run(k)
 
 
