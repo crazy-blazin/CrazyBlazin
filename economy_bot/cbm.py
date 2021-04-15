@@ -289,7 +289,7 @@ async def on_message(message):
             await message.channel.send(f'Price: <:CBCcoin:831506214659293214> (CBC) per :tickets: .')
 
 
-    if message.content.startswith('!buy CBCGold'):
+    if message.content.startswith('!buy CBG'):
         str_split = message.content.split(' ')
         if len(str_split) > 2 or len(str_split) < 1:
             await message.channel.send(f'Too many or few arguments. Use !buy CBCGold')
