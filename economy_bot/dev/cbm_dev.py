@@ -164,7 +164,8 @@ class EventHandler:
 
                 print(f'Coins to : {members}')
 
-        return users
+        users = self.db.read()
+        print(users)
 
 
 events_handler = EventHandler()
