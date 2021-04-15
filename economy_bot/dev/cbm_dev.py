@@ -158,11 +158,12 @@ class EventHandler:
                 else:
                     if 'Boosted' in users[members]['Actives']:
                         users[members]['Coins'] += 0.33*1.40
+                        print(users[members]['Coins'])
                     else:
                         users[members]['Coins'] += 0.33
 
                 print(f'Coins to : {members}')
-        self.db.write(users)
+
         return users
 
 
@@ -191,16 +192,14 @@ async def on_voice_state_update(member, before, after):
         if str(mem.name) in users:
             if 'Active' in users[str(mem.name)]:
                 if users[str(mem.name)]['Active'] == 'Booster':
-                    print(users[str(mem.name)]['Active'])
                     if mem.voice not in events_handler.boosted_channels:
                         if str(mem.voice) != 'None':
                             events_handler.boosted_channels.append(str(mem.voice.channel))
 
-    print(events_handler.boosted_channels)
+
     members = client.get_all_members()
     for mem in members:
         if str(mem.voice) != 'None':
-            print(mem.voice.channel)
             if str(mem.voice.channel) in events_handler.boosted_channels:
                 role = get(mem.guild.roles, name='Boosted')
                 await mem.add_roles(role)
