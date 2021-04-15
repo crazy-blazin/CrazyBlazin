@@ -16,7 +16,7 @@ from discord.ext import tasks
 
 #https://discordapp.com/developers
 
-
+k = 'ODMxOTE4MjA5NDA4OTU4NTE0.YHcONQ.EmqerUByLxuwnPD89Oot5tRQoqY'
 
 class Database:
     def __init__(self):
@@ -42,10 +42,10 @@ class MyClient(discord.Client):
         print(f'Logged in as {self.user} (ID: {self.user.id})')
         print('------')
 
-    @tasks.loop(seconds=60) # task runs every 60 seconds
+    @tasks.loop(seconds=1) # task runs every 60 seconds
     async def add_coins_after_time(self):
-        users = events_handler.db.read()
         events_handler.coin_aggregation()
+        users = events_handler.db.read()
         print('Coins distributed!')
 
         member = False
@@ -151,22 +151,21 @@ class EventHandler:
             if channel_state != 'None':
                 if stream_state:
                     if 'Boosted' in users[members]['Actives']:
-                        users[members]['Coins'] = users[members]['Coins'] + 1*1.40
+                        users[members]['Coins'] = round(users[members]['Coins'] + 1*1.40, 2)
                     else:
-                        users[members]['Coins'] = users[members]['Coins'] + 1
+                        users[members]['Coins'] = round(users[members]['Coins'] + 1, 2)
 
                     print(f'Stream activity: {members}')
                 else:
                     if 'Boosted' in users[members]['Actives']:
-                        users[members]['Coins'] = users[members]['Coins'] + 0.33*1.40
-                        print(users[members]['Coins'])
+                        users[members]['Coins'] = round(users[members]['Coins'] + 0.33*1.40, 2)
                     else:
-                        users[members]['Coins'] = users[members]['Coins'] + 0.33
+                        users[members]['Coins'] = round(users[members]['Coins'] + 0.33, 2)
 
                 print(f'Coins to : {members}')
 
         self.db.write(users)
-        print(users)
+        # return users
 
 
 events_handler = EventHandler()
