@@ -42,7 +42,7 @@ class MyClient(discord.Client):
         print(f'Logged in as {self.user} (ID: {self.user.id})')
         print('------')
 
-    @tasks.loop(seconds=1) # task runs every 60 seconds
+    @tasks.loop(seconds=60) # task runs every 60 seconds
     async def add_coins_after_time(self):
         events_handler.coin_aggregation()
         users = events_handler.db.read()
