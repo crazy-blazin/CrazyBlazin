@@ -220,10 +220,16 @@ async def on_message(message):
     with open('crazy_blazin_database.txt', 'r') as f:
         users = eval(f.read())
 
+
+
     if message.author.name not in users:
         users[message.author.name] = {'Coins': 25, 'Tickets': 1}
         with open('crazy_blazin_database.txt', 'w') as f:
             f.write(str(users))
+    
+    if 'Boosters' not in users[message.author.name]:
+        users[message.author.name]['Boosters'] = 0
+
 
     if message.content.startswith('!bal'):
         value = users[message.author.name]['Coins']
