@@ -88,6 +88,7 @@ class MyClient(discord.Client):
                         await member.remove_roles(role)
 
         events_handler.db.write(users)
+        return users
                         # To force voice state changes for instant changes in boosting roles
 
     @add_coins_after_time.after_loop
@@ -164,7 +165,7 @@ class EventHandler:
 
                 print(f'Coins to : {members}')
 
-        users = self.db.read()
+        self.db.write(users)
         print(users)
 
 
@@ -210,6 +211,8 @@ async def on_voice_state_update(member, before, after):
         else:
             role = get(mem.guild.roles, name='Boosted')
             await mem.remove_roles(role)
+    
+    events_handler.db.write(users)
 
 
 @client.event
@@ -229,8 +232,6 @@ async def on_message(message):
     
     if 'Boosters' not in users[message.author.name]:
         users[message.author.name]['Boosters'] = 0
-
-    events_handler.db.write(users)
 
 
     if message.content.startswith('!bal'):
@@ -494,6 +495,8 @@ async def on_message(message):
             # To force voice state changes for instant changes in boosting roles
             await member.edit(mute = True)
             await member.edit(mute = False)
+    
+    events_handler.db.write(users)
 
         
 client.run(k)
