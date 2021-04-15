@@ -230,6 +230,8 @@ async def on_message(message):
     if 'Boosters' not in users[message.author.name]:
         users[message.author.name]['Boosters'] = 0
 
+    events_handler.db.write(users)
+
 
     if message.content.startswith('!bal'):
         value = users[message.author.name]['Coins']
