@@ -131,7 +131,7 @@ class EventHandler:
         for members in self.coin_aggregation_members:
             state = self.coin_aggregation_members[members]
             if members not in users:
-                users[members] = {'Coins': 25, 'Tickets': 1, 'Timer': 0}
+                users[members] = {'Coins': 25, 'Tickets': 1, 'Timer': 0, 'BoostTimer': 0, 'Boosters': 0}
 
             users[members]['Actives'] = []
                 
@@ -150,17 +150,17 @@ class EventHandler:
             if channel_state != 'None':
                 if stream_state:
                     if 'Boosted' in users[members]['Actives']:
-                        users[members]['Coins'] += 1*1.40
+                        users[members]['Coins'] = users[members]['Coins'] + 1*1.40
                     else:
-                        users[members]['Coins'] += 1
+                        users[members]['Coins'] = users[members]['Coins'] + 1
 
                     print(f'Stream activity: {members}')
                 else:
                     if 'Boosted' in users[members]['Actives']:
-                        users[members]['Coins'] += 0.33*1.40
+                        users[members]['Coins'] = users[members]['Coins'] + 0.33*1.40
                         print(users[members]['Coins'])
                     else:
-                        users[members]['Coins'] += 0.33
+                        users[members]['Coins'] = users[members]['Coins'] + 0.33
 
                 print(f'Coins to : {members}')
 
