@@ -130,13 +130,9 @@ class EventHandler:
         users = self.db.read()
 
         for members in self.coin_aggregation_members:
-            state = self.coin_aggregation_members[members]
             if members not in users:
                 users[members] = {'Coins': 25, 'Tickets': 1, 'Timer': 0, 'BoostTimer': 0, 'Boosters': 0, 'Actives': [], 'Active': '0'}
-
-            users[members]['Actives'] = []
-                
-        for members in self.coin_aggregation_members:
+                users[members]['Actives'] = []
 
             state = self.coin_aggregation_members[members]
             channel_state = str(state.channel)
