@@ -75,6 +75,7 @@ class MyClient(discord.Client):
                     users[key]['BoostTimer'] -= 30
                 else:
                     users[key]['BoostTimer'] = 0
+                    users[key]['Active'] = '0'
                     # next(user for user in client.users if user.name == key)
                     for mem in members:
                         if mem.name == key:
@@ -188,10 +189,13 @@ async def on_voice_state_update(member, before, after):
     for mem in members:
         if str(mem.name) in users:
             if 'Active' in users[str(mem.name)]:
-                if users[str(mem.name)]['Active'] == 'Booster':
-                    if mem.voice not in events_handler.boosted_channels:
-                        if str(mem.voice) != 'None':
-                            events_handler.boosted_channels.append(str(mem.voice.channel))
+                pass
+            else:
+                users[str(mem.name)]['Active'] = '0'
+            if 'Booster' in users[str(mem.name)]['Active']:
+                if mem.voice not in events_handler.boosted_channels:
+                    if str(mem.voice) != 'None':
+                        events_handler.boosted_channels.append(str(mem.voice.channel))
 
     members = client.get_all_members()
     for mem in members:
@@ -218,19 +222,21 @@ async def on_message(message):
         users = eval(f.read())
 
 
-    if message.author.name not in users:
-        users[message.author.name] = {'Coins': 25, 'Tickets': 1, 'Timer': 0, 'BoostTimer': 0, 'Boosters': 0, 'Actives': []}
-        with open('crazy_blazin_database.txt', 'w') as f:
-            f.write(str(users))
-    
     if 'Boosters' not in users[message.author.name]:
         users[message.author.name]['Boosters'] = 0
-    
+
     if 'Actives' not in users[message.author.name]:
         users[message.author.name]['Actives'] = []
 
     if 'Active' not in users[message.author.name]:
         users[message.author.name]['Active'] = '0'
+
+
+    if message.author.name not in users:
+        users[message.author.name] = {'Coins': 25, 'Tickets': 1, 'Timer': 0, 'BoostTimer': 0, 'Boosters': 0, 'Actives': []}
+
+        with open('crazy_blazin_database.txt', 'w') as f:
+            f.write(str(users))
 
 
     if message.content.startswith('!bal'):
