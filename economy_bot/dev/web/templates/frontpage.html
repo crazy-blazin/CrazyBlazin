@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+body {
+  background-color: black;
+}
+grad1 {
+  height: 200px;
+  background-color: #cccccc;
+  background-image: radial-gradient(black, white);
+}
+</style>
+</head>
+<body>
+
+  <html>
+    <body>
+         <table>
+             <tbody>
+             {# here we iterate over every item in our list which we will pass from bar() #}
+             {% for item in my_list %}
+                 <tr><td>{{ item }}</td></tr>
+             {% endfor %}
+             </tbody>
+         </table>
+     </body>
+     </html>
+
+     
+</body>
+</html>

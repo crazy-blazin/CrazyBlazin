@@ -146,7 +146,7 @@ class EventHandler:
                 users[members]['Actives'].append('Boosted')
                 print(f'{members} is boosted')
             else:
-                users[members]['Actives'] = '0'
+                users[members]['Actives'] = []
 
             if channel_state != 'None':
                 if stream_state:
