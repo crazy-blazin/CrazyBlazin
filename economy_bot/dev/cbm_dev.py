@@ -542,7 +542,7 @@ async def on_message(message):
         else:
             users[message.author.name]['Boosters'] -= 1
             users[message.author.name]['Active'] = 'Booster'
-            users[message.author.name]['BoostTimer'] = 36000
+            users[message.author.name]['BoostTimer'] = 18000
             member = message.author
             role = get(member.guild.roles, name='Booster')
             await member.add_roles(role)
