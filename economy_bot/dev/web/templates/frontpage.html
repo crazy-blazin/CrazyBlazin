@@ -94,7 +94,7 @@
   <img class="table_element_width" src="{{ url_for('static', filename='ff.png') }}" />
   </div>
   <div id="container">
-    <table class="middle table table-dark table_element_width">
+    <table class="middle table table-dark table-warning table_element_width">
       <thead>
       <tr>
         <th>Users</th>
@@ -102,12 +102,15 @@
       </tr>
     </thead>
       <tbody>
-        {# here we iterate over every item in our list which we will pass from bar() #}
         {% for key in users %}
         <tr>
-          <td class="table-dark">{{ key[0] }}</td>
+          {% if users_all[key[0]]['Timer'] <= 0 %}
+          <td class="table-dark">{{ key[0] }}
+          {% else %}
+          <td class="table-warning">{{ key[0] }} 
+          {% endif %}
           <td class="table-dark">{{ key[1] }}  <img src="{{ url_for('static', filename='CBCcoin.png') }}" width="20" height="20" /></td>
-        </tr>
+          </tr>
         {% endfor %}
       </tbody>
     </table>
