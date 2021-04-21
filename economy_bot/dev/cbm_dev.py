@@ -414,18 +414,18 @@ async def on_message(message):
         if len(str_split) > 2 or len(str_split) < 1:
             await message.channel.send(f'Too many or few arguments. Use !giveCBC username amount')
         try:
-            amount = int(str_split[2])
+            user = str(str_split[1])
         except ValueError:
-            await message.channel.send(f'value needs to be integer!')
+            await message.channel.send(f'value needs to be str!')
     
         role_names = [role.name for role in message.author.roles]
         if 'Admin' in role_names:
             for member in members:
-                if member.name == str(str_split[2]):
+                if member.name == user:
                     role = get(member.guild.roles, name='Crazy Blazin Gold')
                     await member.add_roles(role)
                     await message.channel.send(f'{member.name} recieved Crazy Blazin Gold Role for one month!')
-                    users[message.author.name]['Timer'] = 2592000
+                    users[member.name]['Timer'] = 2592000
         else:
             await message.channel.send('You need to be admin for this command')
 

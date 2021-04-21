@@ -1,8 +1,14 @@
 from flask import Flask, render_template, url_for
+import pickle
+from datetime import datetime, time
+import numpy as np
 app = Flask(__name__)
-
-
-
+import io
+from PIL import Image
+import matplotlib.pyplot as plt
+# START_TIME = time(hour=9)
+# END_TIME = time(hour=12)  # Can also use something like timedelta
+# if START_TIME <= now.time() <= END_TIME:    
 
 
 class Database:
@@ -34,13 +40,18 @@ def front():
             users[user]['Timer'] = 0
     #users -> key, users[key] -> {'Coins' : 499, .....}
 
-    return render_template('frontpage.html', users = sorted_users, users_all = users)  # make a list and pass it to our template variable named my_list
+    return render_template('frontpage.html', users = sorted_users, users_all = users)  
 
 
 @app.route("/commands")
 def coms():
     
-    return render_template('commands.html')  # make a list and pass it to our template variable named my_list
+    return render_template('commands.html')  
+
+@app.route("/db")
+def get_db():
+    users = db.read()
+    return users
 
 
 if __name__ == "__main__":
