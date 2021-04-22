@@ -140,7 +140,10 @@ class EventHandler:
             stream_state = state.self_stream
 
             if channel_state in self.boosted_channels:
-                users[members]['Actives'].append('Boosted')
+                if 'Boosted' not in users[members]['Actives']:
+                    users[members]['Actives'].append('Boosted')
+                else:
+                    pass
                 print(f'{members} is boosted')
             else:
                 users[members]['Actives'] = []
@@ -390,7 +393,7 @@ async def on_message(message):
             await message.channel.send(f'Too many or few arguments. Use !buy CBCGold')
 
         if 500 <= users[message.author.name]['Coins']:
-            users[message.author.name]['Coins'] -= 500
+            users[message.author.name]['Coins'] -= 1000
             with open('crazy_blazin_database.txt', 'w') as f:
                 f.write(str(users))
 
