@@ -17,7 +17,7 @@ from discord.ext import tasks
 #https://discordapp.com/developers
 
 
-k = 'ODMxNDY1Mjk3Mzk0NDAxMjkx.YHVoZg.8rIpqVTjShqcOctefW6YL9Gqt2c'
+k = 'ODMxOTE4MjA5NDA4OTU4NTE0.YHcONQ.SF3MHZVX_DLD9n8h0_GYkGFBBpQ'
 
 class Database:
     def __init__(self):
@@ -160,6 +160,7 @@ class MyClient(discord.Client):
         print(probability)
         if probability >= 995:
             channel_ = '💻botspam'
+            # channel_ = 'botspam'
             channels = self.get_all_channels()
             for channel in channels:
                 if channel.name == channel_:
@@ -167,7 +168,7 @@ class MyClient(discord.Client):
 
                     embed = discord.Embed(title=f"Lootbox drop! :toolbox:", description=f"Lootbox just dropped! The first one to add ticket will get the lootbox! You can retrieve lootbox by typing !grabbox") #,color=Hex code
                     embed.add_field(name=f"Price:", value=f'5 :tickets: ')
-                    # embed.set_image(url="https://discordapp.com/assets/e4923594e694a21542a489471ecffa50.svg")
+                    embed.set_image(url="https://raw.githubusercontent.com/MartinRovang/CrazyBlazin/main/images/lootcrate.png")
                     await channel.send(embed=embed)
 
         events_handler.db.write(users)
