@@ -28,7 +28,7 @@
 <br />
 <p align="center">
   <a href="https://github.com/MartinRovang/CrazyBlazin">
-    <img src="images/ff3.gif" alt="Logo" width="640" height="414">
+    <img src="images/MOSHED-2021-4-23-18-5-22.gif" alt="Logo" width="640" height="414">
   </a>
 
   <h3 align="center">Crazy Blazin</h3>
