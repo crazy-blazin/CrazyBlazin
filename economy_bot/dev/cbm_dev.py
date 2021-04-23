@@ -162,12 +162,12 @@ class MyClient(discord.Client):
             channel_ = '💻botspam'
             channels = self.get_all_channels()
             for channel in channels:
-                print(channel)
                 if channel.name == channel_:
                     events_handler.lootbox = LootBox()
 
                     embed = discord.Embed(title=f"Lootbox drop! :toolbox:", description=f"Lootbox just dropped! The first one to add ticket will get the lootbox! You can retrieve lootbox by typing !grabbox") #,color=Hex code
                     embed.add_field(name=f"Price:", value=f'5 :tickets: ')
+                    # embed.set_image(url="https://discordapp.com/assets/e4923594e694a21542a489471ecffa50.svg")
                     await channel.send(embed=embed)
 
         events_handler.db.write(users)
