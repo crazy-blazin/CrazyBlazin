@@ -134,13 +134,11 @@ class MyClient(discord.Client):
                     for mem in members:
                         if mem.name == key:
                             member = mem
-                            break
-                    if not member:
-                        continue
-                    role_names = [role.name for role in member.roles]
-                    if 'Crazy Blazin Gold' in role_names:
-                        role = get(member.guild.roles, name='Crazy Blazin Gold')
-                        await member.remove_roles(role)
+                            role_names = [role.name for role in member.roles]
+                            if 'Crazy Blazin Gold' in role_names:
+                                role = get(member.guild.roles, name='Crazy Blazin Gold')
+                                await member.remove_roles(role)
+                        
 
             if 'BoostTimer' in users[key]:
                 if users[key]['BoostTimer'] > 0:
@@ -152,13 +150,10 @@ class MyClient(discord.Client):
                     for mem in members:
                         if mem.name == key:
                             member = mem
-                            break
-                    if not member:
-                        continue
-                    role_names = [role.name for role in member.roles]
-                    if 'Booster' in role_names:
-                        role = get(member.guild.roles, name='Booster')
-                        await member.remove_roles(role)
+                            role_names = [role.name for role in member.roles]
+                            if 'Booster' in role_names:
+                                role = get(member.guild.roles, name='Booster')
+                                await member.remove_roles(role)
 
 
                 #803982821923356773
