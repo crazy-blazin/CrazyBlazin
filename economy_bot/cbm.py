@@ -17,7 +17,6 @@ from discord.ext import tasks
 #https://discordapp.com/developers
 
 
-
 class Database:
     def __init__(self):
         self.dbName = 'crazy_blazin_database.txt' 
@@ -29,58 +28,6 @@ class Database:
         with open(self.dbName, 'w') as f:
             f.write(str(users))
 
-
-class MyClient(discord.Client):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        # an attribute we can access from our task
-        self.counter = 0
-        # start the task to run in the background
-        self.add_coins_after_time.start()
-
-    async def on_ready(self):
-        print(f'Logged in as {self.user} (ID: {self.user.id})')
-        print('------')
-
-    @tasks.loop(seconds=900) # task runs every 60 seconds
-    async def add_coins_after_time(self):
-        users = events_handler.db.read()
-        events_handler.coin_aggregation()
-        print('Coins distributed!')
-        member = False
-        members = self.get_all_members()
-        for key in users:
-            if 'Timer' in users[key]:
-                if users[key]['Timer'] > 0:
-                    users[key]['Timer'] -= 900
-                else:
-                    users[key]['Timer'] = 0
-                    # next(user for user in client.users if user.name == key)
-                    for mem in members:
-                        if mem.name == key:
-                            member = mem
-                            break
-                    if not member:
-                        continue
-                    role_names = [role.name for role in member.roles]
-                    if 'Crazy Blazin Gold' in role_names:
-                        role = get(member.guild.roles, name='Crazy Blazin Gold')
-                        await member.remove_roles(role)
-                events_handler.db.write(users)
-
-    @add_coins_after_time.after_loop
-    async def after_my_task(self):
-        print('help im being violated')
-        if (self.add_coins_after_time.is_being_cancelled()):
-            print('cancelled')
-
-    @add_coins_after_time.before_loop
-    async def before_my_task(self):
-        await self.wait_until_ready() # wait until the bot logs in
-
-intents = discord.Intents.default()
-intents.members = True
-client = MyClient(intents = intents)
 
 
 class EventHandler:
@@ -121,7 +68,73 @@ class EventHandler:
         return users
 
 
+
+class MyClient(discord.Client):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # an attribute we can access from our task
+        self.counter = 0
+        # start the task to run in the background
+        self.add_coins_after_time.start()
+
+    async def on_ready(self):
+        print(f'Logged in as {self.user} (ID: {self.user.id})')
+        print('------')
+
+    @tasks.loop(seconds=900) # task runs every 60 seconds
+    async def add_coins_after_time(self):
+        users = events_handler.db.read()
+        events_handler.coin_aggregation()
+        print('Coins distributed!')
+        probability = np.random.randint(0, 100)
+        member = False
+        members = self.get_all_members()
+        for key in users:
+            if 'Timer' in users[key]:
+                if users[key]['Timer'] > 0:
+                    users[key]['Timer'] -= 900
+                else:
+                    users[key]['Timer'] = 0
+                    # next(user for user in client.users if user.name == key)
+                    for mem in members:
+                        if mem.name == key:
+                            member = mem
+                            break
+                    if not member:
+                        continue
+                    role_names = [role.name for role in member.roles]
+                    if 'Crazy Blazin Gold' in role_names:
+                        role = get(member.guild.roles, name='Crazy Blazin Gold')
+                        await member.remove_roles(role)
+                events_handler.db.write(users)
+
+
+        #803982821923356773
+        print(probability)
+        if probability >= 5:
+            channel = self.get_channel(795729201498947624)
+            await channel.send('hello')
+
+
+
+    @add_coins_after_time.after_loop
+    async def after_my_task(self):
+        print('help im being violated')
+        if (self.add_coins_after_time.is_being_cancelled()):
+            print('cancelled')
+
+    @add_coins_after_time.before_loop
+    async def before_my_task(self):
+        await self.wait_until_ready() # wait until the bot logs in
+
+
+
 events_handler = EventHandler()
+intents = discord.Intents.default()
+intents.members = True
+client = MyClient(intents = intents)
+
+
 
 class Ticket:
     def __init__(self, description, id, creator):

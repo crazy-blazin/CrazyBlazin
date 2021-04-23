@@ -16,7 +16,7 @@ from discord.ext import tasks
 
 #https://discordapp.com/developers
 
-k = 'ODMxOTE4MjA5NDA4OTU4NTE0.YHcONQ.EmqerUByLxuwnPD89Oot5tRQoqY'
+k = 'ODMxOTE4MjA5NDA4OTU4NTE0.YHcONQ.nzzxrWRMChKMC1Ah51msgk1vOXQ'
 
 class Database:
     def __init__(self):
@@ -30,81 +30,6 @@ class Database:
             f.write(str(users))
 
 
-class MyClient(discord.Client):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        # an attribute we can access from our task
-        self.counter = 0
-        # start the task to run in the background
-        self.add_coins_after_time.start()
-
-    async def on_ready(self):
-        print(f'Logged in as {self.user} (ID: {self.user.id})')
-        print('------')
-
-    @tasks.loop(seconds=30) # task runs every 60 seconds
-    async def add_coins_after_time(self):
-        events_handler.coin_aggregation()
-        users = events_handler.db.read()
-        print('Coins distributed!')
-
-        member = False
-        members = self.get_all_members()
-
-
-        for key in users:
-            if 'Timer' in users[key]:
-                if users[key]['Timer'] > 0:
-                    users[key]['Timer'] -= 30
-                else:
-                    users[key]['Timer'] = 0
-                    # next(user for user in client.users if user.name == key)
-                    for mem in members:
-                        if mem.name == key:
-                            member = mem
-                            break
-                    if not member:
-                        continue
-                    role_names = [role.name for role in member.roles]
-                    if 'Crazy Blazin Gold' in role_names:
-                        role = get(member.guild.roles, name='Crazy Blazin Gold')
-                        await member.remove_roles(role)
-
-            if 'BoostTimer' in users[key]:
-                if users[key]['BoostTimer'] > 0:
-                    users[key]['BoostTimer'] -= 30
-                else:
-                    users[key]['BoostTimer'] = 0
-                    users[key]['Active'] = '0'
-                    # next(user for user in client.users if user.name == key)
-                    for mem in members:
-                        if mem.name == key:
-                            member = mem
-                            break
-                    if not member:
-                        continue
-                    role_names = [role.name for role in member.roles]
-                    if 'Booster' in role_names:
-                        role = get(member.guild.roles, name='Booster')
-                        await member.remove_roles(role)
-
-        events_handler.db.write(users)
-        return users
-                        # To force voice state changes for instant changes in boosting roles
-
-    @add_coins_after_time.after_loop
-    async def after_my_task(self):
-        print('help im being violated')
-        if (self.add_coins_after_time.is_being_cancelled()):
-            print('cancelled')
-
-    @add_coins_after_time.before_loop
-    async def before_my_task(self):
-        await self.wait_until_ready() # wait until the bot logs in
-
-intents = discord.Intents.default()
-intents.members = True
-client = MyClient(intents = intents)
 
 
 class EventHandler:
@@ -113,6 +38,7 @@ class EventHandler:
         self.coin_aggregation_members = {}
         self.db = Database()
         self.boosted_channels = []
+        self.lootbox = ''
     
     def current_events(self):
         if len(self.events) < 1:
@@ -151,14 +77,14 @@ class EventHandler:
             if channel_state != 'None':
                 if stream_state:
                     if 'Boosted' in users[members]['Actives']:
-                        users[members]['Coins'] = round(users[members]['Coins'] + 1*1.40, 2)
+                        users[members]['Coins'] = round(users[members]['Coins'] + 1*3, 2)
                     else:
                         users[members]['Coins'] = round(users[members]['Coins'] + 1, 2)
 
                     print(f'Stream activity: {members}')
                 else:
                     if 'Boosted' in users[members]['Actives']:
-                        users[members]['Coins'] = round(users[members]['Coins'] + 0.33*1.40, 2)
+                        users[members]['Coins'] = round(users[members]['Coins'] + 0.33*3, 2)
                     else:
                         users[members]['Coins'] = round(users[members]['Coins'] + 0.33, 2)
 
@@ -168,7 +94,104 @@ class EventHandler:
         # return users
 
 
+class LootBox:
+    def __init__(self):
+        self.coins = np.random.randint(0, 1000)
+        self.boosters = np.random.randint(0, 5)
+
+
+class MyClient(discord.Client):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # an attribute we can access from our task
+        self.counter = 0
+        # start the task to run in the background
+        self.add_coins_after_time.start()
+
+    async def on_ready(self):
+        print(f'Logged in as {self.user} (ID: {self.user.id})')
+        print('------')
+
+    @tasks.loop(seconds=30) # task runs every 60 seconds
+    async def add_coins_after_time(self):
+        events_handler.coin_aggregation()
+        users = events_handler.db.read()
+        print('Coins distributed!')
+
+        member = False
+        members = self.get_all_members()
+
+        probability = np.random.randint(0, 100)
+        for key in users:
+            if 'Timer' in users[key]:
+                if users[key]['Timer'] > 0:
+                    users[key]['Timer'] -= 30
+                else:
+                    users[key]['Timer'] = 0
+                    # next(user for user in client.users if user.name == key)
+                    for mem in members:
+                        if mem.name == key:
+                            member = mem
+                            break
+                    if not member:
+                        continue
+                    role_names = [role.name for role in member.roles]
+                    if 'Crazy Blazin Gold' in role_names:
+                        role = get(member.guild.roles, name='Crazy Blazin Gold')
+                        await member.remove_roles(role)
+
+            if 'BoostTimer' in users[key]:
+                if users[key]['BoostTimer'] > 0:
+                    users[key]['BoostTimer'] -= 30
+                else:
+                    users[key]['BoostTimer'] = 0
+                    users[key]['Active'] = '0'
+                    # next(user for user in client.users if user.name == key)
+                    for mem in members:
+                        if mem.name == key:
+                            member = mem
+                            break
+                    if not member:
+                        continue
+                    role_names = [role.name for role in member.roles]
+                    if 'Booster' in role_names:
+                        role = get(member.guild.roles, name='Booster')
+                        await member.remove_roles(role)
+
+
+                #803982821923356773
+        print(probability)
+        if probability >= 95:
+            channel_ = 'botspam'
+            channels = self.get_all_channels()
+            for channel in channels:
+                if channel.name == channel_:
+                    events_handler.lootbox = LootBox()
+
+                    embed = discord.Embed(title=f"Lootbox drop! :toolbox:", description=f"Lootbox just dropped! The first one to add ticket will get the lootbox! You can retrieve lootbox by typing !grabbox") #,color=Hex code
+                    embed.add_field(name=f"Price:", value=f'5 :tickets: ')
+                    await channel.send(embed=embed)
+
+        events_handler.db.write(users)
+        return users
+                        # To force voice state changes for instant changes in boosting roles
+
+    @add_coins_after_time.after_loop
+    async def after_my_task(self):
+        print('help im being violated')
+        if (self.add_coins_after_time.is_being_cancelled()):
+            print('cancelled')
+
+    @add_coins_after_time.before_loop
+    async def before_my_task(self):
+        await self.wait_until_ready() # wait until the bot logs in
+
+
 events_handler = EventHandler()
+intents = discord.Intents.default()
+intents.members = True
+client = MyClient(intents = intents)
+
 
 class Ticket:
     def __init__(self, description, id, creator):
@@ -536,32 +559,84 @@ async def on_message(message):
 
 
 
+    if message.content.startswith('!transferCBC'):
+        str_split = message.content.split(' ')
+        print(str_split)
+        print(len(str_split))
+        if len(str_split) > 3 or len(str_split) < 1:
+            await message.channel.send(f'Too many or few arguments. Use !transferCBC target amount')
+        else:
+            TARGET_FOUND = False
+            amount = int(str_split[2])
+            target = str(str_split[1])
+            if users[message.author.name]['Coins'] >= amount:
+                members = client.get_all_members()
+                for member in members:
+                    if target == member.name:
+                        users[member.name]['Coins'] += amount
+                        users[message.author.name]['Coins'] -= amount
+                        await message.channel.send(f'{message.author.name} transfered {amount} <:CBCcoin:831506214659293214> (CBC) to {member.name}')
+                        TARGET_FOUND = True
+                    break
+                    
+            else:
+                if TARGET_FOUND:
+                    await message.channel.send(f'{message.author.name} does not have enough <:CBCcoin:831506214659293214> (CBC).')
+                else:
+                    await message.channel.send(f'{target} does not exist.')
+
+
+    if message.content.startswith('!grabbox'):
+        ticket_price = 5
+        if events_handler.lootbox != '':
+            print(users[message.author.name]['Tickets'])
+            if ticket_price > users[message.author.name]['Tickets']:
+                await message.channel.send(f'{message.author.name} does not have enough :tickets:')
+            else:
+                users[message.author.name]['Tickets'] -= ticket_price
+
+                embed = discord.Embed(title=f"Loot box event :toolbox:", description=f"{message.author.name} grabbed the lootbox and got the following items: ") #,color=Hex code
+
+                embed.add_field(name=f"<:CBCcoin:831506214659293214>", value=f'{events_handler.lootbox.coins}')
+                embed.add_field(name=f":pill:", value=f'{events_handler.lootbox.boosters}')
+                await message.channel.send(embed=embed)
+
+                users[message.author.name]['Coins'] += events_handler.lootbox.coins
+                users[message.author.name]['Boosters'] += events_handler.lootbox.boosters
+                events_handler.lootbox = ''
+            
+        else:
+            await message.channel.send(f'No lootbox have dropped!')
+
+
     if message.content.startswith('!use boost'):
         str_split = message.content.split(' ')
         print(str_split)
         print(len(str_split))
         if len(str_split) > 2 or len(str_split) < 1:
             await message.channel.send(f'Too many or few arguments. Use !buy boost amount')
-
-        if 'Boosters' not in users[message.author.name]:
-                users[message.author.name]['Boosters'] = 0
-
-        if users[message.author.name]['Boosters'] < 1:
-            await message.channel.send(f'{message.author.name} does not have any boosters!')
+        
         else:
-            users[message.author.name]['Boosters'] -= 1
-            users[message.author.name]['Active'] = 'Booster'
-            users[message.author.name]['BoostTimer'] = 18000
-            member = message.author
-            role = get(member.guild.roles, name='Booster')
-            await member.add_roles(role)
-            await message.channel.send(f'{message.author.name} used a :pill: boost!, the user will be boosted for 5 hours.')
+            if 'Boosters' not in users[message.author.name]:
+                    users[message.author.name]['Boosters'] = 0
 
-            events_handler.db.write(users)
-            # To force voice state changes for instant changes in boosting roles
-            await member.edit(mute = True)
-            await member.edit(mute = False)
-    
+            if users[message.author.name]['Boosters'] < 1:
+                await message.channel.send(f'{message.author.name} does not have any boosters!')
+            else:
+                users[message.author.name]['Boosters'] -= 1
+                users[message.author.name]['Active'] = 'Booster'
+                users[message.author.name]['BoostTimer'] = 1800
+                member = message.author
+                role = get(member.guild.roles, name='Booster')
+                await member.add_roles(role)
+                await message.channel.send(f'{message.author.name} used a :pill: boost!, the user will be boosted for 5 hours.')
+
+                events_handler.db.write(users)
+                # To force voice state changes for instant changes in boosting roles
+                await member.edit(mute = True)
+                await member.edit(mute = False)
+
+
     events_handler.db.write(users)
 
         
