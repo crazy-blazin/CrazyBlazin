@@ -16,7 +16,6 @@ from discord.ext import tasks
 
 #https://discordapp.com/developers
 
-k = 'ODMxOTE4MjA5NDA4OTU4NTE0.YHcONQ.nzzxrWRMChKMC1Ah51msgk1vOXQ'
 
 class Database:
     def __init__(self):
@@ -121,7 +120,7 @@ class MyClient(discord.Client):
         member = False
         members = self.get_all_members()
 
-        probability = np.random.randint(0, 100)
+        probability = np.random.randint(0, 1000)
         for key in users:
             if 'Timer' in users[key]:
                 if users[key]['Timer'] > 0:
@@ -161,7 +160,7 @@ class MyClient(discord.Client):
 
                 #803982821923356773
         print(probability)
-        if probability >= 95:
+        if probability >= 990:
             channel_ = 'botspam'
             channels = self.get_all_channels()
             for channel in channels:
@@ -563,21 +562,20 @@ async def on_message(message):
         str_split = message.content.split(' ')
         print(str_split)
         print(len(str_split))
-        if len(str_split) > 3 or len(str_split) < 1:
+        if len(str_split) > 3 or len(str_split) < 2:
             await message.channel.send(f'Too many or few arguments. Use !transferCBC target amount')
         else:
             TARGET_FOUND = False
             amount = int(str_split[2])
             target = str(str_split[1])
             if users[message.author.name]['Coins'] >= amount:
-                members = client.get_all_members()
-                for member in members:
-                    if target == member.name:
-                        users[member.name]['Coins'] += amount
+                for member in users:
+                    if target == member:
+                        users[member]['Coins'] += amount
                         users[message.author.name]['Coins'] -= amount
-                        await message.channel.send(f'{message.author.name} transfered {amount} <:CBCcoin:831506214659293214> (CBC) to {member.name}')
+                        await message.channel.send(f'{message.author.name} transfered {amount} <:CBCcoin:831506214659293214> (CBC) to {member}')
                         TARGET_FOUND = True
-                    break
+                        break
                     
             else:
                 if TARGET_FOUND:
@@ -629,7 +627,7 @@ async def on_message(message):
                 member = message.author
                 role = get(member.guild.roles, name='Booster')
                 await member.add_roles(role)
-                await message.channel.send(f'{message.author.name} used a :pill: boost!, the user will be boosted for 5 hours.')
+                await message.channel.send(f'{message.author.name} used a :pill: boost!, the user will be boosted for 30 minutes.')
 
                 events_handler.db.write(users)
                 # To force voice state changes for instant changes in boosting roles
