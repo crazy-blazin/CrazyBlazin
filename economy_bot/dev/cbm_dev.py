@@ -95,7 +95,7 @@ class EventHandler:
 
 class LootBox:
     def __init__(self):
-        self.coins = np.random.randint(0, 1000)
+        self.coins = np.random.randint(0, 5000)
         self.boosters = np.random.randint(0, 5)
 
 
