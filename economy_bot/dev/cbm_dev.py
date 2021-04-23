@@ -140,7 +140,8 @@ class MyClient(discord.Client):
                     events_handler.db.write(users)
                         
 
-            if 'BoostTimer' in users[key]:
+            role_names = [role.name for role in member.roles]
+            if 'Booster' in role_names:
                 if users[key]['BoostTimer'] > 0:
                     users[key]['BoostTimer'] -= 30
                 else:
@@ -218,12 +219,12 @@ async def on_voice_state_update(member, before, after):
                 pass
             else:
                 users[str(mem.name)]['Active'] = '0'
-            if 'Booster' in users[str(mem.name)]['Active']:
+            role_names = [role.name for role in mem.roles]
+            if 'Booster' in role_names:
                 if mem.voice not in events_handler.boosted_channels:
                     if str(mem.voice) != 'None':
                         events_handler.boosted_channels.append(str(mem.voice.channel))
 
-    members = client.get_all_members()
     for mem in members:
         if str(mem.voice) != 'None':
             if str(mem.voice.channel) in events_handler.boosted_channels:
