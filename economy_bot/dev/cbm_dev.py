@@ -119,7 +119,6 @@ class MyClient(discord.Client):
         users = events_handler.db.read()
         print('Coins distributed!')
 
-        member = False
         members = self.get_all_members()
 
         probability = np.random.randint(1, 1001)
@@ -131,13 +130,14 @@ class MyClient(discord.Client):
                     print(key, users[key]['Timer'])
                     users[key]['Timer'] = 0
                     # next(user for user in client.users if user.name == key)
-                    for mem in members:
-                        if mem.name == key:
-                            member = mem
+                    for member in members:
+                        if member.name == key:
                             role_names = [role.name for role in member.roles]
                             if 'Crazy Blazin Gold' in role_names:
                                 role = get(member.guild.roles, name='Crazy Blazin Gold')
                                 await member.remove_roles(role)
+
+                    events_handler.db.write(users)
                         
 
             if 'BoostTimer' in users[key]:
@@ -147,14 +147,15 @@ class MyClient(discord.Client):
                     users[key]['BoostTimer'] = 0
                     users[key]['Active'] = '0'
                     # next(user for user in client.users if user.name == key)
-                    for mem in members:
-                        if mem.name == key:
-                            member = mem
+                    for member in members:
+                        if member.name == key:
                             role_names = [role.name for role in member.roles]
                             if 'Booster' in role_names:
+                                print('Removing booster role')
                                 role = get(member.guild.roles, name='Booster')
                                 await member.remove_roles(role)
-
+                    events_handler.db.write(users)
+            
 
                 #803982821923356773
         print(probability)
