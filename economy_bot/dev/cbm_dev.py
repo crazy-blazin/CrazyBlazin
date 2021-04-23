@@ -17,6 +17,8 @@ from discord.ext import tasks
 #https://discordapp.com/developers
 
 
+k = 'ODMxNDY1Mjk3Mzk0NDAxMjkx.YHVoZg.8rIpqVTjShqcOctefW6YL9Gqt2c'
+
 class Database:
     def __init__(self):
         self.dbName = 'crazy_blazin_database.txt' 
@@ -120,7 +122,7 @@ class MyClient(discord.Client):
         member = False
         members = self.get_all_members()
 
-        probability = np.random.randint(0, 1000)
+        probability = np.random.randint(1, 1001)
         for key in users:
             if 'Timer' in users[key]:
                 if users[key]['Timer'] > 0:
@@ -160,10 +162,11 @@ class MyClient(discord.Client):
 
                 #803982821923356773
         print(probability)
-        if probability >= 990:
-            channel_ = 'botspam'
+        if probability >= 995:
+            channel_ = '💻botspam'
             channels = self.get_all_channels()
             for channel in channels:
+                print(channel)
                 if channel.name == channel_:
                     events_handler.lootbox = LootBox()
 
