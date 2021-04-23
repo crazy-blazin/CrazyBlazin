@@ -128,6 +128,7 @@ class MyClient(discord.Client):
                 if users[key]['Timer'] > 0:
                     users[key]['Timer'] -= 30
                 else:
+                    print(key, users[key]['Timer'])
                     users[key]['Timer'] = 0
                     # next(user for user in client.users if user.name == key)
                     for mem in members:
@@ -417,7 +418,7 @@ async def on_message(message):
         if len(str_split) > 2 or len(str_split) < 1:
             await message.channel.send(f'Too many or few arguments. Use !buy CBCGold')
 
-        if 500 <= users[message.author.name]['Coins']:
+        if 1000 <= users[message.author.name]['Coins']:
             users[message.author.name]['Coins'] -= 1000
             with open('crazy_blazin_database.txt', 'w') as f:
                 f.write(str(users))
