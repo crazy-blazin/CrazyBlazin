@@ -83,8 +83,6 @@ class AddWebpage(Resource):
         return {'Response': 'Complete'}, http.client.OK
 
 
-
-
 class EventUI:
     def __init__(self, text, color, size):
         self.text = text
@@ -93,24 +91,25 @@ class EventUI:
 
 class Monster:
     monsterevents = []
-    def __init__(self, id, name = 'GOBLIN', health = 100, atk = 100, armor = 1):
+    def __init__(self, id, name = 'GOBLIN FAMILY', health = 100, atk = 100, armor = 1, img = ''):
         self.id = id
         self.name = name
         self.health = health
         self.atk = atk
         self.armor = armor
+        self.img = 'https://raw.githubusercontent.com/MartinRovang/CrazyBlazin/main/images/mobs/goblin_familiy.png'
         self.eventlogs = [] #{'textevents': ["DWNDJWND", "DWNDJWND22"], 'color': ["red", "blue"], 'size': ["30", "10"]}
         self.monsterevents.append(self)
-        self.doevent('Foxxravin')
+        # self.doevent('Foxxravin')
 
     def doevent(self, target):
         #EventUI("MONSTER HIT PAUL FOR 10 DMG", "red", "30")
         # CALCULATE EVENT
         users = db.read()
-        users[target]['rpg'] = {}
-        users[target]['rpg']['health'] = 100
-        users[target]['rpg']['atk'] = 100
-        users[target]['rpg']['armor'] = 2
+        # users[target]['rpg'] = {}
+        # users[target]['rpg']['health'] = 100
+        # users[target]['rpg']['atk'] = 100
+        # users[target]['rpg']['armor'] = 2
         for user in users:
             i = 0
             if user == target:
@@ -148,7 +147,7 @@ class Monster:
                     event = EventUI(f"{target} Lost!", "red", "30")
                     self.eventlogs.append(event)
 
-        
+
 #ed0ce8c7-a4fe-11eb-badb-40167e77d41a
 
 class MonsterEventHandler(Resource):
@@ -162,7 +161,7 @@ class MonsterEventHandler(Resource):
 def event(eventid):
     for monsterevent in Monster.monsterevents:
         if eventid == monsterevent.id:
-            return render_template('event.html', eventlogs = jsonpickle.encode(monsterevent.eventlogs))
+            return render_template('event.html', eventlogs = jsonpickle.encode(monsterevent.eventlogs), mobimg = monsterevent.img)
     
     return {'Response': 'Event does not exist'}, http.client.NOT_FOUND
 
