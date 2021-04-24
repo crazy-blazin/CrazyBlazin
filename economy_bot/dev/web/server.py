@@ -7,7 +7,7 @@ from PIL import Image
 import matplotlib.pyplot as plt
 import json
 import jsonpickle
-
+import random
 # START_TIME = time(hour=9)
 # END_TIME = time(hour=12)  # Can also use something like timedelta
 # if START_TIME <= now.time() <= END_TIME:    
@@ -91,7 +91,16 @@ class EventUI:
 
 class Monster:
     monsterevents = []
-    def __init__(self, id, name = 'GOBLIN FAMILY', health = 100, atk = 100, armor = 1, img = ''):
+    def __init__(self, 
+    id, 
+    name = 'GOBLIN FAMILY', 
+    health = 100, 
+    atk = 100, 
+    armor = 1, 
+    img = '',
+    loot_table = ["🐱", "🐥", "🏰" ],
+    loot_chance = [0.2, 0.3, 0.01], 
+    loot_drop_size = 5):
         self.id = id
         self.name = name
         self.health = health
@@ -99,17 +108,22 @@ class Monster:
         self.armor = armor
         self.img = 'https://raw.githubusercontent.com/MartinRovang/CrazyBlazin/main/images/mobs/goblin_familiy.png'
         self.eventlogs = [] #{'textevents': ["DWNDJWND", "DWNDJWND22"], 'color': ["red", "blue"], 'size': ["30", "10"]}
+        self.loot_table = loot_table
+        self.loot_chance = loot_chance
+        self.loot_drop_size = loot_drop_size
+        # https://apps.timwhitlock.info/emoji/tables/unicode
+
+        self.loot = random.choices(self.loot_table, self.loot_chance, k = self.loot_drop_size)
         self.monsterevents.append(self)
-        # self.doevent('Foxxravin')
 
     def doevent(self, target):
         #EventUI("MONSTER HIT PAUL FOR 10 DMG", "red", "30")
         # CALCULATE EVENT
         users = db.read()
-        # users[target]['rpg'] = {}
-        # users[target]['rpg']['health'] = 100
-        # users[target]['rpg']['atk'] = 100
-        # users[target]['rpg']['armor'] = 2
+        users[target]['rpg'] = {}
+        users[target]['rpg']['health'] = 100
+        users[target]['rpg']['atk'] = 100
+        users[target]['rpg']['armor'] = 2
         for user in users:
             i = 0
             if user == target:
@@ -132,20 +146,15 @@ class Monster:
                 
                 if self.health <= 0:
                     event = EventUI(f"{target} WON!", "green", "30")
-                    coindrop = np.random.randint(0, 1000)
-                    tickets = np.random.randint(0, 10)
-                    boosts = np.random.randint(0, 10)
-                    event = EventUI(f"COINS DROPPED: {coindrop}", "black", "20")
                     self.eventlogs.append(event)
-                    event = EventUI(f"BOOSTS DROPPED: {boosts}", "black", "20")
+                    event = EventUI(f"LOOT:  {self.loot}", "black", "30")
                     self.eventlogs.append(event)
-                    event = EventUI(f"TICKETS DROPPED: {tickets}", "black", "20")
-                    self.eventlogs.append(event)
-                    # GIVE LOOT
 
                 if users[target]['rpg']['health'] <= 0:
                     event = EventUI(f"{target} Lost!", "red", "30")
                     self.eventlogs.append(event)
+                    
+        users = db.write(users)
 
 
 #ed0ce8c7-a4fe-11eb-badb-40167e77d41a
@@ -161,6 +170,7 @@ class MonsterEventHandler(Resource):
 def event(eventid):
     for monsterevent in Monster.monsterevents:
         if eventid == monsterevent.id:
+            monsterevent.doevent('Foxxravin')
             return render_template('event.html', eventlogs = jsonpickle.encode(monsterevent.eventlogs), mobimg = monsterevent.img)
     
     return {'Response': 'Event does not exist'}, http.client.NOT_FOUND
