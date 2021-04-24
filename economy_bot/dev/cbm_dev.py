@@ -140,8 +140,7 @@ class MyClient(discord.Client):
                     events_handler.db.write(users)
                         
 
-            role_names = [role.name for role in member.roles]
-            if 'Booster' in role_names:
+            if 'BoostTimer' in users[key]:
                 if users[key]['BoostTimer'] > 0:
                     users[key]['BoostTimer'] -= 30
                 else:
