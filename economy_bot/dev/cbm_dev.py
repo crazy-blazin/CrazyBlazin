@@ -216,15 +216,12 @@ async def on_voice_state_update(member, before, after):
     for mem in members:
         if str(mem.name) in users:
             if 'Active' in users[str(mem.name)]:
-                pass
-            else:
-                users[str(mem.name)]['Active'] = '0'
-            role_names = [role.name for role in mem.roles]
-            if 'Booster' in role_names:
-                if mem.voice not in events_handler.boosted_channels:
-                    if str(mem.voice) != 'None':
-                        events_handler.boosted_channels.append(str(mem.voice.channel))
+                if users[str(mem.name)]['Active'] == 'Booster':
+                    if mem.voice not in events_handler.boosted_channels:
+                        if str(mem.voice) != 'None':
+                            events_handler.boosted_channels.append(str(mem.voice.channel))
 
+    members = client.get_all_members()
     for mem in members:
         if str(mem.voice) != 'None':
             if str(mem.voice.channel) in events_handler.boosted_channels:
@@ -238,6 +235,7 @@ async def on_voice_state_update(member, before, after):
             await mem.remove_roles(role)
     
     events_handler.db.write(users)
+    
 
 
 @client.event
@@ -607,6 +605,13 @@ async def on_message(message):
             
         else:
             await message.channel.send(f'No lootbox have dropped!')
+
+
+
+    if message.content.startswith('!web'):
+        with open('webpage.txt', 'r') as f:
+            webpage = f.read()
+        await message.channel.send(f'Webpage is: {webpage}')
 
 
     if message.content.startswith('!use boost'):
