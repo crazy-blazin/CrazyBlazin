@@ -162,7 +162,7 @@ class Monster:
 class MonsterEventHandler(Resource):
     def post(self):
         id = str(uuid.uuid1())
-        Monster.monsterevents.append(Monster(id = id, health = 100))
+        Monster.monsterevents.append(Monster(id = id, name= "Gobling family"))
         return {'id': f'{id}'}, http.client.OK
 
 
@@ -174,6 +174,7 @@ def event(eventid):
             return render_template('event.html', eventlogs = jsonpickle.encode(monsterevent.eventlogs), mobimg = monsterevent.img)
     
     return {'Response': 'Event does not exist'}, http.client.NOT_FOUND
+
 
 api.add_resource(MonsterEventHandler, '/api/event/generate')
 

@@ -97,8 +97,9 @@ class EventHandler:
 
 class LootBox:
     def __init__(self):
-        self.coins = np.random.randint(0, 2000)
-        self.boosters = np.random.randint(0, 5)
+        self.coins = np.random.randint(0, 50)
+        self.boosters = np.random.randint(0, 3)
+        self.tickets = np.random.randint(0, 2)
 
 
 class MyClient(discord.Client):
@@ -159,18 +160,12 @@ class MyClient(discord.Client):
 
                 #803982821923356773
         print(probability)
-        if probability >= 995:
-            channel_ = '💻botspam'
-            # channel_ = 'botspam'
-            channels = self.get_all_channels()
-            for channel in channels:
-                if channel.name == channel_:
-                    events_handler.lootbox = LootBox()
-
-                    embed = discord.Embed(title=f"Lootbox drop! :toolbox:", description=f"Lootbox just dropped! The first one to add ticket will get the lootbox! You can retrieve lootbox by typing !grabbox") #,color=Hex code
-                    embed.add_field(name=f"Price:", value=f'5 :tickets: ')
-                    embed.set_image(url="https://raw.githubusercontent.com/MartinRovang/CrazyBlazin/main/images/lootcrate.png")
-                    await channel.send(embed=embed)
+        if probability >= 980:
+            channel = client.get_channel(803982821923356773)
+            events_handler.lootbox = LootBox()
+            embed = discord.Embed(title=f"Lootbox drop! :toolbox:", description=f"Lootbox just dropped! The first one to add ticket will get the lootbox! You can retrieve lootbox by typing !grabbox") #,color=Hex code
+            embed.set_image(url="https://raw.githubusercontent.com/MartinRovang/CrazyBlazin/main/images/lootcrate.png")
+            await channel.send(embed=embed)
 
         events_handler.db.write(users)
         return users
@@ -497,29 +492,29 @@ async def on_message(message):
                 f.write(str(users))
 
     
-    if message.content.startswith('!buy boost'):
-        str_split = message.content.split(' ')
-        print(str_split)
-        print(len(str_split))
-        if len(str_split) > 3 or len(str_split) < 2:
-            await message.channel.send(f'Too many or few arguments. Use !buy boost amount')
-        try:
-            amount = int(str_split[2])
-        except ValueError:
-            await message.channel.send(f'value needs to be integer!')
+    # if message.content.startswith('!buy boost'):
+    #     str_split = message.content.split(' ')
+    #     print(str_split)
+    #     print(len(str_split))
+    #     if len(str_split) > 3 or len(str_split) < 2:
+    #         await message.channel.send(f'Too many or few arguments. Use !buy boost amount')
+    #     try:
+    #         amount = int(str_split[2])
+    #     except ValueError:
+    #         await message.channel.send(f'value needs to be integer!')
 
 
-        if 300*amount <= users[message.author.name]['Coins']:
-            if 'Boosters' in users[message.author.name]:
-                users[message.author.name]['Boosters'] += amount
-            else:
-                users[message.author.name]['Boosters'] = amount
-            users[message.author.name]['Coins'] -= amount*300
-            await message.channel.send(f'{message.author.name} bought {amount} :pill: boosts!')
-        else:
-            await message.channel.send(f'{message.author.name} does not have enough <:CBCcoin:831506214659293214> (CBC) to buy :pill: boosters!')
-            await message.channel.send(f' Price: 300 <:CBCcoin:831506214659293214> (CBC).')
-        events_handler.db.write(users)
+    #     if 300*amount <= users[message.author.name]['Coins']:
+    #         if 'Boosters' in users[message.author.name]:
+    #             users[message.author.name]['Boosters'] += amount
+    #         else:
+    #             users[message.author.name]['Boosters'] = amount
+    #         users[message.author.name]['Coins'] -= amount*300
+    #         await message.channel.send(f'{message.author.name} bought {amount} :pill: boosts!')
+    #     else:
+    #         await message.channel.send(f'{message.author.name} does not have enough <:CBCcoin:831506214659293214> (CBC) to buy :pill: boosters!')
+    #         await message.channel.send(f' Price: 300 <:CBCcoin:831506214659293214> (CBC).')
+    #     events_handler.db.write(users)
 
 
     # if message.content.startswith('!buy mute'):
@@ -584,23 +579,19 @@ async def on_message(message):
 
 
     if message.content.startswith('!grabbox'):
-        ticket_price = 5
         if events_handler.lootbox != '':
-            print(users[message.author.name]['Tickets'])
-            if ticket_price > users[message.author.name]['Tickets']:
-                await message.channel.send(f'{message.author.name} does not have enough :tickets:')
-            else:
-                users[message.author.name]['Tickets'] -= ticket_price
 
-                embed = discord.Embed(title=f"Loot box event :toolbox:", description=f"{message.author.name} grabbed the lootbox and got the following items: ") #,color=Hex code
+            embed = discord.Embed(title=f"Loot box event :toolbox:", description=f"{message.author.name} grabbed the lootbox and got the following items: ") #,color=Hex code
 
-                embed.add_field(name=f"<:CBCcoin:831506214659293214>", value=f'{events_handler.lootbox.coins}')
-                embed.add_field(name=f":pill:", value=f'{events_handler.lootbox.boosters}')
-                await message.channel.send(embed=embed)
+            embed.add_field(name=f"<:CBCcoin:831506214659293214>", value=f'{events_handler.lootbox.coins}')
+            embed.add_field(name=f":pill:", value=f'{events_handler.lootbox.boosters}')
+            embed.add_field(name=f":tickets:", value=f'{events_handler.lootbox.tickets}')
+            await message.channel.send(embed=embed)
 
-                users[message.author.name]['Coins'] += events_handler.lootbox.coins
-                users[message.author.name]['Boosters'] += events_handler.lootbox.boosters
-                events_handler.lootbox = ''
+            users[message.author.name]['Coins'] += events_handler.lootbox.coins
+            users[message.author.name]['Boosters'] += events_handler.lootbox.boosters
+            users[message.author.name]['Tickets'] += events_handler.lootbox.tickets
+            events_handler.lootbox = ''
             
         else:
             await message.channel.send(f'No lootbox have dropped!')
