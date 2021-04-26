@@ -177,7 +177,7 @@ def event(eventid):
 
 
 api.add_resource(MonsterEventHandler, '/api/event/generate')
-
+api.add_resource(AddWebpage, '/web/<link>')
 
 #curl -X POST localhost:5000/api/files/<id>/predict
 
