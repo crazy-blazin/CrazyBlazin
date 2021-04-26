@@ -137,10 +137,10 @@ class MyClient(discord.Client):
                             if 'Crazy Blazin Gold' in role_names:
                                 role = get(member.guild.roles, name='Crazy Blazin Gold')
                                 await member.remove_roles(role)
+        events_handler.db.write(users)
 
-                    events_handler.db.write(users)
-                        
-
+        members = self.get_all_members()
+        for key in users:
             if 'BoostTimer' in users[key]:
                 if users[key]['BoostTimer'] > 0:
                     users[key]['BoostTimer'] -= 30
@@ -155,7 +155,7 @@ class MyClient(discord.Client):
                                 print('Removing booster role')
                                 role = get(member.guild.roles, name='Booster')
                                 await member.remove_roles(role)
-                    events_handler.db.write(users)
+        events_handler.db.write(users)
             
 
                 #803982821923356773
@@ -577,6 +577,21 @@ async def on_message(message):
                         await message.channel.send(f'{message.author.name} does not have enough <:CBCcoin:831506214659293214> (CBC).')
                     else:
                         await message.channel.send(f'{target} does not exist.')
+
+
+    # if message.content.startswith('!spray'):
+    #     #embed = discord.Embed(title=f"", description=f"Lootbox just dropped! The first one to add ticket will get the lootbox! You can retrieve lootbox by typing !grabbox") #,color=Hex code
+    #     embed.set_image(url="https://raw.githubusercontent.com/MartinRovang/CrazyBlazin/main/images/lootcrate.png")
+    #     await message.channel.send(embed=embed)
+
+    if message.content.startswith('!buy spray '):
+        str_split = message.content.split(' ')
+        if len(str_split) > 3 or len(str_split) < 2:
+            await message.channel.send(f'Too many or few arguments. Use !buy spray id')
+        else:
+            pass
+
+
 
 
     if message.content.startswith('!grabbox'):
