@@ -561,21 +561,22 @@ async def on_message(message):
         else:
             TARGET_FOUND = False
             amount = int(str_split[2])
-            target = str(str_split[1])
-            if users[message.author.name]['Coins'] >= amount:
-                for member in users:
-                    if target == member:
-                        users[member]['Coins'] += amount
-                        users[message.author.name]['Coins'] -= amount
-                        await message.channel.send(f'{message.author.name} transfered {amount} <:CBCcoin:831506214659293214> (CBC) to {member}')
-                        TARGET_FOUND = True
-                        break
-                    
-            else:
-                if TARGET_FOUND:
-                    await message.channel.send(f'{message.author.name} does not have enough <:CBCcoin:831506214659293214> (CBC).')
+            if amount >= 0:
+                target = str(str_split[1])
+                if users[message.author.name]['Coins'] >= amount:
+                    for member in users:
+                        if target == member:
+                            users[member]['Coins'] += amount
+                            users[message.author.name]['Coins'] -= amount
+                            await message.channel.send(f'{message.author.name} transfered {amount} <:CBCcoin:831506214659293214> (CBC) to {member}')
+                            TARGET_FOUND = True
+                            break
+                        
                 else:
-                    await message.channel.send(f'{target} does not exist.')
+                    if TARGET_FOUND:
+                        await message.channel.send(f'{message.author.name} does not have enough <:CBCcoin:831506214659293214> (CBC).')
+                    else:
+                        await message.channel.send(f'{target} does not exist.')
 
 
     if message.content.startswith('!grabbox'):
@@ -643,3 +644,5 @@ client.run(k)
 # ax[1].imshow(input_image_masked)
 # ax[2].imshow(r)
 # plt.show()
+
+
