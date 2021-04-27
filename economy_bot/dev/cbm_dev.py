@@ -510,7 +510,7 @@ async def on_message(message):
     if message.content.startswith('!donate'):
         # str_split = message.content.split(' ')
         name = message.author.name
-        sio.emit('msg', {'name': name, 'img': "https://i.gifer.com/7LRm.gif"})
+        sio.emit('msg', {'name': name, 'img': "https://raw.githubusercontent.com/MartinRovang/CrazyBlazin/main/images/kris_slave.gif"})
         #current_time = datetime.datetime.now()
         #body = name + '\n' + current_time
 
