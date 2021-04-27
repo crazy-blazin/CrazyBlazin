@@ -11,13 +11,16 @@ from discord.utils import get
 from collections import Counter
 import asyncio
 from discord.ext import tasks
+import datetime
+import socketio
+import concurrent.futures
 
 # client = commands.Bot(command_prefix='!')
 
 #https://discordapp.com/developers
 
 
-k = 'ODMxOTE4MjA5NDA4OTU4NTE0.YHcONQ.SF3MHZVX_DLD9n8h0_GYkGFBBpQ'
+
 
 class Database:
     def __init__(self):
@@ -186,7 +189,17 @@ events_handler = EventHandler()
 intents = discord.Intents.default()
 intents.members = True
 client = MyClient(intents = intents)
+sio = socketio.Client()
 
+import threading
+
+def run():
+    sio.connect('http://127.0.0.1:5000')
+    sio.wait()
+
+t = threading.Thread(target=run)
+t.daemon = True
+t.start()
 
 class Ticket:
     def __init__(self, description, id, creator):
@@ -410,8 +423,6 @@ async def on_message(message):
 
         if 1000 <= users[message.author.name]['Coins']:
             users[message.author.name]['Coins'] -= 1000
-            with open('crazy_blazin_database.txt', 'w') as f:
-                f.write(str(users))
 
             member = message.author
             role = get(member.guild.roles, name='Crazy Blazin Gold')
@@ -420,6 +431,8 @@ async def on_message(message):
             await message.channel.send(f'{message.author.name} Bought Crazy Blazin Gold Role for one month!')
 
             users[message.author.name]['Timer'] = 2592000
+            with open('crazy_blazin_database.txt', 'w') as f:
+                f.write(str(users))
 
         else:
             await message.channel.send(f'{message.author.name} does not have enough <:CBCcoin:831506214659293214> (CBC) to buy Crazy Blazin Gold!')
@@ -491,7 +504,23 @@ async def on_message(message):
             with open('crazy_blazin_database.txt', 'w') as f:
                 f.write(str(users))
 
-    
+
+
+
+    if message.content.startswith('!donate'):
+        # str_split = message.content.split(' ')
+        name = message.author.name
+        sio.emit('msg', {'name': name, 'img': "https://i.gifer.com/7LRm.gif"})
+        #current_time = datetime.datetime.now()
+        #body = name + '\n' + current_time
+
+        # # dd/mm/YY H:M:S
+        # dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
+        # print("date and time =", dt_string)
+
+
+
+
     # if message.content.startswith('!buy boost'):
     #     str_split = message.content.split(' ')
     #     print(str_split)

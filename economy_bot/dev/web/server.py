@@ -28,9 +28,25 @@ from werkzeug.datastructures import FileStorage
 from flask_restful import Resource, Api, reqparse
 from werkzeug.utils import secure_filename
 
+from flask_socketio import SocketIO
+
 app = Flask(__name__)
 api = Api(app)
+socketio = SocketIO(app, cors_allowed_origins="*")
 
+@socketio.on('msg')
+def msg(msg):
+    print(msg)
+    socketio.emit('clientMsg', msg, broadcast=True, include_self=False)
+
+@socketio.on('connect')
+def test_connect():
+    print('Client connected')
+    socketio.emit('my response', {'data': 'Connected'})
+
+@socketio.on('disconnect')
+def test_disconnect():
+    print('Client disconnected')
 
 class Database:
     def __init__(self):
@@ -62,7 +78,6 @@ def front():
     #users -> key, users[key] -> {'Coins' : 499, .....}
 
     return render_template('frontpage.html', users = sorted_users, users_all = users)  
-
 
 @app.route("/commands")
 def coms():
@@ -179,7 +194,15 @@ def event(eventid):
 api.add_resource(MonsterEventHandler, '/api/event/generate')
 api.add_resource(AddWebpage, '/web/<link>')
 
+
+
+@app.route("/obs")
+def obs():
+    return render_template('obs.html')
+
+
+
 #curl -X POST localhost:5000/api/files/<id>/predict
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    socketio.run(app, debug=True)
