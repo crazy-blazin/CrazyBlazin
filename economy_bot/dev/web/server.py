@@ -196,11 +196,14 @@ api.add_resource(AddWebpage, '/web/<link>')
 
 
 
-@app.route("/obs")
-def obs():
-    return render_template('obs.html')
+@app.route("/obs_gif")
+def obs_gif():
+    return render_template('obs_gif.html')
 
 
+@app.route("/obs_donation")
+def obs_donation():
+    return render_template('obs_donation.html')
 
 #curl -X POST localhost:5000/api/files/<id>/predict
 

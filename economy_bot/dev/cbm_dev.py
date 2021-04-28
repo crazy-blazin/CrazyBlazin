@@ -163,7 +163,7 @@ class MyClient(discord.Client):
 
                 #803982821923356773
         print(probability)
-        if probability >= 980:
+        if probability >= 995:
             channel = client.get_channel(803982821923356773)
             events_handler.lootbox = LootBox()
             embed = discord.Embed(title=f"Lootbox drop! :toolbox:", description=f"Lootbox just dropped! The first one to add ticket will get the lootbox! You can retrieve lootbox by typing !grabbox") #,color=Hex code
@@ -505,12 +505,26 @@ async def on_message(message):
                 f.write(str(users))
 
 
-
-
     if message.content.startswith('!donate'):
-        # str_split = message.content.split(' ')
-        name = message.author.name
-        sio.emit('msg', {'name': name, 'img': "https://raw.githubusercontent.com/MartinRovang/CrazyBlazin/main/images/kris_slave.gif"})
+        str_split = message.content.split(' ')
+        if len(str_split) > 3 or len(str_split) < 2:
+            await message.channel.send(f'Too many or few arguments. Use !donate target amount')
+        else:
+            amount = int(str_split[2])
+            if amount >= 0:
+                target = str(str_split[1])
+                if users[message.author.name]['Coins'] >= amount:
+                    for member in users:
+                        if target == 'Carbonade' or target == 'Foxxravin':
+                            users[member]['Coins'] += amount*0.80
+                            users[message.author.name]['Coins'] -= amount
+                            name = message.author.name
+                            sio.emit('msg', {'name': name, 'amount': amount, 'img': "https://raw.githubusercontent.com/MartinRovang/CrazyBlazin/main/images/kris_slave.gif"})
+                            await message.channel.send(f'{message.author.name} donated {amount} <:CBCcoin:831506214659293214> (CBC) to {member}')
+                            break
+                else:
+                    await message.channel.send(f'{message.author.name} does not have enough <:CBCcoin:831506214659293214> (CBC).')
+
         #current_time = datetime.datetime.now()
         #body = name + '\n' + current_time
 

@@ -92,7 +92,6 @@
 </head>
 
 <body>
-  <img id="img"></img>
   <div id="msg"></div>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
   <script>
@@ -106,14 +105,7 @@
   socket.on('clientMsg',function(data) {
     console.log('Received a message from the server!', data);
     let x = document.getElementById("msg");
-    img.src = data.img;
-    var src = document.getElementById("img");
-    x.innerHTML = "Last donator: <br>" + data.name + " <br> amount: " + data.amount;
-    img.src
-    img.style.display = 'inline';
-    setTimeout(function(){
-    img.style.display = 'none';
-    }, 5000);
+    x.innerHTML = "Last donator: <br>" + data.name + " <br> amount: " + data.amount + " (CBC)";
   });
   
   socket.on('disconnect',function(sid) {
