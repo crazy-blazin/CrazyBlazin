@@ -17,13 +17,13 @@ import concurrent.futures
 from skimage.morphology import disk
 from skimage.filters.rank import mean
 import requests
+import praw
 
 # client = commands.Bot(command_prefix='!')
 
 #https://discordapp.com/developers
 
 
-k = 'ODMxOTE4MjA5NDA4OTU4NTE0.YHcONQ.0SfvaT5R7grWcX7UHMVvB8vNDWQ'
 
 class Database:
     def __init__(self):
@@ -46,6 +46,8 @@ class EventHandler:
         self.db = Database()
         self.boosted_channels = []
         self.lootbox = ''
+        self.imageofthedayunlocket = False
+        self.imageunlocketby = ''
     
     def current_events(self):
         if len(self.events) < 1:
@@ -163,7 +165,6 @@ class MyClient(discord.Client):
                                 await member.remove_roles(role)
         events_handler.db.write(users)
             
-
                 #803982821923356773
         # print(probability)
         # if probability >= 995:
@@ -531,18 +532,29 @@ async def on_message(message):
     
     if message.content.startswith('!imageoftheday'):
 
-        embed = discord.Embed(title=f"IMAGE OF THE DAY", description=f"Unlock image of the day for 100 <:CBCcoin:831506214659293214> (CBC). ") #,color=Hex code
-        embed.add_field(name=f"Command: ", value=f'!unlock imageoftheday')
-        embed.add_field(name=f"Add your own: ", value=f'You can add your own image of the day with command: !addimageoftheday <link> price: 400 <:CBCcoin:831506214659293214> (CBC)')
-        file = discord.File("imgoftheday_blurred.jpg", filename="imgoftheday_blurred.jpg")
-        await message.channel.send(file = file, embed=embed)
+        if events_handler.imageofthedayunlocket:
+            users[message.author.name]['Coins'] -= 100
+            embed = discord.Embed(title=f"IMAGE OF THE DAY", description=f"Unlocked by: {events_handler.imageunlocketby}") #,color=Hex code
+            embed.add_field(name=f"Add your own: ", value=f'You can add your own image of the day with command: !addimageoftheday <link> price: 400 <:CBCcoin:831506214659293214> (CBC)')
+            file = discord.File("imgoftheday.jpg", filename="imgoftheday.jpg")
+            await message.channel.send(file = file, embed=embed)
+        else:
+            embed = discord.Embed(title=f"IMAGE OF THE DAY", description=f"Unlock image of the day for 100 <:CBCcoin:831506214659293214> (CBC). ") #,color=Hex code
+            embed.add_field(name=f"Command: ", value=f'!unlock imageoftheday')
+            embed.add_field(name=f"Add your own: ", value=f'You can add your own image of the day with command: !addimageoftheday <link> price: 400 <:CBCcoin:831506214659293214> (CBC)')
+            file = discord.File("imgoftheday_blurred.jpg", filename="imgoftheday_blurred.jpg")
+            await message.channel.send(file = file, embed=embed)
+
+
 
 
     if message.content.startswith('!unlock imageoftheday'):
 
         if 100 <= users[message.author.name]['Coins']:
             users[message.author.name]['Coins'] -= 100
-            embed = discord.Embed(title=f"IMAGE OF THE DAY", description=f"") #,color=Hex code
+            events_handler.imageofthedayunlocket = True
+            events_handler.imageunlocketby = message.author.name
+            embed = discord.Embed(title=f"IMAGE OF THE DAY", description=f"Unlocked by: {events_handler.imageunlocketby}") #,color=Hex code
             file = discord.File("imgoftheday.jpg", filename="imgoftheday.jpg")
             await message.channel.send(file = file, embed=embed)
         else:
@@ -555,6 +567,7 @@ async def on_message(message):
             await message.channel.send(f'Too many or few arguments. Use !addimageoftheday <link>')
         else:
             if 400 <= users[message.author.name]['Coins']:
+                events_handler.imageofthedayunlocket = False
                 users[message.author.name]['Coins'] -= 400
                 response = requests.get(str_split[1])
                 if response.status_code == 200:
@@ -593,6 +606,49 @@ async def on_message(message):
             else:
                 client.delete_message(message)
                 await message.channel.send(f'{message.author.name} does not have enough <:CBCcoin:831506214659293214> (CBC).')
+
+
+    if message.content.startswith('!adminaddimageoftheday'):
+        str_split = message.content.split(' ')
+        await message.delete()
+        if len(str_split) > 2 or len(str_split) < 1:
+            await message.channel.send(f'Too many or few arguments. Use !adminaddimageoftheday <link>')
+        else:
+            response = requests.get(str_split[1])
+            if response.status_code == 200:
+                with open("imgoftheday.jpg", 'wb') as f:
+                    f.write(response.content)
+
+            events_handler.imageofthedayunlocket = False
+            img = plt.imread('imgoftheday.jpg')
+            height, width, nbands = img.shape
+            dpi = 80
+            # What size does the figure need to be in inches to fit the image?
+            figsize = width / float(dpi), height / float(dpi)
+
+            # Create a figure of the right size with one axes that takes up the full figure
+            fig = plt.figure(figsize=figsize)
+            ax = fig.add_axes([0, 0, 1, 1])
+
+            # Hide spines, ticks, etc.
+            ax.axis('off')
+
+            if nbands > 0:
+                img_avg_1 = mean(img[:, :, 0], disk(50))
+                img_avg_2 = mean(img[:, :, 1], disk(50))
+                img_avg_3 = mean(img[:, :, 2], disk(50))
+                
+                img_avg = np.zeros((height, width, nbands))
+                img_avg[:, :, 0] = img_avg_1
+                img_avg[:, :, 1] = img_avg_2
+                img_avg[:, :, 2] = img_avg_3
+            img_avg = img_avg.astype('int')
+
+            ax.imshow(img_avg)
+            ax.set(xlim=[-0.5, width - 0.5], ylim=[height - 0.5, -0.5], aspect=1)
+            fig.savefig('imgoftheday_blurred.jpg', dpi=dpi)
+            plt.close()
+            await message.channel.send(f'Image added.')
 
 
         #current_time = datetime.datetime.now()
