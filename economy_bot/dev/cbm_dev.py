@@ -17,7 +17,6 @@ import concurrent.futures
 from skimage.morphology import disk
 from skimage.filters.rank import mean
 import requests
-import praw
 
 # client = commands.Bot(command_prefix='!')
 
