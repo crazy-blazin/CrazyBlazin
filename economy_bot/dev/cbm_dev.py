@@ -587,9 +587,9 @@ async def on_message(message):
                 ax.axis('off')
 
                 if nbands > 0:
-                    img_avg_1 = mean(img[:, :, 0], disk(50))
-                    img_avg_2 = mean(img[:, :, 1], disk(50))
-                    img_avg_3 = mean(img[:, :, 2], disk(50))
+                    img_avg_1 = mean(img[:, :, 0], disk(width//5 + height//5))
+                    img_avg_2 = mean(img[:, :, 1], disk(width//5+ height//5))
+                    img_avg_3 = mean(img[:, :, 2], disk(width//5+ height//5))
                     
                     img_avg = np.zeros((height, width, nbands))
                     img_avg[:, :, 0] = img_avg_1
