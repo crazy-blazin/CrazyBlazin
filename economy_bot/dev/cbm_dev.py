@@ -148,7 +148,7 @@ class MyClient(discord.Client):
             tot_dmg = 0
             for weapon in users[key]['weapons']:
                 tot_dmg += users[key]['weapons'][weapon][0]*users[key]['weapons'][weapon][1]
-                users[key]['tot_dmg'] = tot_dmg
+            users[key]['tot_dmg'] = tot_dmg
 
         members = self.get_all_members()
 
@@ -218,7 +218,7 @@ class MyClient(discord.Client):
                 else:
                     event.append([key, tot_dmg, ':crossed_swords:'])
             if lock:
-                embed = discord.Embed(title=f"Gullfugl event! :baby_chick: Health left: {events_handler.gullfugl.hp}", description=f"{events_handler.gullfugl.name} :baby_chick: has been observed, but no one managed to shot it!") #,color=Hex code
+                embed = discord.Embed(title=f"Gullfugl event! :baby_chick: Health left: {events_handler.gullfugl.hp}", description=f"{events_handler.gullfugl.name} :baby_chick: has been observed, but no one managed to shoot it!") #,color=Hex code
             else:
                 embed = discord.Embed(title=f"Gullfugl event! :baby_chick: Health left: {events_handler.gullfugl.hp}", description=f"{events_handler.gullfugl.name} appeared, {winner} shot :baby_chick: and looted {events_handler.gullfugl.drop} <:CBCcoin:831506214659293214>! ") #,color=Hex code
             for ev in event:
@@ -306,8 +306,7 @@ async def on_message(message):
     if message.author == client.user:
         return
     
-    with open('crazy_blazin_database.txt', 'r') as f:
-        users = eval(f.read())
+    users = events_handler.db.read()
 
 
     if 'Boosters' not in users[message.author.name]:
@@ -350,6 +349,7 @@ async def on_message(message):
 
 
     if message.content.startswith('!top'):
+        users = events_handler.db.read()
         index = 1
         with open('crazy_blazin_database.txt', 'r') as f:
             users = eval(f.read())
@@ -510,8 +510,8 @@ async def on_message(message):
         shop_items = {'Snake gun': [10, 100, 1, ':snake:'], 'Revolver': [24, 200, 2, ':gun:'], 'Acid dispenser': [38, 300, 3, ':leafy_green:'], 'Battlecruiser': [455 , 3100, 4, ':ship:']}
         embed = discord.Embed(title=f"Weapon Shop", description=f"Weapons for damaging the gullfugl! To buy item use !buy weapons <index> <amount>") #,color=Hex code
         for weapon in shop_items:
-            dmg = shop_items[weapon][0]
-            cost = shop_items[weapon][1]
+            dmg = shop_items[weapon][1]
+            cost = shop_items[weapon][0]
             index = shop_items[weapon][2]
             item_icon = shop_items[weapon][3]
             embed.add_field(name=f"{index}. {weapon} {item_icon}", value=f'Damage: {dmg} | Cost: {cost}')
