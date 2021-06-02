@@ -521,8 +521,8 @@ async def on_message(message):
         if len(str_split) > 4 or len(str_split) < 4:
             await message.channel.send(f'Too many or few arguments. Use !buy weapons <index> <amount>')
         else:
-            index = int(str_split[2])
-            amount = int(str_split[-1])
+            index = int(str_split[2])*np.sign(int(str_split[2]))
+            amount = int(str_split[-1])*np.sign(int(str_split[-1]))
             shop_items = {'Snake gun': [10, 100, 1, ':snake:'], 'Revolver': [24, 200, 2, ':gun:'], 'Acid dispenser': [38, 300, 3, ':leafy_green:'], 'Battlecruiser': [455 , 3100, 4, ':ship:']}
 
             for weapon in shop_items:
