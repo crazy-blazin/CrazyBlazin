@@ -23,7 +23,6 @@ import requests
 #https://discordapp.com/developers
 
 
-k = 'ODMxOTE4MjA5NDA4OTU4NTE0.YHcONQ.niv-yzimIEPhOj7iewXEiiFnaXA'
 
 class Database:
     def __init__(self):
@@ -67,7 +66,7 @@ class EventHandler:
 
         for members in self.coin_aggregation_members:
             if members not in users:
-                users[members] = {'Coins': 25, 'Tickets': 1, 'Timer': 0, 'BoostTimer': 0, 'Boosters': 0, 'Actives': [], 'Active': '0'}
+                users[members] = {'Coins': 500, 'Tickets': 1, 'Timer': 0, 'BoostTimer': 0, 'Boosters': 0, 'Actives': [], 'weapons': {'Kick': [2, 1, ':foot:']}}
                 users[members]['Actives'] = []
 
             state = self.coin_aggregation_members[members]
@@ -128,12 +127,9 @@ class MyClient(discord.Client):
         users = events_handler.db.read()
 
         members = self.get_all_members()
-        if member not in members:
-            users[member.name] = {'Coins': 25, 'Tickets': 1, 'Timer': 0, 'BoostTimer': 0, 'Boosters': 0, 'Actives': [], 'weapons': {'Kick': [2, 1, ':foot:']}}
-        for key in users:
-            if 'weapons' not in users[key]:
-                users[key]['weapons'] = {'Kick': [2, 1, ':foot:']} # weapon: [dmg, num]
-
+        for member in members:
+            if member.name not in users:
+                users[member.name] = {'Coins': 500, 'Tickets': 1, 'Timer': 0, 'BoostTimer': 0, 'Boosters': 0, 'Actives': [], 'weapons': {'Kick': [2, 1, ':foot:']}}
 
         members = self.get_all_members()
         for member in members:
@@ -357,9 +353,6 @@ async def on_message(message):
     if message.content.startswith('!top'):
         users = events_handler.db.read()
         index = 1
-        with open('crazy_blazin_database.txt', 'r') as f:
-            users = eval(f.read())
-
         embed = discord.Embed(title="Top damage dealers", description="Users with highest damage") #,color=Hex code
             
         temp_stats = {}
@@ -368,7 +361,7 @@ async def on_message(message):
         for key in sorted(temp_stats, key=temp_stats.get, reverse=True):
             if (index < 11):
                 embed.add_field(name=f"{index}. {key}", value=f'{users[key]["tot_dmg"]} :crossed_swords:')
-            else: 
+            else:
                 await message.channel.send(embed=embed)
                 return
             index += 1
