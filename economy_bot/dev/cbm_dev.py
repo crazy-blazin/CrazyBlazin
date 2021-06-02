@@ -124,6 +124,10 @@ class MyClient(discord.Client):
         print(f'Logged in as {self.user} (ID: {self.user.id})')
         print('------')
         users = events_handler.db.read()
+
+        members = self.get_all_members()
+        if members.name not in users:
+            users[members.name] = {'Coins': 25, 'Tickets': 1, 'Timer': 0, 'BoostTimer': 0, 'Boosters': 0, 'Actives': [], 'weapons': {'Kick': [2, 1, ':foot:']}}
         for key in users:
             if 'weapons' not in users[key]:
                 users[key]['weapons'] = {'Kick': [2, 1, ':foot:']} # weapon: [dmg, num]
@@ -511,7 +515,7 @@ async def on_message(message):
         embed = discord.Embed(title=f"Weapon Shop", description=f"Weapons for damaging the gullfugl! To buy item use !buy weapons <index> <amount>") #,color=Hex code
         for weapon in shop_items:
             dmg = shop_items[weapon][0]
-            cost = shop_items[weapon][0]
+            cost = shop_items[weapon][1]
             index = shop_items[weapon][2]
             item_icon = shop_items[weapon][3]
             embed.add_field(name=f"{index}. {weapon} {item_icon}", value=f'Damage: {dmg} | Cost: {cost}')
