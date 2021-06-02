@@ -190,7 +190,7 @@ class MyClient(discord.Client):
             
         print(probability)
         if probability >= 995:
-            channel = client.get_channel(803982821923356773)
+            channel = client.get_channel(849752403687374899)
             # channel = client.get_channel(734481490431443068)
             events_handler.gullfugl = Gullfugl()
 
@@ -201,14 +201,14 @@ class MyClient(discord.Client):
             for key in users:
                 shuffled_users.append(key)
             np.random.shuffle(shuffled_users)
-
+            super_tot_dmg = 0
             for key in shuffled_users:
                 tot_dmg = 0
                 for weapon in users[key]['weapons']:
                     dmg = users[key]['weapons'][weapon][0]
                     amount = users[key]['weapons'][weapon][1]
                     tot_dmg += dmg*amount
-                
+                super_tot_dmg += tot_dmg
                 events_handler.gullfugl.hp -= tot_dmg
 
                 if events_handler.gullfugl.hp <= 0 and lock:
@@ -220,9 +220,9 @@ class MyClient(discord.Client):
                 else:
                     event.append([key, tot_dmg, ':crossed_swords:'])
             if lock:
-                embed = discord.Embed(title=f"Gullfugl event! :baby_chick: Health left: {events_handler.gullfugl.hp}", description=f"{events_handler.gullfugl.name} :baby_chick: has been observed, but no one managed to shoot it!") #,color=Hex code
+                embed = discord.Embed(title=f"Gullfugl event! :baby_chick: Health left: {events_handler.gullfugl.hp}| Total damage dealt: {super_tot_dmg}", description=f"{events_handler.gullfugl.name} :baby_chick: has been observed, but no one managed to shoot it!") #,color=Hex code
             else:
-                embed = discord.Embed(title=f"Gullfugl event! :baby_chick: Health left: {events_handler.gullfugl.hp}", description=f"{events_handler.gullfugl.name} appeared, {winner} shot :baby_chick: and looted {events_handler.gullfugl.drop} <:CBCcoin:831506214659293214>! ") #,color=Hex code
+                embed = discord.Embed(title=f"Gullfugl event! :baby_chick: Health left: {events_handler.gullfugl.hp}| Total damage dealt: {super_tot_dmg}", description=f"{events_handler.gullfugl.name} appeared, {winner} shot :baby_chick: and looted {events_handler.gullfugl.drop} <:CBCcoin:831506214659293214>! ") #,color=Hex code
             for ev in event:
                 embed.add_field(name=f"{ev[0]}: ", value=f'{ev[1]} {ev[2]}')
             await channel.send(embed=embed)
@@ -322,10 +322,8 @@ async def on_message(message):
 
 
     if message.author.name not in users:
-        users[message.author.name] = {'Coins': 25, 'Tickets': 1, 'Timer': 0, 'BoostTimer': 0, 'Boosters': 0, 'Actives': []}
-
-        with open('crazy_blazin_database.txt', 'w') as f:
-            f.write(str(users))
+        users[message.author.name] = {'Coins': 500, 'Tickets': 1, 'Timer': 0, 'BoostTimer': 0, 'Boosters': 0, 'Actives': [], 'weapons': {'Kick': [2, 1, ':foot:']}}
+        events_handler.db.write(users)
 
 
     if message.content.startswith('!bal'):
@@ -456,6 +454,7 @@ async def on_message(message):
                     events_handler.events.remove(event)
                 else:
                     await message.channel.send(f'You are not the raffle creator!')
+        events_handler.db.write(users)
                     
     if message.content.startswith('!buy tickets'):
         str_split = message.content.split(' ')
@@ -479,6 +478,7 @@ async def on_message(message):
             await message.channel.send(f'{message.author.name} does not have enough <:CBCcoin:831506214659293214> (CBC) to buy {amount} :tickets:!')
             await message.channel.send(f'Price: <:CBCcoin:831506214659293214> (CBC) per :tickets: .')
 
+        events_handler.db.write(users)
 
     if message.content.startswith('!buy CBG'):
         str_split = message.content.split(' ')
@@ -501,6 +501,7 @@ async def on_message(message):
         else:
             await message.channel.send(f'{message.author.name} does not have enough <:CBCcoin:831506214659293214> (CBC) to buy Crazy Blazin Gold!')
             await message.channel.send(f' Price: 500 <:CBCcoin:831506214659293214> (CBC).')
+        events_handler.db.write(users)
 
 
     
@@ -515,6 +516,7 @@ async def on_message(message):
             item_icon = shop_items[weapon][3]
             embed.add_field(name=f"{index}. {weapon} {item_icon}", value=f'Damage: {dmg} | Cost: {cost}')
         await message.channel.send(embed=embed)
+        events_handler.db.write(users)
 
     if message.content.startswith('!buy weapons '):
         str_split = message.content.split(' ')
@@ -540,8 +542,6 @@ async def on_message(message):
 
 
 
-
-
     if message.content.startswith('!giveCBG'):
         members = client.get_all_members()
         str_split = message.content.split(' ')
@@ -562,6 +562,7 @@ async def on_message(message):
                     users[member.name]['Timer'] = 2592000
         else:
             await message.channel.send('You need to be admin for this command')
+        events_handler.db.write(users)
 
 
     if message.content.startswith('!giveCBC'):
@@ -586,6 +587,7 @@ async def on_message(message):
                 f.write(str(users))
         else:
             await message.channel.send('You need to be admin for this command')
+        events_handler.db.write(users)
     
     if message.content.startswith('!givetickets'):
         str_split = message.content.split(' ')
@@ -603,8 +605,7 @@ async def on_message(message):
                 if user == reciever_user:
                     users[user]['Tickets'] += amount
             await message.channel.send(f'{reciever_user} recieved {amount} :tickets: (tickets)')
-            with open('crazy_blazin_database.txt', 'w') as f:
-                f.write(str(users))
+        events_handler.db.write(users)
 
 
     if message.content.startswith('!donate'):
@@ -626,6 +627,7 @@ async def on_message(message):
                             break
                 else:
                     await message.channel.send(f'{message.author.name} does not have enough <:CBCcoin:831506214659293214> (CBC).')
+        events_handler.db.write(users)
 
     
     if message.content.startswith('!imageoftheday'):
@@ -642,6 +644,7 @@ async def on_message(message):
             embed.add_field(name=f"Add your own: ", value=f'You can add your own image of the day with command: !addimageoftheday <link> price: 400 <:CBCcoin:831506214659293214> (CBC)')
             file = discord.File("imgoftheday_blurred.jpg", filename="imgoftheday_blurred.jpg")
             await message.channel.send(file = file, embed=embed)
+        events_handler.db.write(users)
 
 
 
@@ -657,6 +660,7 @@ async def on_message(message):
             await message.channel.send(file = file, embed=embed)
         else:
             await message.channel.send(f'{message.author.name} does not have enough <:CBCcoin:831506214659293214> (CBC).')
+        events_handler.db.write(users)
 
     if message.content.startswith('!addimageoftheday'):
         str_split = message.content.split(' ')
@@ -704,6 +708,7 @@ async def on_message(message):
             else:
                 client.delete_message(message)
                 await message.channel.send(f'{message.author.name} does not have enough <:CBCcoin:831506214659293214> (CBC).')
+        events_handler.db.write(users)
 
 
     if message.content.startswith('!adminaddimageoftheday'):
@@ -747,6 +752,7 @@ async def on_message(message):
             fig.savefig('imgoftheday_blurred.jpg', dpi=dpi)
             plt.close()
             await message.channel.send(f'Image added.')
+        events_handler.db.write(users)
 
 
         #current_time = datetime.datetime.now()
@@ -844,6 +850,7 @@ async def on_message(message):
                         await message.channel.send(f'{message.author.name} does not have enough <:CBCcoin:831506214659293214> (CBC).')
                     else:
                         await message.channel.send(f'{target} does not exist.')
+        events_handler.db.write(users)
 
 
     # if message.content.startswith('!spray'):
@@ -857,6 +864,7 @@ async def on_message(message):
             await message.channel.send(f'Too many or few arguments. Use !buy spray id')
         else:
             pass
+        events_handler.db.write(users)
 
 
 
@@ -878,6 +886,7 @@ async def on_message(message):
             
         else:
             await message.channel.send(f'No lootbox have dropped!')
+        events_handler.db.write(users)
 
 
 
@@ -915,7 +924,7 @@ async def on_message(message):
                 await member.edit(mute = False)
 
 
-    events_handler.db.write(users)
+        events_handler.db.write(users)
 
         
 client.run(k)
