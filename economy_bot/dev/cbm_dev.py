@@ -23,7 +23,6 @@ import requests
 #https://discordapp.com/developers
 
 
-
 class Database:
     def __init__(self):
         self.dbName = 'crazy_blazin_database.txt' 
@@ -102,11 +101,15 @@ class EventHandler:
         # return users
 
 
-class LootBox:
+class Gullfugl:
     def __init__(self):
-        self.coins = np.random.randint(0, 50)
-        self.boosters = np.random.randint(0, 3)
-        self.tickets = np.random.randint(0, 2)
+        self.dmglog = {}
+        self.name_list = ['An armored gullfugl', 'A cute gullfugl', 'A rare gullfugl', 'A retarded gullfugl']
+        self.name = np.random.choice(self.name_list, 1)[0]
+        self.hp = np.random.randint(500,100000)
+        self.drop = self.hp*0.3
+
+
 
 
 class MyClient(discord.Client):
@@ -120,6 +123,19 @@ class MyClient(discord.Client):
     async def on_ready(self):
         print(f'Logged in as {self.user} (ID: {self.user.id})')
         print('------')
+        users = events_handler.db.read()
+        for key in users:
+            if 'weapons' not in users[key]:
+                users[key]['weapons'] = {'Kick': [2, 1, ':foot:']} # weapon: [dmg, num]
+
+        members = self.get_all_members()
+        for member in members:
+            role_names = [role.name for role in member.roles]
+            if 'Bots' in role_names:
+                 users.pop(member.name, None)
+        events_handler.db.write(users)
+
+
 
     @tasks.loop(seconds=30) # task runs every 60 seconds
     async def add_coins_after_time(self):
@@ -162,16 +178,46 @@ class MyClient(discord.Client):
                                 print('Removing booster role')
                                 role = get(member.guild.roles, name='Booster')
                                 await member.remove_roles(role)
-        events_handler.db.write(users)
             
-                #803982821923356773
-        # print(probability)
-        # if probability >= 995:
-        #     channel = client.get_channel(803982821923356773)
-        #     events_handler.lootbox = LootBox()
-        #     embed = discord.Embed(title=f"Lootbox drop! :toolbox:", description=f"Lootbox just dropped! The first one to add ticket will get the lootbox! You can retrieve lootbox by typing !grabbox") #,color=Hex code
-        #     embed.set_image(url="https://raw.githubusercontent.com/MartinRovang/CrazyBlazin/main/images/lootcrate.png")
-        #     await channel.send(embed=embed)
+        print(probability)
+        if probability >= 995:
+            channel = client.get_channel(803982821923356773)
+            # channel = client.get_channel(734481490431443068)
+            events_handler.gullfugl = Gullfugl()
+
+            event = []
+            shuffled_users = []
+
+            lock = True
+            for key in users:
+                shuffled_users.append(key)
+            np.random.shuffle(shuffled_users)
+
+            for key in shuffled_users:
+                tot_dmg = 0
+                for weapon in users[key]['weapons']:
+                    dmg = users[key]['weapons'][weapon][0]
+                    amount = users[key]['weapons'][weapon][1]
+                    tot_dmg += dmg*amount
+                
+                events_handler.gullfugl.hp -= tot_dmg
+
+                if events_handler.gullfugl.hp <= 0 and lock:
+                    lock = False
+                    winner = key
+                    users[key]['Coins'] += events_handler.gullfugl.drop
+                    users[key]['Coins'] = round(users[key]['Coins'],2)
+                    event.append([key, tot_dmg, ':crossed_swords: :boom:'])
+                else:
+                    event.append([key, tot_dmg, ':crossed_swords:'])
+            if lock:
+                embed = discord.Embed(title=f"Gullfugl event! :baby_chick: Health left: {events_handler.gullfugl.hp}", description=f"{events_handler.gullfugl.name} :baby_chick: has been observed, but no one managed to shot it!") #,color=Hex code
+            else:
+                embed = discord.Embed(title=f"Gullfugl event! :baby_chick: Health left: {events_handler.gullfugl.hp}", description=f"{events_handler.gullfugl.name} appeared, {winner} shot :baby_chick: and looted {events_handler.gullfugl.drop} <:CBCcoin:831506214659293214>! ") #,color=Hex code
+            for ev in event:
+                embed.add_field(name=f"{ev[0]}: ", value=f'{ev[1]} {ev[2]}')
+            await channel.send(embed=embed)
+
 
         events_handler.db.write(users)
         return users
@@ -282,7 +328,16 @@ async def on_message(message):
 
         embed.add_field(name=f"<:CBCcoin:831506214659293214> (CBC)", value=f'{value}')
         embed.add_field(name=f":tickets: (tickets)", value=f'{ticket}')
-        embed.add_field(name=f":pill: (boosts)", value=f'{boosts}')
+        tot_dmg = 0
+        for weapon in users[message.author.name]['weapons']:
+            # [shop_items[weapon][1], amount]
+            if len(users[message.author.name]['weapons'][weapon]) < 3:
+                embed.add_field(name=f"{weapon} :foot: :", value=f"{users[message.author.name]['weapons'][weapon][1]}")
+            else:
+                embed.add_field(name=f"{weapon} {users[message.author.name]['weapons'][weapon][2]}:", value=f"{users[message.author.name]['weapons'][weapon][1]}")
+            tot_dmg += users[message.author.name]['weapons'][weapon][0]*users[message.author.name]['weapons'][weapon][1]
+        embed.add_field(name=f"Total damage: ", value=f"{tot_dmg} :crossed_swords:")
+        # embed.add_field(name=f":pill: (boosts)", value=f'{boosts}')
         await message.channel.send(embed=embed)
 
 
@@ -441,7 +496,45 @@ async def on_message(message):
             await message.channel.send(f'{message.author.name} does not have enough <:CBCcoin:831506214659293214> (CBC) to buy Crazy Blazin Gold!')
             await message.channel.send(f' Price: 500 <:CBCcoin:831506214659293214> (CBC).')
 
+
     
+    if message.content.startswith('!shop'):
+
+        shop_items = {'Snake gun': [10, 100, 1, ':snake:'], 'Revolver': [24, 200, 2, ':gun:'], 'Acid dispenser': [38, 300, 3, ':leafy_green:'], 'Battlecruiser': [455 , 3100, 4, ':ship:']}
+        embed = discord.Embed(title=f"Weapon Shop", description=f"Weapons for damaging the gullfugl! To buy item use !buy weapons <index> <amount>") #,color=Hex code
+        for weapon in shop_items:
+            dmg = shop_items[weapon][0]
+            cost = shop_items[weapon][1]
+            index = shop_items[weapon][2]
+            item_icon = shop_items[weapon][3]
+            embed.add_field(name=f"{index}. {weapon} {item_icon}", value=f'Damage: {dmg} | Cost: {cost}')
+        await message.channel.send(embed=embed)
+
+    if message.content.startswith('!buy weapons '):
+        str_split = message.content.split(' ')
+        if len(str_split) > 4 or len(str_split) < 3:
+            await message.channel.send(f'Too many or few arguments. Use !buy weapons <index> <amount>')
+
+        index = int(str_split[2])
+        amount = int(str_split[-1])
+        shop_items = {'Snake gun': [10, 100, 1, ':snake:'], 'Revolver': [24, 200, 2, ':gun:'], 'Acid dispenser': [38, 300, 3, ':leafy_green:'], 'Battlecruiser': [455 , 3100, 4, ':ship:']}
+
+        for weapon in shop_items:
+            if shop_items[weapon][2] == index:
+                if shop_items[weapon][0]*amount <= users[message.author.name]['Coins']:
+                    users[message.author.name]['Coins'] -= shop_items[weapon][0]*amount
+                    await message.channel.send(f'{message.author.name} bought {amount} {weapon}{shop_items[weapon][3]} for {shop_items[weapon][0]*amount} <:CBCcoin:831506214659293214>')
+                    if weapon not in users[message.author.name]['weapons']:
+                        users[message.author.name]['weapons'][weapon] = [shop_items[weapon][1], amount, shop_items[weapon][3]]
+                    else:
+                        users[message.author.name]['weapons'][weapon][1] += amount
+                else:
+                    await message.channel.send(f'{message.author.name} can not afford this!')
+        events_handler.db.write(users)
+
+
+
+
 
     if message.content.startswith('!giveCBG'):
         members = client.get_all_members()
@@ -587,9 +680,9 @@ async def on_message(message):
                 ax.axis('off')
 
                 if nbands > 0:
-                    img_avg_1 = mean(img[:, :, 0], disk(width//5 + height//5))
-                    img_avg_2 = mean(img[:, :, 1], disk(width//5+ height//5))
-                    img_avg_3 = mean(img[:, :, 2], disk(width//5+ height//5))
+                    img_avg_1 = mean(img[:, :, 0], disk(int(0.1*width + height*0.1)))
+                    img_avg_2 = mean(img[:, :, 1], disk(int(0.1*width + height*0.1)))
+                    img_avg_3 = mean(img[:, :, 2], disk(int(0.1*width + height*0.1)))
                     
                     img_avg = np.zeros((height, width, nbands))
                     img_avg[:, :, 0] = img_avg_1
