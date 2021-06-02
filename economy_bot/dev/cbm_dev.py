@@ -510,7 +510,7 @@ async def on_message(message):
         shop_items = {'Snake gun': [10, 100, 1, ':snake:'], 'Revolver': [24, 200, 2, ':gun:'], 'Acid dispenser': [38, 300, 3, ':leafy_green:'], 'Battlecruiser': [455 , 3100, 4, ':ship:']}
         embed = discord.Embed(title=f"Weapon Shop", description=f"Weapons for damaging the gullfugl! To buy item use !buy weapons <index> <amount>") #,color=Hex code
         for weapon in shop_items:
-            dmg = shop_items[weapon][1]
+            dmg = shop_items[weapon][0]
             cost = shop_items[weapon][0]
             index = shop_items[weapon][2]
             item_icon = shop_items[weapon][3]
@@ -519,25 +519,25 @@ async def on_message(message):
 
     if message.content.startswith('!buy weapons '):
         str_split = message.content.split(' ')
-        if len(str_split) > 4 or len(str_split) < 3:
+        if len(str_split) > 4 or len(str_split) < 4:
             await message.channel.send(f'Too many or few arguments. Use !buy weapons <index> <amount>')
+        else:
+            index = int(str_split[2])
+            amount = int(str_split[-1])
+            shop_items = {'Snake gun': [10, 100, 1, ':snake:'], 'Revolver': [24, 200, 2, ':gun:'], 'Acid dispenser': [38, 300, 3, ':leafy_green:'], 'Battlecruiser': [455 , 3100, 4, ':ship:']}
 
-        index = int(str_split[2])
-        amount = int(str_split[-1])
-        shop_items = {'Snake gun': [10, 100, 1, ':snake:'], 'Revolver': [24, 200, 2, ':gun:'], 'Acid dispenser': [38, 300, 3, ':leafy_green:'], 'Battlecruiser': [455 , 3100, 4, ':ship:']}
-
-        for weapon in shop_items:
-            if shop_items[weapon][2] == index:
-                if shop_items[weapon][0]*amount <= users[message.author.name]['Coins']:
-                    users[message.author.name]['Coins'] -= shop_items[weapon][0]*amount
-                    await message.channel.send(f'{message.author.name} bought {amount} {weapon}{shop_items[weapon][3]} for {shop_items[weapon][0]*amount} <:CBCcoin:831506214659293214>')
-                    if weapon not in users[message.author.name]['weapons']:
-                        users[message.author.name]['weapons'][weapon] = [shop_items[weapon][1], amount, shop_items[weapon][3]]
+            for weapon in shop_items:
+                if shop_items[weapon][2] == index:
+                    if shop_items[weapon][1]*amount <= users[message.author.name]['Coins']:
+                        users[message.author.name]['Coins'] -= shop_items[weapon][1]*amount
+                        await message.channel.send(f'{message.author.name} bought {amount} {weapon}{shop_items[weapon][3]} for {shop_items[weapon][1]*amount} <:CBCcoin:831506214659293214>')
+                        if weapon not in users[message.author.name]['weapons']:
+                            users[message.author.name]['weapons'][weapon] = [shop_items[weapon][0], amount, shop_items[weapon][3]]
+                        else:
+                            users[message.author.name]['weapons'][weapon][1] += amount
                     else:
-                        users[message.author.name]['weapons'][weapon][1] += amount
-                else:
-                    await message.channel.send(f'{message.author.name} can not afford this!')
-        events_handler.db.write(users)
+                        await message.channel.send(f'{message.author.name} can not afford this!')
+            events_handler.db.write(users)
 
 
 
