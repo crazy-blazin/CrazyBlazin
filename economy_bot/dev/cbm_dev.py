@@ -128,6 +128,7 @@ class MyClient(discord.Client):
             if 'weapons' not in users[key]:
                 users[key]['weapons'] = {'Kick': [2, 1, ':foot:']} # weapon: [dmg, num]
 
+
         members = self.get_all_members()
         for member in members:
             role_names = [role.name for role in member.roles]
@@ -142,6 +143,12 @@ class MyClient(discord.Client):
         events_handler.coin_aggregation()
         users = events_handler.db.read()
         print('Coins distributed!')
+
+        for key in users:
+            tot_dmg = 0
+            for weapon in users[key]['weapons']:
+                tot_dmg += users[key]['weapons'][weapon][0]*users[key]['weapons'][weapon][1]
+                users[key]['tot_dmg'] = tot_dmg
 
         members = self.get_all_members()
 
@@ -347,14 +354,14 @@ async def on_message(message):
         with open('crazy_blazin_database.txt', 'r') as f:
             users = eval(f.read())
 
-        embed = discord.Embed(title="Top wealth", description="Top owners of Crazy Blazin Coins") #,color=Hex code
+        embed = discord.Embed(title="Top damage dealers", description="Users with highest damage") #,color=Hex code
             
         temp_stats = {}
         for key_user in users:
-            temp_stats[key_user] = users[key_user]['Coins']
+            temp_stats[key_user] = users[key_user]['tot_dmg']
         for key in sorted(temp_stats, key=temp_stats.get, reverse=True):
             if (index < 11):
-                embed.add_field(name=f"{index}. {key}", value=f'{users[key]["Coins"]} <:CBCcoin:831506214659293214>')
+                embed.add_field(name=f"{index}. {key}", value=f'{users[key]["tot_dmg"]} :crossed_swords:')
             else: 
                 await message.channel.send(embed=embed)
                 return
