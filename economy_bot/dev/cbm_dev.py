@@ -23,6 +23,8 @@ import requests
 #https://discordapp.com/developers
 
 
+k = 'ODMxOTE4MjA5NDA4OTU4NTE0.YHcONQ.niv-yzimIEPhOj7iewXEiiFnaXA'
+
 class Database:
     def __init__(self):
         self.dbName = 'crazy_blazin_database.txt' 
@@ -126,8 +128,8 @@ class MyClient(discord.Client):
         users = events_handler.db.read()
 
         members = self.get_all_members()
-        if members.name not in users:
-            users[members.name] = {'Coins': 25, 'Tickets': 1, 'Timer': 0, 'BoostTimer': 0, 'Boosters': 0, 'Actives': [], 'weapons': {'Kick': [2, 1, ':foot:']}}
+        if member not in members:
+            users[member.name] = {'Coins': 25, 'Tickets': 1, 'Timer': 0, 'BoostTimer': 0, 'Boosters': 0, 'Actives': [], 'weapons': {'Kick': [2, 1, ':foot:']}}
         for key in users:
             if 'weapons' not in users[key]:
                 users[key]['weapons'] = {'Kick': [2, 1, ':foot:']} # weapon: [dmg, num]
