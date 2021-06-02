@@ -536,7 +536,7 @@ async def on_message(message):
                             users[message.author.name]['weapons'][weapon][1] += amount
                     else:
                         await message.channel.send(f'{message.author.name} can not afford this!')
-            events_handler.db.write(users)
+        events_handler.db.write(users)
 
 
 
