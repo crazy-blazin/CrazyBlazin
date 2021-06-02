@@ -71,7 +71,9 @@ def front():
         temp_dict[user] = users[user]['tot_dmg']
         # print(users[user]['Coins'])
     sorted_users = sorted(temp_dict.items(),  key=lambda x: x[1], reverse=True)
-
+    for user in users:
+        if 'Timer' not in users[user]:
+            users[user]['Timer'] = 0
     #users -> key, users[key] -> {'Coins' : 499, .....}
 
     return render_template('frontpage.html', users = sorted_users, users_all = users)  
