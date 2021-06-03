@@ -23,8 +23,6 @@ import requests
 #https://discordapp.com/developers
 
 
-<:CBCcoin:831506214659293214>
-
 
 shop_items = {'Snake gun': [10, 100, 1, ':snake:'], 
                 'Revolver': [24, 200, 2, ':gun:'], 
@@ -159,8 +157,8 @@ class Stonks:
 
 
 
-cocaine = Stonks(name = 'Cocaine', init_price = 82.48, drift = 0.002, variance = 1)
-Ingamersh = Stonks(name = 'Ingamersh verksted', init_price = 159, drift = 0.001, variance = 5)
+cocaine = Stonks(name = 'Cocaine', init_price = 88.67, drift = 0.002, variance = 1)
+Ingamersh = Stonks(name = 'Ingamersh verksted', init_price = 125.38, drift = 0.001, variance = 5)
 
 
 class MyClient(discord.Client):
@@ -649,12 +647,12 @@ async def on_message(message):
         events_handler.db.write(users)
 
 
-    if message.content.startswith('!sell cocaine'):
+    if message.content.startswith('!sell stonks'):
         str_split = message.content.split(' ')
         if len(str_split) > 3 or len(str_split) < 2:
-            await message.channel.send(f'Too many or few arguments. Use !sell cocaine <index> <amount>')
+            await message.channel.send(f'Too many or few arguments. Use !sell stonks <index> <amount>')
         else:
-            amount = int(str_split[2])*np.sign(int(str_split[2]))
+            amount = int(str_split[3])*np.sign(int(str_split[3]))
             index = int(str_split[2])*np.sign(int(str_split[2]))
             if index == 1:
                 price = round(cocaine.current_price*amount,2)
