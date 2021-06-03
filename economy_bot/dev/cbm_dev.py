@@ -24,6 +24,7 @@ import requests
 
 
 
+
 shop_items = {'Snake gun': [10, 100, 1, ':snake:'], 
                 'Revolver': [24, 200, 2, ':gun:'], 
                 'Acid dispenser': [38, 300, 3, ':leafy_green:'], 
@@ -157,8 +158,8 @@ class Stonks:
 
 
 
-cocaine = Stonks(name = 'Cocaine', init_price = 88.67, drift = 0.002, variance = 1)
-Ingamersh = Stonks(name = 'Ingamersh verksted', init_price = 125.38, drift = 0.001, variance = 5)
+cocaine = Stonks(name = 'Cocaine', init_price = 92.36, drift = 0.002, variance = 1)
+Ingamersh = Stonks(name = 'Ingamersh verksted', init_price = 128.69, drift = 0.001, variance = 5)
 
 
 class MyClient(discord.Client):
@@ -649,7 +650,7 @@ async def on_message(message):
 
     if message.content.startswith('!sell stonks'):
         str_split = message.content.split(' ')
-        if len(str_split) > 3 or len(str_split) < 2:
+        if len(str_split) > 4 or len(str_split) < 3:
             await message.channel.send(f'Too many or few arguments. Use !sell stonks <index> <amount>')
         else:
             amount = int(str_split[3])*np.sign(int(str_split[3]))
@@ -668,7 +669,7 @@ async def on_message(message):
                     price = round(Ingamersh.current_price*amount,2)
                     users[message.author.name]['ingamersh'] -= amount
                     users[message.author.name]['Coins'] += price
-                    await message.channel.send(f'{message.author.name} bought {amount} Ingamers verksted :house_with_garden: for {price} <:CBCcoin:831506214659293214> @ {round(Ingamersh.current_price,2)} per Ingamersh verksted.')
+                    await message.channel.send(f'{message.author.name} sold {amount} Ingamers verksted :house_with_garden: for {price} <:CBCcoin:831506214659293214> @ {round(Ingamersh.current_price,2)} per Ingamersh verksted.')
                 else:
                     await message.channel.send(f'{message.author.name} does not own this much Ingamers verksted!')
 
