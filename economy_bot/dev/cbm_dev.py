@@ -23,14 +23,15 @@ import requests
 #https://discordapp.com/developers
 
 
+<:CBCcoin:831506214659293214>
 
 
 shop_items = {'Snake gun': [10, 100, 1, ':snake:'], 
                 'Revolver': [24, 200, 2, ':gun:'], 
                 'Acid dispenser': [38, 300, 3, ':leafy_green:'], 
-                'Ak47': [173, 950, 4, '<:ak47_emo:850092688132145192>'], 
+                'Ak47': [173, 950, 4, '<:ak47_emo:850092572797698068>'], 
                 'Battlecruiser': [510 , 3100, 5, ':ship:'],
-                'Ahegao Princess': [2110 , 25000, 6, '<:aegao:850090913815986198>']
+                'Ahegao Princess': [2110 , 25000, 6, '<:aegao:849030455189438485>']
                 }
 
 class Database:
@@ -116,9 +117,8 @@ class Gullfugl:
         self.dmglog = {}
         self.name_list = ['An armored gullfugl', 'A cute gullfugl', 'A rare gullfugl', 'A retarded gullfugl']
         self.name = np.random.choice(self.name_list, 1)[0]
-        self.hp = np.random.randint(250,5000)
+        self.hp = np.random.randint(500,5000)
         self.drop = self.hp*0.2
-
 
 
 
