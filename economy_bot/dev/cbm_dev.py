@@ -22,7 +22,16 @@ import requests
 
 #https://discordapp.com/developers
 
-# k = 'ODMxOTE4MjA5NDA4OTU4NTE0.YHcONQ.rg3vu8FXZCXUOqtBwcdwCbZaNZ8'
+
+
+
+shop_items = {'Snake gun': [10, 100, 1, ':snake:'], 
+                'Revolver': [24, 200, 2, ':gun:'], 
+                'Acid dispenser': [38, 300, 3, ':leafy_green:'], 
+                'Ak47': [173, 950, 4, '<:ak47_emo:850092688132145192>'], 
+                'Battlecruiser': [510 , 3100, 5, ':ship:'],
+                'Ahegao Princess': [2110 , 25000, 6, '<:aegao:850090913815986198>']
+                }
 
 class Database:
     def __init__(self):
@@ -107,38 +116,51 @@ class Gullfugl:
         self.dmglog = {}
         self.name_list = ['An armored gullfugl', 'A cute gullfugl', 'A rare gullfugl', 'A retarded gullfugl']
         self.name = np.random.choice(self.name_list, 1)[0]
-        self.hp = np.random.randint(500,100000)
-        self.drop = self.hp*0.3
+        self.hp = np.random.randint(250,5000)
+        self.drop = self.hp*0.2
 
 
-class Cocaine:
-    def __init__(self):
-        self.price = [53]
+
+
+class Stonks:
+    stonks = []
+    def __init__(self, name = 'Cocaine', init_price = 53, drift = 0.002, variance = 1):
+        self.price = [init_price]
         self.current_price = self.price[-1]
+        self.name = name
+        self.variance = variance
+        self.drift = drift
+        self.stonks.append(self)
 
     
     def move_price(self):
-        self.price.append(0.002 + self.price[-1] + np.random.normal(0,1))
+        self.price.append(self.drift + self.price[-1] + np.random.normal(0, self.variance))
         if self.price[-1] <= 0:
-            self.price[-1] = 1
+            self.price[-1] = 0
 
-        self.current_price = self.price[-1]
+        self.current_price = round(self.price[-1], 2)
 
-        with open('cocaine.txt', 'a') as f:
-            f.write(str(self.price[-1]))
-        plt.plot(self.price[-1000:], linewidth = 1, color = 'black')
-        plt.plot(len(self.price[-1000:])-1, self.current_price, 'o', color = 'red')
-        plt.title(f'Cocaine price: {self.current_price}')
-        plt.ylabel('Crazy blazin coins')
-        plt.xlabel('Time')
-        plt.savefig('cocaine.jpg')
+    @staticmethod
+    def plot_results():
+        fig, ax = plt.subplots(1, len(Stonks.stonks))
+        colors = ['black', 'black']
+        color_tip = ['red', 'blue']
+        for i, stonk in enumerate(Stonks.stonks):
+            ax[i].plot(stonk.price[-1000:], linewidth = 1, color = colors[i])
+            ax[i].plot(len(stonk.price[-1000:])-1, stonk.current_price, 'o', color = color_tip[i])
+            ax[i].plot(len(stonk.price[-1000:])-1, stonk.current_price, 'o', color = color_tip[i], fillstyle = 'none', markersize = 10)
+            ax[i].plot(len(stonk.price[-1000:])-1, stonk.current_price, 'o', color = color_tip[i], fillstyle = 'none', markersize = 15)
+            ax[i].set_title(f'{i+1}. {stonk.name} \n price: {stonk.current_price}')
+            ax[i].set_ylabel('Crazy blazin coins')
+            ax[i].set_xlabel('Time')
+        plt.tight_layout()
+        plt.savefig('stonk.jpg')
         plt.close()
 
-        return self.current_price
 
 
-cocaine = Cocaine()
-
+cocaine = Stonks(name = 'Cocaine', init_price = 82.48, drift = 0.002, variance = 1)
+Ingamersh = Stonks(name = 'Ingamersh verksted', init_price = 159, drift = 0.001, variance = 5)
 
 
 class MyClient(discord.Client):
@@ -160,6 +182,8 @@ class MyClient(discord.Client):
                 users[member.name] = {'Coins': 500, 'Tickets': 1, 'Timer': 0, 'BoostTimer': 0, 'Boosters': 0, 'Actives': [], 'weapons': {'Kick': [2, 1, ':foot:']}}
             if 'cocaine' not in users[member.name]:
                 users[member.name]['cocaine'] = 0
+            if 'ingamersh' not in users[member.name]:
+                users[member.name]['ingamersh'] = 0
 
 
         members = self.get_all_members()
@@ -259,7 +283,9 @@ class MyClient(discord.Client):
             await channel.send(embed=embed)
 
 
-        cocaine.move_price() # move cocaine price
+        for stonk in Stonks.stonks:
+            stonk.move_price() # move cocaine price
+        Stonks.plot_results()
 
         events_handler.db.write(users)
         return users
@@ -374,11 +400,13 @@ async def on_message(message):
         ticket = users[message.author.name]['Tickets']
         boosts = users[message.author.name]['Boosters']
         cocaine_wealth = users[message.author.name]['cocaine']
+        ingamersh_wealth = users[message.author.name]['ingamersh']
         embed = discord.Embed(title=f"Balance", description=f"{message.author.name} current balance") #,color=Hex code
 
-        embed.add_field(name=f"<:CBCcoin:831506214659293214> (CBC)", value=f'{value}')
+        embed.add_field(name=f"<:CBCcoin:831506214659293214> (CBC)", value=f'{round(value,2)}')
         embed.add_field(name=f":tickets: (tickets)", value=f'{ticket}')
-        embed.add_field(name=f":salt: (cocaine)", value=f'{cocaine_wealth} worth: {cocaine_wealth*cocaine.current_price} <:CBCcoin:831506214659293214>')
+        embed.add_field(name=f":salt: (cocaine)", value=f'{cocaine_wealth} worth: {round(cocaine_wealth*cocaine.current_price,2)} <:CBCcoin:831506214659293214>')
+        embed.add_field(name=f":house_with_garden:  (Ingamersh verksted)", value=f'{ingamersh_wealth} worth: {round(ingamersh_wealth*Ingamersh.current_price,2)} <:CBCcoin:831506214659293214>')
         tot_dmg = 0
         for weapon in users[message.author.name]['weapons']:
             # [shop_items[weapon][1], amount]
@@ -552,7 +580,6 @@ async def on_message(message):
     
     if message.content.startswith('!shop'):
 
-        shop_items = {'Snake gun': [10, 100, 1, ':snake:'], 'Revolver': [24, 200, 2, ':gun:'], 'Acid dispenser': [38, 300, 3, ':leafy_green:'], 'Battlecruiser': [510 , 3100, 4, ':ship:']}
         embed = discord.Embed(title=f"Weapon Shop", description=f"Weapons for damaging the gullfugl! To buy item use !buy weapons <index> <amount>") #,color=Hex code
         for weapon in shop_items:
             dmg = shop_items[weapon][0]
@@ -570,7 +597,6 @@ async def on_message(message):
         else:
             index = int(str_split[2])*np.sign(int(str_split[2]))
             amount = int(str_split[-1])*np.sign(int(str_split[-1]))
-            shop_items = {'Snake gun': [10, 100, 1, ':snake:'], 'Revolver': [24, 200, 2, ':gun:'], 'Acid dispenser': [38, 300, 3, ':leafy_green:'], 'Battlecruiser': [510 , 3100, 4, ':ship:']}
 
             for weapon in shop_items:
                 if shop_items[weapon][2] == index:
@@ -587,26 +613,38 @@ async def on_message(message):
 
 
 
-    if message.content.startswith('!cocaine'):
-        embed = discord.Embed(title=f"Cocaine stonk", description=f"Historical and current price of cocaine. Buy item use !buy cocaine <amount> and !sell cocaine <amount>") #,color=Hex code
-        file = discord.File("cocaine.jpg", filename="cocaine.jpg")
+    if message.content.startswith('!stonks'):
+        embed = discord.Embed(title=f"Stonks", description=f"Historical and current price of stonks. Buy item use !buy stonks <index> <amount> and !sell stonks <index> <amount>") #,color=Hex code
+        file = discord.File("stonk.jpg", filename="stonk.jpg")
         await message.channel.send(file = file, embed=embed)
 
 
 
-    if message.content.startswith('!buy cocaine'):
+    if message.content.startswith('!buy stonks'):
         str_split = message.content.split(' ')
-        if len(str_split) > 3 or len(str_split) < 2:
-            await message.channel.send(f'Too many or few arguments. Use !buy cocaine <amount>')
+        if len(str_split) > 4 or len(str_split) < 3:
+            await message.channel.send(f'Too many or few arguments. Use !buy stonks <index> <amount>')
         else:
-            amount = int(str_split[2])*np.sign(int(str_split[2]))
-            price = cocaine.current_price*amount
-            if price <= users[message.author.name]['Coins']:
-                users[message.author.name]['cocaine'] += amount
-                users[message.author.name]['Coins'] -= price
-                await message.channel.send(f'{message.author.name} bought {amount} cocaine :salt: for {price} <:CBCcoin:831506214659293214>')
-            else:
-                await message.channel.send(f'{message.author.name} can not afford this much cocaine!')
+            amount = int(str_split[3])*np.sign(int(str_split[3]))
+            index = int(str_split[2])*np.sign(int(str_split[2]))
+            if index == 1:
+                price = round(cocaine.current_price*amount,2)
+                if price <= users[message.author.name]['Coins']:
+                    price = round(cocaine.current_price*amount,2)
+                    users[message.author.name]['cocaine'] += amount
+                    users[message.author.name]['Coins'] -= price
+                    await message.channel.send(f'{message.author.name} bought {amount} cocaine :salt: for {price} <:CBCcoin:831506214659293214> @ {round(cocaine.current_price,2)} per cocaine.')
+                else:
+                    await message.channel.send(f'{message.author.name} can not afford this much cocaine!')
+            if index == 2:
+                price = round(Ingamersh.current_price*amount,2)
+                if price <= users[message.author.name]['Coins']:
+                    price = round(Ingamersh.current_price*amount,2)
+                    users[message.author.name]['ingamersh'] += amount
+                    users[message.author.name]['Coins'] -= price
+                    await message.channel.send(f'{message.author.name} bought {amount} Ingamers verksted :house_with_garden: for {price} <:CBCcoin:831506214659293214> @ {round(Ingamersh.current_price,2)} per Ingamersh verksted.')
+                else:
+                    await message.channel.send(f'{message.author.name} can not afford this much Ingamers verksted!')
 
         events_handler.db.write(users)
 
@@ -614,16 +652,27 @@ async def on_message(message):
     if message.content.startswith('!sell cocaine'):
         str_split = message.content.split(' ')
         if len(str_split) > 3 or len(str_split) < 2:
-            await message.channel.send(f'Too many or few arguments. Use !sell cocaine <amount>')
+            await message.channel.send(f'Too many or few arguments. Use !sell cocaine <index> <amount>')
         else:
             amount = int(str_split[2])*np.sign(int(str_split[2]))
-            price = cocaine.current_price*amount
-            if amount <= users[message.author.name]['cocaine']:
-                users[message.author.name]['cocaine'] -= amount
-                users[message.author.name]['Coins'] += price
-                await message.channel.send(f'{message.author.name} sold {amount} cocaine :salt: for {price} <:CBCcoin:831506214659293214>')
-            else:
-                await message.channel.send(f'{message.author.name} does not own this much cocaine!')
+            index = int(str_split[2])*np.sign(int(str_split[2]))
+            if index == 1:
+                price = round(cocaine.current_price*amount,2)
+                if amount <= users[message.author.name]['cocaine']:
+                    users[message.author.name]['cocaine'] -= amount
+                    users[message.author.name]['Coins'] += price
+                    await message.channel.send(f'{message.author.name} sold {amount} cocaine :salt: for {price} <:CBCcoin:831506214659293214>  @ {round(cocaine.current_price,2)} per cocaine.')
+                else:
+                    await message.channel.send(f'{message.author.name} does not own this much cocaine!')
+            if index == 2:
+                price = round(Ingamersh.current_price*amount,2)
+                if price <= users[message.author.name]['Coins']:
+                    price = round(Ingamersh.current_price*amount,2)
+                    users[message.author.name]['ingamersh'] -= amount
+                    users[message.author.name]['Coins'] += price
+                    await message.channel.send(f'{message.author.name} bought {amount} Ingamers verksted :house_with_garden: for {price} <:CBCcoin:831506214659293214> @ {round(Ingamersh.current_price,2)} per Ingamersh verksted.')
+                else:
+                    await message.channel.send(f'{message.author.name} does not own this much Ingamers verksted!')
 
         events_handler.db.write(users)
 
