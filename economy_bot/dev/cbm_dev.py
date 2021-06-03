@@ -23,7 +23,6 @@ import requests
 #https://discordapp.com/developers
 
 
-
 class Database:
     def __init__(self):
         self.dbName = 'crazy_blazin_database.txt' 
@@ -310,6 +309,21 @@ async def on_message(message):
     
     users = events_handler.db.read()
 
+    if message.author.name == 'Foxxravin':
+        # emoji = get(client.emojis(), name=':first_place:')
+        await message.add_reaction('🥇')
+
+    if message.author.name == 'vitiation':
+        await message.add_reaction('🥈')
+
+    if message.author.name == 'pakistaniel':
+        await message.add_reaction('🥉')
+
+
+
+    if message.author.name not in users:
+        users[message.author.name] = {'Coins': 500, 'Tickets': 1, 'Timer': 0, 'BoostTimer': 0, 'Boosters': 0, 'Actives': [], 'weapons': {'Kick': [2, 1, ':foot:']}}
+        events_handler.db.write(users)
 
     if 'Boosters' not in users[message.author.name]:
         users[message.author.name]['Boosters'] = 0
@@ -319,11 +333,6 @@ async def on_message(message):
 
     if 'Active' not in users[message.author.name]:
         users[message.author.name]['Active'] = '0'
-
-
-    if message.author.name not in users:
-        users[message.author.name] = {'Coins': 500, 'Tickets': 1, 'Timer': 0, 'BoostTimer': 0, 'Boosters': 0, 'Actives': [], 'weapons': {'Kick': [2, 1, ':foot:']}}
-        events_handler.db.write(users)
 
 
     if message.content.startswith('!bal'):
@@ -514,7 +523,7 @@ async def on_message(message):
             cost = shop_items[weapon][1]
             index = shop_items[weapon][2]
             item_icon = shop_items[weapon][3]
-            embed.add_field(name=f"{index}. {weapon} {item_icon}", value=f'Damage: {dmg} | Cost: {cost}')
+            embed.add_field(name=f"{index}. {weapon} {item_icon}", value=f'Damage: {dmg} | Cost: {cost} <:CBCcoin:831506214659293214>')
         await message.channel.send(embed=embed)
         events_handler.db.write(users)
 
