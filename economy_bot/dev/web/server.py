@@ -204,6 +204,11 @@ def obs_gif():
 def obs_donation():
     return render_template('obs_donation.html')
 
+
+@app.route("/stonk")
+def stonk():
+    return render_template('stonk.html')
+
 #curl -X POST localhost:5000/api/files/<id>/predict
 
 if __name__ == "__main__":

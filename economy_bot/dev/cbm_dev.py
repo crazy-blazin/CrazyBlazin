@@ -121,6 +121,7 @@ class Gullfugl:
 
 
 class Stonks:
+    ind = 0
     stonks = []
     def __init__(self, name = 'Cocaine', init_price = 53, drift = 0.002, variance = 1):
         self.price = [init_price]
@@ -140,6 +141,7 @@ class Stonks:
 
     @staticmethod
     def plot_results():
+        Stonks.ind += 1
         fig, ax = plt.subplots(1, len(Stonks.stonks))
         colors = ['black', 'black']
         color_tip = ['red', 'blue']
@@ -153,7 +155,13 @@ class Stonks:
             ax[i].set_xlabel('Time')
         plt.tight_layout()
         plt.savefig('stonk.jpg')
+        plt.savefig(f'web/static/stonk{Stonks.ind}.jpg')
+        try:
+            os.remove(f'web/static/stonk{Stonks.ind-1}.jpg')
+        except:
+            pass
         plt.close()
+        sio.emit('msg', {'img': f"http://localhost:5000/static/stonk{Stonks.ind}.jpg"})
 
 
 
@@ -302,15 +310,16 @@ class MyClient(discord.Client):
         temp_stats = {}
         for key_user in users:
             if 'tot_dmg' not in users[key_user]:
-                users[key_user]['tot_dmg'] =  0
-            temp_stats[key_user] = users[key_user]['tot_dmg']
+                pass
+            else:
+                temp_stats[key_user] = users[key_user]['tot_dmg']
         for key in sorted(temp_stats, key=temp_stats.get, reverse=True):
             if (index < 5):
                 index += 1
                 users[key]['rank'] = index
             else:
                 break
-
+        
         events_handler.db.write(users)
         return users
                         # To force voice state changes for instant changes in boosting roles
@@ -630,7 +639,7 @@ async def on_message(message):
     if message.content.startswith('!buy stonks'):
         users = events_handler.db.read()
         str_split = message.content.split(' ')
-        if len(str_split) > 4 or len(str_split) < 3:
+        if len(str_split) > 4 or len(str_split) < 4:
             await message.channel.send(f'Too many or few arguments. Use !buy stonks <index> <amount>')
         else:
             amount = int(str_split[3])*np.sign(int(str_split[3]))
@@ -660,7 +669,7 @@ async def on_message(message):
     if message.content.startswith('!sell stonks'):
         users = events_handler.db.read()
         str_split = message.content.split(' ')
-        if len(str_split) > 4 or len(str_split) < 3:
+        if len(str_split) > 4 or len(str_split) < 4:
             await message.channel.send(f'Too many or few arguments. Use !sell stonks <index> <amount>')
         else:
             amount = int(str_split[3])*np.sign(int(str_split[3]))
