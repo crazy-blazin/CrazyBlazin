@@ -24,13 +24,12 @@ import requests
 
 
 
-
 shop_items = {'Snake gun': [10, 100, 1, ':snake:'], 
                 'Revolver': [24, 200, 2, ':gun:'], 
                 'Acid dispenser': [38, 300, 3, ':leafy_green:'], 
                 'Ak47': [173, 950, 4, '<:ak47_emo:850092572797698068>'], 
-                'Battlecruiser': [510 , 3100, 5, ':ship:'],
-                'Ahegao Princess': [2110 , 25000, 6, '<:aegao:849030455189438485>']
+                'Battlecruiser': [610 , 3100, 5, ':ship:'],
+                'Ahegao Princess': [6100 , 25000, 6, '<:aegao:849030455189438485>']
                 }
 
 class Database:
@@ -74,22 +73,22 @@ class EventHandler:
         users = self.db.read()
 
         for members in self.coin_aggregation_members:
-            if members not in users:
-                users[members] = {'Coins': 500, 'Tickets': 1, 'Timer': 0, 'BoostTimer': 0, 'Boosters': 0, 'Actives': [], 'weapons': {'Kick': [2, 1, ':foot:']}}
-                users[members]['Actives'] = []
+        #     if members not in users:
+        #         users[members] = {'Coins': 500, 'Tickets': 1, 'Timer': 0, 'BoostTimer': 0, 'Boosters': 0, 'Actives': [], 'weapons': {'Kick': [2, 1, ':foot:']}}
+        #         users[members]['Actives'] = []
 
             state = self.coin_aggregation_members[members]
             channel_state = str(state.channel)
             stream_state = state.self_stream
 
-            if channel_state in self.boosted_channels:
-                if 'Boosted' not in users[members]['Actives']:
-                    users[members]['Actives'].append('Boosted')
-                else:
-                    pass
-                print(f'{members} is boosted')
-            else:
-                users[members]['Actives'] = []
+            # if channel_state in self.boosted_channels:
+            #     if 'Boosted' not in users[members]['Actives']:
+            #         users[members]['Actives'].append('Boosted')
+            #     else:
+            #         pass
+            #     print(f'{members} is boosted')
+            # else:
+            #     users[members]['Actives'] = []
 
             if channel_state != 'None':
                 if stream_state:
@@ -117,7 +116,7 @@ class Gullfugl:
         self.name_list = ['An armored gullfugl', 'A cute gullfugl', 'A rare gullfugl', 'A retarded gullfugl']
         self.name = np.random.choice(self.name_list, 1)[0]
         self.hp = np.random.randint(500,5000)
-        self.drop = self.hp*0.2
+        self.drop = self.hp*0.1
 
 
 
@@ -183,6 +182,7 @@ class MyClient(discord.Client):
                 users[member.name]['cocaine'] = 0
             if 'ingamersh' not in users[member.name]:
                 users[member.name]['ingamersh'] = 0
+            
 
 
         members = self.get_all_members()
@@ -215,6 +215,9 @@ class MyClient(discord.Client):
                 users[member.name]['cocaine'] = 0
             if 'ingamersh' not in users[member.name]:
                 users[member.name]['ingamersh'] = 0
+            if 'rank' not in users[member.name]:
+                users[member.name]['rank'] = 100
+            
 
         probability = np.random.randint(1, 1001)
         for key in users:
@@ -233,22 +236,22 @@ class MyClient(discord.Client):
                                 await member.remove_roles(role)
         events_handler.db.write(users)
 
-        members = self.get_all_members()
-        for key in users:
-            if 'BoostTimer' in users[key]:
-                if users[key]['BoostTimer'] > 0:
-                    users[key]['BoostTimer'] -= 30
-                else:
-                    users[key]['BoostTimer'] = 0
-                    users[key]['Active'] = '0'
-                    # next(user for user in client.users if user.name == key)
-                    for member in members:
-                        if member.name == key:
-                            role_names = [role.name for role in member.roles]
-                            if 'Booster' in role_names:
-                                print('Removing booster role')
-                                role = get(member.guild.roles, name='Booster')
-                                await member.remove_roles(role)
+        # members = self.get_all_members()
+        # for key in users:
+        #     if 'BoostTimer' in users[key]:
+        #         if users[key]['BoostTimer'] > 0:
+        #             users[key]['BoostTimer'] -= 30
+        #         else:
+        #             users[key]['BoostTimer'] = 0
+        #             users[key]['Active'] = '0'
+        #             # next(user for user in client.users if user.name == key)
+        #             for member in members:
+        #                 if member.name == key:
+        #                     role_names = [role.name for role in member.roles]
+        #                     if 'Booster' in role_names:
+        #                         print('Removing booster role')
+        #                         role = get(member.guild.roles, name='Booster')
+        #                         await member.remove_roles(role)
             
         print(probability)
         if probability >= 995:
@@ -293,6 +296,19 @@ class MyClient(discord.Client):
         for stonk in Stonks.stonks:
             stonk.move_price() # move cocaine price
         Stonks.plot_results()
+
+
+
+        index = 1
+        temp_stats = {}
+        for key_user in users:
+            temp_stats[key_user] = users[key_user]['tot_dmg']
+        for key in sorted(temp_stats, key=temp_stats.get, reverse=True):
+            if (index < 4):
+                users[key]['rank'] = index
+                index += 1
+            else:
+                break
 
         events_handler.db.write(users)
         return users
@@ -339,31 +355,30 @@ async def on_voice_state_update(member, before, after):
     print('Changed state: ' + member)
     events_handler.coin_aggregation_members[member] = after
 
-    members = client.get_all_members()
     users = events_handler.db.read()
 
-    events_handler.boosted_channels = []
+    # events_handler.boosted_channels = []
 
-    for mem in members:
-        if str(mem.name) in users:
-            if 'Active' in users[str(mem.name)]:
-                if users[str(mem.name)]['Active'] == 'Booster':
-                    if mem.voice not in events_handler.boosted_channels:
-                        if str(mem.voice) != 'None':
-                            events_handler.boosted_channels.append(str(mem.voice.channel))
+    # for mem in members:
+    #     if str(mem.name) in users:
+    #         if 'Active' in users[str(mem.name)]:
+    #             if users[str(mem.name)]['Active'] == 'Booster':
+    #                 if mem.voice not in events_handler.boosted_channels:
+    #                     if str(mem.voice) != 'None':
+    #                         events_handler.boosted_channels.append(str(mem.voice.channel))
 
-    members = client.get_all_members()
-    for mem in members:
-        if str(mem.voice) != 'None':
-            if str(mem.voice.channel) in events_handler.boosted_channels:
-                role = get(mem.guild.roles, name='Boosted')
-                await mem.add_roles(role)
-            else:
-                role = get(mem.guild.roles, name='Boosted')
-                await mem.remove_roles(role)
-        else:
-            role = get(mem.guild.roles, name='Boosted')
-            await mem.remove_roles(role)
+    # members = client.get_all_members()
+    # for mem in members:
+    #     if str(mem.voice) != 'None':
+    #         if str(mem.voice.channel) in events_handler.boosted_channels:
+    #             role = get(mem.guild.roles, name='Boosted')
+    #             await mem.add_roles(role)
+    #         else:
+    #             role = get(mem.guild.roles, name='Boosted')
+    #             await mem.remove_roles(role)
+    #     else:
+    #         role = get(mem.guild.roles, name='Boosted')
+    #         await mem.remove_roles(role)
     
     events_handler.db.write(users)
     
@@ -374,13 +389,14 @@ async def on_message(message):
     if message.author == client.user:
         return
 
-    if message.author.name == 'Foxxravin':
+    users = events_handler.db.read()
+    if users[message.author.name]['rank'] == 1:
         await message.add_reaction('🥇')
 
-    if message.author.name == 'vitiation':
+    if users[message.author.name]['rank'] == 2:
         await message.add_reaction('🥈')
 
-    if message.author.name == 'pakistaniel':
+    if users[message.author.name]['rank'] == 3:
         await message.add_reaction('🥉')
 
 
