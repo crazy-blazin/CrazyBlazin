@@ -208,6 +208,14 @@ class MyClient(discord.Client):
 
         members = self.get_all_members()
 
+        for member in members:
+            if member.name not in users:
+                users[member.name] = {'Coins': 500, 'Tickets': 1, 'Timer': 0, 'BoostTimer': 0, 'Boosters': 0, 'Actives': [], 'weapons': {'Kick': [2, 1, ':foot:']}}
+            if 'cocaine' not in users[member.name]:
+                users[member.name]['cocaine'] = 0
+            if 'ingamersh' not in users[member.name]:
+                users[member.name]['ingamersh'] = 0
+
         probability = np.random.randint(1, 1001)
         for key in users:
             if 'Timer' in users[key]:
@@ -365,11 +373,8 @@ async def on_voice_state_update(member, before, after):
 async def on_message(message):
     if message.author == client.user:
         return
-    
-    users = events_handler.db.read()
 
     if message.author.name == 'Foxxravin':
-        # emoji = get(client.emojis(), name=':first_place:')
         await message.add_reaction('🥇')
 
     if message.author.name == 'vitiation':
@@ -379,25 +384,10 @@ async def on_message(message):
         await message.add_reaction('🥉')
 
 
-
-    if message.author.name not in users:
-        users[message.author.name] = {'Coins': 500, 'Tickets': 1, 'Timer': 0, 'BoostTimer': 0, 'Boosters': 0, 'Actives': [], 'weapons': {'Kick': [2, 1, ':foot:']}}
-        events_handler.db.write(users)
-
-    if 'Boosters' not in users[message.author.name]:
-        users[message.author.name]['Boosters'] = 0
-
-    if 'Actives' not in users[message.author.name]:
-        users[message.author.name]['Actives'] = []
-
-    if 'Active' not in users[message.author.name]:
-        users[message.author.name]['Active'] = '0'
-
-
     if message.content.startswith('!bal'):
+        users = events_handler.db.read()
         value = users[message.author.name]['Coins']
         ticket = users[message.author.name]['Tickets']
-        boosts = users[message.author.name]['Boosters']
         cocaine_wealth = users[message.author.name]['cocaine']
         ingamersh_wealth = users[message.author.name]['ingamersh']
         embed = discord.Embed(title=f"Balance", description=f"{message.author.name} current balance") #,color=Hex code
@@ -504,7 +494,6 @@ async def on_message(message):
         if EVENT_FOUND:
             await message.channel.send(f'This event does not exist!')
 
-
     if message.content.startswith('!startraffle'):
         str_split = message.content.split(' ')
         if len(str_split) > 2 or len(str_split) <= 1:
@@ -527,7 +516,8 @@ async def on_message(message):
                 else:
                     await message.channel.send(f'You are not the raffle creator!')
         events_handler.db.write(users)
-                    
+
+
     if message.content.startswith('!buy tickets'):
         str_split = message.content.split(' ')
         if len(str_split) > 3 or len(str_split) < 2:
@@ -551,6 +541,7 @@ async def on_message(message):
             await message.channel.send(f'Price: <:CBCcoin:831506214659293214> (CBC) per :tickets: .')
 
         events_handler.db.write(users)
+
 
     if message.content.startswith('!buy CBG'):
         str_split = message.content.split(' ')
@@ -590,6 +581,7 @@ async def on_message(message):
         events_handler.db.write(users)
 
     if message.content.startswith('!buy weapons '):
+        users = events_handler.db.read()
         str_split = message.content.split(' ')
         if len(str_split) > 4 or len(str_split) < 4:
             await message.channel.send(f'Too many or few arguments. Use !buy weapons <index> <amount>')
@@ -611,7 +603,6 @@ async def on_message(message):
         events_handler.db.write(users)
 
 
-
     if message.content.startswith('!stonks'):
         embed = discord.Embed(title=f"Stonks", description=f"Historical and current price of stonks. Buy item use !buy stonks <index> <amount> and !sell stonks <index> <amount>") #,color=Hex code
         file = discord.File("stonk.jpg", filename="stonk.jpg")
@@ -620,6 +611,7 @@ async def on_message(message):
 
 
     if message.content.startswith('!buy stonks'):
+        users = events_handler.db.read()
         str_split = message.content.split(' ')
         if len(str_split) > 4 or len(str_split) < 3:
             await message.channel.send(f'Too many or few arguments. Use !buy stonks <index> <amount>')
@@ -649,6 +641,7 @@ async def on_message(message):
 
 
     if message.content.startswith('!sell stonks'):
+        users = events_handler.db.read()
         str_split = message.content.split(' ')
         if len(str_split) > 4 or len(str_split) < 3:
             await message.channel.send(f'Too many or few arguments. Use !sell stonks <index> <amount>')
@@ -660,12 +653,12 @@ async def on_message(message):
                 if amount <= users[message.author.name]['cocaine']:
                     users[message.author.name]['cocaine'] -= amount
                     users[message.author.name]['Coins'] += price
-                    await message.channel.send(f'{message.author.name} sold {amount} cocaine :salt: for {price} <:CBCcoin:831506214659293214>  @ {round(cocaine.current_price,2)} per cocaine.')
+                    await message.channel.send(f'{message.author.name} sold {amount} cocaine :salt: for {price} <:CBCcoin:831506214659293214> @ {round(cocaine.current_price,2)} per cocaine.')
                 else:
                     await message.channel.send(f'{message.author.name} does not own this much cocaine!')
             if index == 2:
                 price = round(Ingamersh.current_price*amount,2)
-                if price <= users[message.author.name]['Coins']:
+                if amount <= users[message.author.name]['Coins']:
                     price = round(Ingamersh.current_price*amount,2)
                     users[message.author.name]['ingamersh'] -= amount
                     users[message.author.name]['Coins'] += price
