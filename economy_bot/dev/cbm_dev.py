@@ -298,10 +298,11 @@ class MyClient(discord.Client):
         Stonks.plot_results()
 
 
-
         index = 1
         temp_stats = {}
         for key_user in users:
+            if 'tot_dmg' not in users[key_user]:
+                users[key_user]['tot_dmg'] =  0
             temp_stats[key_user] = users[key_user]['tot_dmg']
         for key in sorted(temp_stats, key=temp_stats.get, reverse=True):
             if (index < 4):
