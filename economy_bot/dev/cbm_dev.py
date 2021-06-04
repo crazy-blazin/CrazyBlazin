@@ -27,7 +27,7 @@ import requests
 shop_items = {'Snake gun': [10, 100, 1, ':snake:'], 
                 'Revolver': [24, 200, 2, ':gun:'], 
                 'Acid dispenser': [38, 300, 3, ':leafy_green:'], 
-                'Ak47': [173, 950, 4, '<:ak47_emo:850092572797698068>'], 
+                'Ak47': [173, 950, 4, '<:ak47_emo_:850128015837102112>'], 
                 'Battlecruiser': [610 , 3100, 5, ':ship:'],
                 'Ahegao Princess': [6100 , 25000, 6, '<:aegao:849030455189438485>']
                 }
@@ -648,6 +648,7 @@ async def on_message(message):
                             users[message.author.name]['weapons'][weapon] = [shop_items[weapon][0], amount, shop_items[weapon][3]]
                         else:
                             users[message.author.name]['weapons'][weapon][1] += amount
+                            users[message.author.name]['weapons'][weapon][2] == shop_items[weapon][3]
                     else:
                         await message.channel.send(f'{message.author.name} can not afford this!')
         events_handler.db.write(users)
@@ -683,7 +684,7 @@ async def on_message(message):
                     price = round(Ingamersh.current_price*amount,2)
                     users[message.author.name]['ingamersh'] += amount
                     users[message.author.name]['Coins'] -= price
-                    await message.channel.send(f'{message.author.name} bought {amount} Ingamers verksted :house_with_garden: for {price} <:CBCcoin:831506214659293214> @ {round(Ingamersh.current_price,2)} per Ingamersh verksted.')
+                    await message.channel.send(f'{message.author.name} bought {amount} Ingamersh verksted :house_with_garden: for {price} <:CBCcoin:831506214659293214> @ {round(Ingamersh.current_price,2)} per Ingamersh verksted.')
                 else:
                     await message.channel.send(f'{message.author.name} can not afford this much Ingamersh verksted!')
 
@@ -708,7 +709,7 @@ async def on_message(message):
                     await message.channel.send(f'{message.author.name} does not own this much cocaine!')
             if index == 2:
                 price = round(Ingamersh.current_price*amount,2)
-                if amount <= users[message.author.name]['Coins']:
+                if amount <= users[message.author.name]['ingamersh']:
                     price = round(Ingamersh.current_price*amount,2)
                     users[message.author.name]['ingamersh'] -= amount
                     users[message.author.name]['Coins'] += price
