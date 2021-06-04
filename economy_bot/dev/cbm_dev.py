@@ -661,7 +661,7 @@ async def on_message(message):
                     users[message.author.name]['Coins'] -= price
                     await message.channel.send(f'{message.author.name} bought {amount} Ingamers verksted :house_with_garden: for {price} <:CBCcoin:831506214659293214> @ {round(Ingamersh.current_price,2)} per Ingamersh verksted.')
                 else:
-                    await message.channel.send(f'{message.author.name} can not afford this much Ingamers verksted!')
+                    await message.channel.send(f'{message.author.name} can not afford this much Ingamersh verksted!')
 
         events_handler.db.write(users)
 
