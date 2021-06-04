@@ -218,6 +218,10 @@ class MyClient(discord.Client):
             users[key]['tot_dmg'] = tot_dmg
 
         members = self.get_all_members()
+        for member in members:
+            role_names = [role.name for role in member.roles]
+            if 'Bots' in role_names:
+                 users.pop(member.name, None)
 
         for member in members:
             if member.name not in users:
@@ -451,13 +455,16 @@ async def on_message(message):
         users = events_handler.db.read()
         index = 1
         embed = discord.Embed(title="Top damage dealers", description="Users with highest damage") #,color=Hex code
-            
+        medaljonger = [':first_place:', ':second_place:', ':third_place:']
         temp_stats = {}
         for key_user in users:
             temp_stats[key_user] = users[key_user]['tot_dmg']
         for key in sorted(temp_stats, key=temp_stats.get, reverse=True):
             if (index < 11):
-                embed.add_field(name=f"{index}. {key}", value=f'{users[key]["tot_dmg"]} :crossed_swords:')
+                if index < 4:
+                    embed.add_field(name=f"{index}{medaljonger[index-1]}. {key}", value=f'{users[key]["tot_dmg"]} :crossed_swords:')
+                else:
+                    embed.add_field(name=f"{index}. {key}", value=f'{users[key]["tot_dmg"]} :crossed_swords:')
             else:
                 await message.channel.send(embed=embed)
                 return

@@ -120,7 +120,7 @@ class Monster:
         self.health = health
         self.atk = atk
         self.armor = armor
-        self.img = 'https://raw.githubusercontent.com/MartinRovang/CrazyBlazin/main/images/mobs/goblin_familiy.png'
+        self.img = 'https://raw.githubusercontent.com/MartinRovang/CrazyBlazin/main/images/mobs/ararajuba--guaruba-guarouba------golden-parakeet-158698703-5b5a6e67c9e77c0050187aec.jpg'
         self.eventlogs = [] #{'textevents': ["DWNDJWND", "DWNDJWND22"], 'color': ["red", "blue"], 'size': ["30", "10"]}
         self.loot_table = loot_table
         self.loot_chance = loot_chance
@@ -134,10 +134,6 @@ class Monster:
         #EventUI("MONSTER HIT PAUL FOR 10 DMG", "red", "30")
         # CALCULATE EVENT
         users = db.read()
-        users[target]['rpg'] = {}
-        users[target]['rpg']['health'] = 100
-        users[target]['rpg']['atk'] = 100
-        users[target]['rpg']['armor'] = 2
         for user in users:
             i = 0
             if user == target:
