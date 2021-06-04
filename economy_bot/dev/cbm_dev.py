@@ -17,6 +17,8 @@ import concurrent.futures
 from skimage.morphology import disk
 from skimage.filters.rank import mean
 import requests
+import base64
+import io 
 
 # client = commands.Bot(command_prefix='!')
 
@@ -158,13 +160,10 @@ class Stonks:
             ax[i].set_xlabel('Time')
         plt.tight_layout()
         plt.savefig('stonk.jpg')
-        plt.savefig(f'web/static/stonk{Stonks.ind}.jpg')
-        try:
-            os.remove(f'web/static/stonk{Stonks.ind-1}.jpg')
-        except:
-            pass
         plt.close()
-        sio.emit('msg', {'img': f"http://localhost:5000/static/stonk{Stonks.ind}.jpg"})
+
+        x_vals = np.np.arange(0, len(stonk.price[-1000:]))
+        sio.emit('msg', {'x': x_vals, 'y': stonk.price[-1000:]})
 
 
 
