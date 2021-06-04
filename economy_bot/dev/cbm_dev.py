@@ -134,10 +134,13 @@ class Stonks:
     
     def move_price(self):
         self.price.append(self.drift + self.price[-1] + np.random.normal(0, self.variance))
+        price_collapse = False
         if self.price[-1] <= 0:
-            self.price[-1] = 0
+            self.price[-1] = 53
+            price_collapse = True
 
         self.current_price = round(self.price[-1], 2)
+        return price_collapse
 
     @staticmethod
     def plot_results():
@@ -165,8 +168,8 @@ class Stonks:
 
 
 
-cocaine = Stonks(name = 'Cocaine', init_price = 92.36, drift = 0.002, variance = 1)
-Ingamersh = Stonks(name = 'Ingamersh verksted', init_price = 128.69, drift = 0.001, variance = 5)
+cocaine = Stonks(name = 'Cocaine', init_price = 161.14, drift = 0.002, variance = 1)
+Ingamersh = Stonks(name = 'Ingamersh verksted', init_price = 472.39, drift = 0.001, variance = 5)
 
 
 class MyClient(discord.Client):
@@ -274,6 +277,7 @@ class MyClient(discord.Client):
             for key in users:
                 shuffled_users.append(key)
             np.random.shuffle(shuffled_users)
+            print(shuffled_users)
             super_tot_dmg = 0
             for key in shuffled_users:
                 tot_dmg = 0
@@ -302,7 +306,14 @@ class MyClient(discord.Client):
 
 
         for stonk in Stonks.stonks:
-            stonk.move_price() # move cocaine price
+            price_collapse = stonk.move_price() # move cocaine price
+            if price_collapse: # Remove all if price collapse
+                for key in users:
+                    if stonk.name == 'Ingamersh verksted':
+                        users[key]['ingamersh'] = 0
+                    if stonk.name == 'Cocaine':
+                        users[key]['cocaine'] = 0
+
         Stonks.plot_results()
 
 
@@ -590,7 +601,13 @@ async def on_message(message):
         else:
             await message.channel.send(f'{message.author.name} does not have enough <:CBCcoin:831506214659293214> (CBC) to buy Crazy Blazin Gold!')
             await message.channel.send(f' Price: 500 <:CBCcoin:831506214659293214> (CBC).')
+            
         events_handler.db.write(users)
+
+
+    if message.content.startswith('!help'):
+        await message.channel.send(f' See commands channel for help!')
+
 
 
     
