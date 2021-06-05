@@ -26,6 +26,7 @@ import io
 
 
 
+
 shop_items = {'Snake gun': [10, 100, 1, ':snake:'], 
                 'Revolver': [24, 200, 2, ':gun:'], 
                 'Acid dispenser': [38, 300, 3, ':leafy_green:'], 
@@ -183,7 +184,7 @@ class Stonks:
 
 
 cocaine = Stonks(name = 'Cocaine', init_price = 1, drift = 0, mean = 3, variance = 2, include_order = False)
-Ingamersh = Stonks(name = 'Ingamersh verksted', init_price = 128.8, drift = 0.15, variance = 50)
+Ingamersh = Stonks(name = 'Ingamersh verksted', init_price = 202.58, drift = 0.15, variance = 50)
 
 
 class MyClient(discord.Client):
@@ -284,8 +285,8 @@ class MyClient(discord.Client):
             
         print(probability)
         if probability >= 995:
-            channel = client.get_channel(849752403687374899)
-            # channel = client.get_channel(734481490431443068)
+            # channel = client.get_channel(849752403687374899)
+            channel = client.get_channel(734481490431443068)
             events_handler.gullfugl = Gullfugl()
 
             event = []
@@ -327,7 +328,7 @@ class MyClient(discord.Client):
         # channel = client.get_channel(795738540251545620)
         bankrupcy_lock = False
         for key in users:
-            if users[key]['cocaine'] > 0:
+            if users[key]['cocaine'] > 0 or users[key]['ingamersh'] > 0:
                 bankrupcy_lock = True
                 break
             
@@ -337,19 +338,28 @@ class MyClient(discord.Client):
                 for key in users:
                     if stonk.name == 'Ingamersh verksted':
                         users[key]['ingamersh'] = 0
-                        if bankrupcy_lock:
-                            embed = discord.Embed(title=f"Bankrupt!", description=f"We are sorry, but {stonk.name} is bankrupt and everyone lost all their shares!") #,color=Hex code
-                            embed.set_image(url="https://media.giphy.com/media/3oriO5t2QB4IPKgxHi/giphy.gif")
-                            await channel.send(embed=embed)
                     if stonk.name == 'Cocaine':
-                        if bankrupcy_lock:
-                            embed = discord.Embed(title=f"Police raid!", description=f"Police have found every owner of cocaine. Everyone lost their cocaine!") #,color=Hex code
-                            embed.set_image(url="https://media.giphy.com/media/7wouU3i8xWB0I/giphy.gif")
-                            await channel.send(embed=embed)
                         users[key]['cocaine'] = 0
-    
+
+                if bankrupcy_lock:
+                    if stonk.name == 'Ingamersh verksted':
+                        embed = discord.Embed(title=f"Bankrupt!", description=f"We are sorry, but {stonk.name} is bankrupt and everyone lost all their shares!") #,color=Hex code
+                        embed.set_image(url="https://media.giphy.com/media/3oriO5t2QB4IPKgxHi/giphy.gif")
+                        await channel.send(embed=embed)
+                    if stonk.name == 'Cocaine':
+                        busted_gifs = ['https://media2.giphy.com/media/l2SpTqt1GogboNnBm/giphy.gif?cid=ecf05e47brua9wj4cgxm8u0iorb3te6kr4akr33v2dvx61vo&rid=giphy.gif&ct=g',
+                                                        'https://media.giphy.com/media/3oriO5t2QB4IPKgxHi/giphy.gif',
+                                                        'https://media.giphy.com/media/l0HlEVps1ahASNDUY/giphy.gif']
+
+                        embed = discord.Embed(title=f"Busted by police!", description=f"We are sorry, but everyone got busted by police and lost all their cocaine!") #,color=Hex code
+                        embed.set_image(url=f"{np.random.choice(busted_gifs)}")
+                        await channel.send(embed=embed)
+
         Stonks.plot_results()
 
+# embed = discord.Embed(title=f"Bankrupt!", description=f"We are sorry, but {stonk.name} is bankrupt and everyone lost all their shares!") #,color=Hex code
+# embed.set_image(url="https://media.giphy.com/media/3oriO5t2QB4IPKgxHi/giphy.gif")
+# await channel.send(embed=embed)
 
         index = 0
         temp_stats = {}
@@ -711,7 +721,12 @@ async def on_message(message):
 
     if message.content.startswith('!buy stonks'):
         users = events_handler.db.read()
+
         str_split = message.content.split(' ')
+        busted_gifs = ['https://media2.giphy.com/media/l2SpTqt1GogboNnBm/giphy.gif?cid=ecf05e47brua9wj4cgxm8u0iorb3te6kr4akr33v2dvx61vo&rid=giphy.gif&ct=g',
+                                                        'https://media.giphy.com/media/3oriO5t2QB4IPKgxHi/giphy.gif',
+                                                        'https://media.giphy.com/media/l0HlEVps1ahASNDUY/giphy.gif']
+        busted_by_police_chance = np.random.randint(1, 101)
         if len(str_split) > 4 or len(str_split) < 4:
             await message.channel.send(f'Too many or few arguments. Use !buy stonks <index> <amount>')
         else:
@@ -722,9 +737,15 @@ async def on_message(message):
                     price = round(cocaine.current_price*amount,2)
                     if price <= users[message.author.name]['Coins']:
                         price = round(cocaine.current_price*amount,2)
-                        users[message.author.name]['cocaine'] += amount
-                        users[message.author.name]['Coins'] -= price
-                        await message.channel.send(f'{message.author.name} bought {amount} cocaine :salt: for {price} <:CBCcoin:831506214659293214> @ {round(cocaine.current_price,2)} per cocaine.')
+                        if busted_by_police_chance > 99:
+                            embed = discord.Embed(title=f"Busted by police!", description=f"We are sorry, but you got busted by police and lost all the cocaine!") #,color=Hex code
+                            embed.set_image(url=f"{np.random.choice(busted_gifs)}")
+                            await message.channel.send(embed=embed)
+                            users[message.author.name]['Coins'] -= price
+                        else:
+                            users[message.author.name]['cocaine'] += amount
+                            users[message.author.name]['Coins'] -= price
+                            await message.channel.send(f'{message.author.name} bought {amount} cocaine :salt: for {price} <:CBCcoin:831506214659293214> @ {round(cocaine.current_price,2)} per cocaine.')
                     else:
                         await message.channel.send(f'{message.author.name} can not afford this much cocaine!')
                 else:
@@ -754,9 +775,15 @@ async def on_message(message):
             if index == 1:
                 price = round(cocaine.current_price*amount,2)
                 if amount <= users[message.author.name]['cocaine']:
-                    users[message.author.name]['cocaine'] -= amount
-                    users[message.author.name]['Coins'] += price
-                    await message.channel.send(f'{message.author.name} sold {amount} cocaine :salt: for {price} <:CBCcoin:831506214659293214> @ {round(cocaine.current_price,2)} per cocaine.')
+                    if busted_by_police_chance > 99:
+                        embed = discord.Embed(title=f"Busted by police!", description=f"We are sorry, but you got busted by police and lost all the cocaine!") #,color=Hex code
+                        embed.set_image(url=f"{np.random.choice(busted_gifs)}")
+                        users[message.author.name]['cocaine'] -= amount
+                        await message.channel.send(embed=embed)
+                    else:
+                        users[message.author.name]['cocaine'] -= amount
+                        users[message.author.name]['Coins'] += price
+                        await message.channel.send(f'{message.author.name} sold {amount} cocaine :salt: for {price} <:CBCcoin:831506214659293214> @ {round(cocaine.current_price,2)} per cocaine.')
                 else:
                     await message.channel.send(f'{message.author.name} does not own this much cocaine!')
             if index == 2:
