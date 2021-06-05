@@ -11,79 +11,98 @@
     integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6" crossorigin="anonymous">
 
 
-    <style>
-      body {
-        background-color: black;
-      }
-  
-      #container {
-        width: 1200px;
-        margin: 0 auto;
-      }
-      
+  <style>
+    body {
+      background-color: white;
+    }
+
+    #container {
+      width: 1200px;
+      margin: 0 auto;
+    }
+
     .middle {
-        margin: 0 auto;
+      margin: 0 auto;
     }
+
     .table_element_width {
-        width: 600px;
+      width: 600px;
     }
+
     .img-container {
-          text-align: center;
-        }
-  
-      /* The sidebar menu */
-  .sidenav {
-    height: 100%; /* Full-height: remove this if you want "auto" height */
-    width: 160px; /* Set the width of the sidebar */
-    z-index: 1; /* Stay on top */
-    top: 30%; /* Stay at the top */
-    left: 5%;
-    background-color: black; /* Black */
-    overflow-x: hidden; /* Disable horizontal scroll */
-    padding-top: 20px;
-  }
-  
-  /* The navigation menu links */
-  .sidenav a {
-    padding: 6px 8px 6px 16px;
-    text-decoration: none;
-    font-size: 25px;
-    color: white;
-    display: block;
-  }
-  
-  /* When you mouse over the navigation links, change their color */
-  .sidenav a:hover {
-    color: purple;
-  }
-  .commands_text {
+      text-align: center;
+    }
 
+    /* The sidebar menu */
+    .sidenav {
+      height: 100%;
+      /* Full-height: remove this if you want "auto" height */
+      width: 160px;
+      /* Set the width of the sidebar */
+      z-index: 1;
+      /* Stay on top */
+      top: 30%;
+      /* Stay at the top */
+      left: 5%;
+      background-color: black;
+      /* Black */
+      overflow-x: hidden;
+      /* Disable horizontal scroll */
+      padding-top: 20px;
+    }
 
-  }
-  
-  /* Style page content */
-  .main {
-    margin-left: 160px; /* Same as the width of the sidebar */
-    padding: 0px 10px;
-  }
-  
-  /* On smaller screens, where height is less than 450px, change the style of the sidebar (less padding and a smaller font size) */
-  @media screen and (max-height: 450px) {
-    .sidenav {padding-top: 15px;}
-    .sidenav a {font-size: 18px;}
-  }
+    /* The navigation menu links */
+    .sidenav a {
+      padding: 6px 8px 6px 16px;
+      text-decoration: none;
+      font-size: 25px;
+      color: white;
+      display: block;
+    }
 
-  #msg {
-    font-size: 48px;
-    color: whitesmoke;
- 
-  }
+    /* When you mouse over the navigation links, change their color */
+    .sidenav a:hover {
+      color: purple;
+    }
 
-  #img {
-    height: 400px; /* Full-height: remove this if you want "auto" height */
-    width: 400px; /* Set the width of the sidebar */
+    .commands_text {}
 
-  }
+    /* Style page content */
+    .main {
+      margin-left: 160px;
+      /* Same as the width of the sidebar */
+      padding: 0px 10px;
+    }
+
+    /* On smaller screens, where height is less than 450px, change the style of the sidebar (less padding and a smaller font size) */
+    @media screen and (max-height: 450px) {
+      .sidenav {
+        padding-top: 15px;
+      }
+
+      .sidenav a {
+        font-size: 18px;
+      }
+    }
+
+    #msg {
+      font-size: 48px;
+      color: whitesmoke;
+
+    }
+
+    #img {
+      height: 400px;
+      /* Full-height: remove this if you want "auto" height */
+      width: 400px;
+      /* Set the width of the sidebar */
+
+    }
+
+    .test {
+      height: 400px;
+      width: 400px;
+    }
   </style>
 
 
@@ -92,36 +111,139 @@
 </head>
 
 <body>
-  <img id="img"> </img>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"
+    integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA=="
+    crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <div class="test">
+    <canvas id="myChart"></canvas>
+    <canvas id="myChart2"></canvas>
+  </div>
+  <div style="display:none;">
+    <img id="source"
+         style="color: pink;"
+         src="https://upload.wikimedia.org/wikipedia/commons/1/18/Double-barred_dollar_sign.svg"
+         width="8" height="8">
+  </div>
   <script>
-  
-  socket = io();
-  
-  socket.on('connect',function(sid, environ) {
-    console.log('Client has connected to the server!');
-  });
-  
-  socket.on('clientMsg',function(data) {
-    console.log('Received a message from the server!', data);
-    console.log(img.src);
-    // img.src = data.img;
-    img.src = "data:image/jpg;base64, " + data.img
-    var src = document.getElementById("img");
-    src.style.height = '500px';
-    src.style.width = '800px';
-    img.style.display = 'inline';
-  });
-  
-  socket.on('disconnect',function(sid) {
-    console.log('The client has disconnected!');
-  });
-  
-  // Sends a message to the server via sockets
-  function send(message) {
-    socket.emit('msg', message);
-  };
-  send('hello');
+    const xAxis = [];
+    const properData = [];
+    const properData2 = [];
+    const image = document.getElementById('source');
+
+    const mainData = {
+      datasets: [{
+        labels: xAxis,
+        label: 'Cocaine',
+        backgroundColor: '#56C900',
+        borderColor: '#6CFC01',
+        data: properData,
+      }]
+    };
+    const mainData2 = {
+      datasets: [{
+        labels: xAxis,
+        label: 'Ingamersh verksted',
+        backgroundColor: '#00C9C6',
+        borderColor: '#01FCF8',
+        data: properData2,
+      }]
+    };
+
+    const config = {
+      type: 'line',
+      data: mainData,
+      options: {
+        elements: {
+          point: {
+            pointStyle: image
+          },
+          line: {
+            borderWidth: 2,
+          }
+        },
+        plugins: {
+          title: {
+            display: true,
+            text: 'Current value: ' + 0 //data.y1[data.y1.length - 1]
+          }
+        }
+      }
+    };
+    var myChart = new Chart(
+      document.getElementById('myChart'),
+      config
+    );
+
+
+    const config2 = {
+      type: 'line',
+      data: mainData2,
+      options: {
+        elements: {
+          point: {
+            pointStyle: image,
+            backgroundColor: 'green',
+          },
+          line: {
+            borderWidth: 2,
+          }
+        },
+        plugins: {
+          title: {
+            display: true,
+            text: 'Current value: ' + 0 //data.y2[data.y2.length - 1]
+          }
+        }
+      }
+    };
+    var myChart2 = new Chart(
+      document.getElementById('myChart2'),
+      config2
+    );
+    socket = io();
+
+    socket.on('connect', function (sid, environ) {
+      console.log('Client has connected to the server!');
+    });
+
+    socket.on('clientMsg', function (data) {
+      console.log('Received a message from the server!', data);
+
+      const xAxis = data.x.map(x => x.toString());
+
+      const properData = data.y1.map((point, index) => {
+        return { x: xAxis[index], y: point }
+      })
+      const properData2 = data.y2.map((point, index) => {
+        return { x: xAxis[index], y: point }
+      })
+      myChart.data.datasets[0].data = properData;
+      myChart.data.labels = properData.map(x => x.x);
+      myChart.options.plugins.title.text = 'Current value: ' + properData[properData.length - 1].y;
+      myChart.update();
+
+      myChart2.data.datasets[0].data = properData2;
+      myChart2.data.labels = properData2.map(x => x.x);
+      myChart2.options.plugins.title.text = 'Current value: ' + properData2[properData2.length - 1].y;
+
+      myChart2.update();
+    });
+
+    socket.on('disconnect', function (sid) {
+      console.log('The client has disconnected!');
+    });
+
+    // Sends a message to the server via sockets
+    function send(message) {
+      socket.emit('msg', message);
+    };
+    send('hello');
+
+
+
+
+
   </script>
 </body>
 

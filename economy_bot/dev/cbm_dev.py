@@ -94,18 +94,18 @@ class EventHandler:
 
             if channel_state != 'None':
                 if stream_state:
-                    if 'Boosted' in users[members]['Actives']:
-                        users[members]['Coins'] = round(users[members]['Coins'] + 1*3, 2)
-                    else:
+                    try:
                         users[members]['Coins'] = round(users[members]['Coins'] + 1, 2)
-
+                    except KeyError as msg:
+                        print(msg)
+                        pass
                     print(f'Stream activity: {members}')
                 else:
-                    if 'Boosted' in users[members]['Actives']:
-                        users[members]['Coins'] = round(users[members]['Coins'] + 0.33*3, 2)
-                    else:
+                    try:
                         users[members]['Coins'] = round(users[members]['Coins'] + 0.33, 2)
-
+                    except KeyError as msg:
+                        print(msg)
+                        pass
                 print(f'Coins to : {members}')
 
         self.db.write(users)
@@ -135,14 +135,11 @@ class Stonks:
 
     
     def move_price(self):
-        self.price.append(self.drift + self.price[-1] + np.random.normal(0, self.variance))
-        price_collapse = False
+        self.price.append(round(self.drift + self.price[-1] + np.random.normal(0, self.variance), 2))
         if self.price[-1] <= 0:
-            self.price[-1] = 53
-            price_collapse = True
+            self.price[-1] = 1
 
         self.current_price = round(self.price[-1], 2)
-        return price_collapse
 
     @staticmethod
     def plot_results():
@@ -150,25 +147,28 @@ class Stonks:
         fig, ax = plt.subplots(1, len(Stonks.stonks))
         colors = ['black', 'black']
         color_tip = ['red', 'blue']
+        volatility = ['Small', 'Large']
+        two_stonks = []
         for i, stonk in enumerate(Stonks.stonks):
+            two_stonks.append(stonk.price[-1000:])
             ax[i].plot(stonk.price[-1000:], linewidth = 1, color = colors[i])
             ax[i].plot(len(stonk.price[-1000:])-1, stonk.current_price, 'o', color = color_tip[i])
             ax[i].plot(len(stonk.price[-1000:])-1, stonk.current_price, 'o', color = color_tip[i], fillstyle = 'none', markersize = 10)
             ax[i].plot(len(stonk.price[-1000:])-1, stonk.current_price, 'o', color = color_tip[i], fillstyle = 'none', markersize = 15)
-            ax[i].set_title(f'{i+1}. {stonk.name} \n price: {stonk.current_price}')
+            ax[i].set_title(f'{i+1}. {stonk.name} \n price: {stonk.current_price} \n Volatility: {volatility}')
             ax[i].set_ylabel('Crazy blazin coins')
             ax[i].set_xlabel('Time')
         plt.tight_layout()
         plt.savefig('stonk.jpg')
         plt.close()
 
-        x_vals = np.np.arange(0, len(stonk.price[-1000:]))
-        sio.emit('msg', {'x': x_vals, 'y': stonk.price[-1000:]})
+        x_vals = [x for x in range(0, len(two_stonks[0]))]
+        sio.emit('msg', {'x': x_vals, 'y1': two_stonks[0], 'y2': two_stonks[1]})
 
 
 
-cocaine = Stonks(name = 'Cocaine', init_price = 161.14, drift = 0.002, variance = 1)
-Ingamersh = Stonks(name = 'Ingamersh verksted', init_price = 472.39, drift = 0.001, variance = 5)
+cocaine = Stonks(name = 'Cocaine', init_price = 128.63, drift = 0.02, variance = 2)
+Ingamersh = Stonks(name = 'Ingamersh verksted', init_price = 535.52, drift = 0.01, variance = 10)
 
 
 class MyClient(discord.Client):
@@ -309,14 +309,7 @@ class MyClient(discord.Client):
 
 
         for stonk in Stonks.stonks:
-            price_collapse = stonk.move_price() # move cocaine price
-            if price_collapse: # Remove all if price collapse
-                for key in users:
-                    if stonk.name == 'Ingamersh verksted':
-                        users[key]['ingamersh'] = 0
-                    if stonk.name == 'Cocaine':
-                        users[key]['cocaine'] = 0
-
+            stonk.move_price() # move cocaine price
         Stonks.plot_results()
 
 
@@ -414,14 +407,17 @@ async def on_message(message):
         return
 
     users = events_handler.db.read()
-    if users[message.author.name]['rank'] == 1:
-        await message.add_reaction('🥇')
+    try:
+        if users[message.author.name]['rank'] == 1:
+            await message.add_reaction('🥇')
 
-    if users[message.author.name]['rank'] == 2:
-        await message.add_reaction('🥈')
+        if users[message.author.name]['rank'] == 2:
+            await message.add_reaction('🥈')
 
-    if users[message.author.name]['rank'] == 3:
-        await message.add_reaction('🥉')
+        if users[message.author.name]['rank'] == 3:
+            await message.add_reaction('🥉')
+    except KeyError as msg:
+        print(msg + 'RANK')
 
 
     if message.content.startswith('!bal'):
