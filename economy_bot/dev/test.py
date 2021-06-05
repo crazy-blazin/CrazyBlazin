@@ -20,7 +20,7 @@ for l in range(0, 5):
     price = [5]
     tot = 0
     for i in range(1, 1000):
-        x = 0.12 + price[-1]  + np.random.normal(0, 30)
+        x = np.random.normal(4, 3)
         price.append(x)
         if x <= 0:
             tot += 1

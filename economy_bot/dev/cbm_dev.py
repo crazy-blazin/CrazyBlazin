@@ -181,8 +181,8 @@ class Stonks:
 
 
 
-cocaine = Stonks(name = 'Cocaine', init_price = 5, drift = 0, mean = 5, variance = 2, include_order = False)
-Ingamersh = Stonks(name = 'Ingamersh verksted', init_price = 307.54, drift = 0.12, variance = 30)
+cocaine = Stonks(name = 'Cocaine', init_price = 5, drift = 0, mean = 4, variance = 3, include_order = False)
+Ingamersh = Stonks(name = 'Ingamersh verksted', init_price = 0, drift = 0.12, variance = 30)
 
 
 class MyClient(discord.Client):
@@ -322,7 +322,7 @@ class MyClient(discord.Client):
             await channel.send(embed=embed)
 
 
-        channel = client.get_channel(734481490431443068)
+        channel = client.get_channel(803982821923356773)
         # channel = client.get_channel(795738540251545620)
         for stonk in Stonks.stonks:
             price_collapse = stonk.move_price() # move cocaine price
@@ -705,7 +705,7 @@ async def on_message(message):
             amount = int(str_split[3])*np.sign(int(str_split[3]))
             index = int(str_split[2])*np.sign(int(str_split[2]))
             if index == 1:
-                if (users[message.author.name]['cocaine']+amount) <= 200:
+                if (users[message.author.name]['cocaine']+amount) <= 50:
                     price = round(cocaine.current_price*amount,2)
                     if price <= users[message.author.name]['Coins']:
                         price = round(cocaine.current_price*amount,2)
