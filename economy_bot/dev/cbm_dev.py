@@ -143,6 +143,7 @@ class Stonks:
         else:
             self.price.append(round(self.drift +  1.5*np.sin(self.time*0.2)+ np.random.normal(self.mean, self.variance), 2))
         price_collapse = False
+        self.time += 1 
         if self.price[-1] <= 0:
             if self.include_order:
                 self.price[-1] = 153
