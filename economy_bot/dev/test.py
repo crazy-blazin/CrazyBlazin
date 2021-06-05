@@ -17,10 +17,10 @@ import numpy as np
 
 
 for l in range(0, 5):
-    price = [5]
+    price = [15]
     tot = 0
     for i in range(1, 1000):
-        x = np.random.normal(4, 3)
+        x = np.random.normal(15, 40)
         price.append(x)
         if x <= 0:
             tot += 1

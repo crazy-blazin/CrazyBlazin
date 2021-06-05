@@ -25,6 +25,7 @@ import io
 #https://discordapp.com/developers
 
 
+
 shop_items = {'Snake gun': [10, 100, 1, ':snake:'], 
                 'Revolver': [24, 200, 2, ':gun:'], 
                 'Acid dispenser': [38, 300, 3, ':leafy_green:'], 
@@ -145,7 +146,7 @@ class Stonks:
             if self.include_order:
                 self.price[-1] = 153
             else:
-                self.price[-1] = 5
+                self.price[-1] = 1
             price_collapse = True
 
         self.current_price = round(self.price[-1], 2)
@@ -181,8 +182,8 @@ class Stonks:
 
 
 
-cocaine = Stonks(name = 'Cocaine', init_price = 5, drift = 0, mean = 4, variance = 3, include_order = False)
-Ingamersh = Stonks(name = 'Ingamersh verksted', init_price = 0, drift = 0.12, variance = 30)
+cocaine = Stonks(name = 'Cocaine', init_price = 1, drift = 0, mean = 3, variance = 2, include_order = False)
+Ingamersh = Stonks(name = 'Ingamersh verksted', init_price = 128.8, drift = 0.15, variance = 50)
 
 
 class MyClient(discord.Client):
@@ -324,17 +325,29 @@ class MyClient(discord.Client):
 
         channel = client.get_channel(803982821923356773)
         # channel = client.get_channel(795738540251545620)
+        bankrupcy_lock = False
+        for key in users:
+            if users[key]['cocaine'] > 0:
+                bankrupcy_lock = True
+                break
+            
         for stonk in Stonks.stonks:
             price_collapse = stonk.move_price() # move cocaine price
             if price_collapse: # Remove all if price collapse
                 for key in users:
                     if stonk.name == 'Ingamersh verksted':
                         users[key]['ingamersh'] = 0
+                        if bankrupcy_lock:
+                            embed = discord.Embed(title=f"Bankrupt!", description=f"We are sorry, but {stonk.name} is bankrupt and everyone lost all their shares!") #,color=Hex code
+                            embed.set_image(url="https://media.giphy.com/media/3oriO5t2QB4IPKgxHi/giphy.gif")
+                            await channel.send(embed=embed)
                     if stonk.name == 'Cocaine':
+                        if bankrupcy_lock:
+                            embed = discord.Embed(title=f"Police raid!", description=f"Police have found every owner of cocaine. Everyone lost their cocaine!") #,color=Hex code
+                            embed.set_image(url="https://media.giphy.com/media/7wouU3i8xWB0I/giphy.gif")
+                            await channel.send(embed=embed)
                         users[key]['cocaine'] = 0
-                embed = discord.Embed(title=f"Bankrupt!", description=f"We are sorry, but {stonk.name} is bankrupt and everyone lost all their shares!") #,color=Hex code
-                embed.set_image(url="https://media.giphy.com/media/3oriO5t2QB4IPKgxHi/giphy.gif")
-                await channel.send(embed=embed)
+    
         Stonks.plot_results()
 
 
@@ -715,7 +728,7 @@ async def on_message(message):
                     else:
                         await message.channel.send(f'{message.author.name} can not afford this much cocaine!')
                 else:
-                    await message.channel.send(f'{message.author.name} The resistance does not want to make you an monopoly. You can hold max 200 cocaine!')
+                    await message.channel.send(f'{message.author.name} The resistance does not want to make you an monopoly. You can hold max 50 cocaine!')
                 
             if index == 2:
                 price = round(Ingamersh.current_price*amount,2)
