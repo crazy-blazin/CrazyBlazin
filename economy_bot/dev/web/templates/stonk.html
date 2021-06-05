@@ -13,7 +13,7 @@
 
   <style>
     body {
-      background-color: white;
+      background-color: rgba(255,255,255, 0.7);
     }
 
     #container {
@@ -100,8 +100,16 @@
     }
 
     .test {
-      height: 400px;
-      width: 400px;
+      height: 50%;
+      width: 50%;
+      justify-content: center;
+      margin: 0 auto;
+    }
+
+    .stonkbtns {
+      margin-top: 24px;
+      margin-left: 24px;
+      font-size: 16px;
     }
   </style>
 
@@ -115,15 +123,13 @@
     integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA=="
     crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <div class="stonkbtns">
+    <div class="btn btn-dark" type="button">Darkmode</div>
+    <div class="btn btn-light" type="button">Lightmode</div>
+  </div>
   <div class="test">
     <canvas id="myChart"></canvas>
     <canvas id="myChart2"></canvas>
-  </div>
-  <div style="display:none;">
-    <img id="source"
-         style="color: pink;"
-         src="https://upload.wikimedia.org/wikipedia/commons/1/18/Double-barred_dollar_sign.svg"
-         width="8" height="8">
   </div>
   <script>
     const xAxis = [];
@@ -156,7 +162,7 @@
       options: {
         elements: {
           point: {
-            pointStyle: image
+            pointStyle: 'circle'
           },
           line: {
             borderWidth: 2,
@@ -166,7 +172,7 @@
           title: {
             display: true,
             text: 'Current value: ' + 0 //data.y1[data.y1.length - 1]
-          }
+          },
         }
       }
     };
@@ -182,8 +188,7 @@
       options: {
         elements: {
           point: {
-            pointStyle: image,
-            backgroundColor: 'green',
+            pointStyle: 'circle',
           },
           line: {
             borderWidth: 2,
@@ -201,6 +206,40 @@
       document.getElementById('myChart2'),
       config2
     );
+
+    const theme = localStorage.getItem('theme');
+    if (theme === 'dark') {
+      document.body.style.backgroundColor = '#1D2021';
+      myChart.options.plugins.title.color = 'rgba(255,255,255, 0.7)';
+      myChart2.options.plugins.title.color = 'rgba(255,255,255, 0.7)';
+      myChart.update();
+      myChart2.update();
+    } else if (theme === 'light') {
+      document.body.style.backgroundColor = 'rgba(255,255,255, 0.7)';
+      myChart.options.plugins.title.color = 'rgba(28, 28, 28, 1)';
+      myChart2.options.plugins.title.color = 'rgba(28, 28, 28, 1)';
+      myChart.update();
+      myChart2.update();
+    }
+    const darkBtn = document.getElementsByClassName("btn-dark")[0];
+    darkBtn.onclick = () => {
+      localStorage.setItem('theme', 'dark');
+      document.body.style.backgroundColor = '#1D2021';
+      myChart.options.plugins.title.color = 'rgba(255,255,255, 0.7)';
+      myChart2.options.plugins.title.color = 'rgba(255,255,255, 0.7)';
+      myChart.update();
+      myChart2.update();
+    };
+    const lightBtn = document.getElementsByClassName("btn-light")[0];
+    lightBtn.onclick = () => {
+      localStorage.setItem('theme', 'light');
+      document.body.style.backgroundColor = 'rgba(255,255,255, 0.7)';
+      myChart.options.plugins.title.color = '#1D2021';
+      myChart2.options.plugins.title.color = '#1D2021';
+      myChart.update();
+      myChart2.update();
+    };
+
     socket = io();
 
     socket.on('connect', function (sid, environ) {
@@ -208,6 +247,7 @@
     });
 
     socket.on('clientMsg', function (data) {
+      const theme = localStorage.getItem('theme');
       console.log('Received a message from the server!', data);
 
       const xAxis = data.x.map(x => x.toString());
@@ -221,11 +261,14 @@
       myChart.data.datasets[0].data = properData;
       myChart.data.labels = properData.map(x => x.x);
       myChart.options.plugins.title.text = 'Current value: ' + properData[properData.length - 1].y;
+      myChart.options.plugins.title.font.size = 48;
+
       myChart.update();
 
       myChart2.data.datasets[0].data = properData2;
       myChart2.data.labels = properData2.map(x => x.x);
       myChart2.options.plugins.title.text = 'Current value: ' + properData2[properData2.length - 1].y;
+      myChart2.options.plugins.title.font.size = 48;
 
       myChart2.update();
     });

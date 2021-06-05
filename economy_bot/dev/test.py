@@ -9,12 +9,15 @@ import numpy as np
 #     print(KeyError)
 
 
-price = [53]
-for i in range(1, 100000):
-    price.append(0.02 + price[-1] + np.random.normal(0,2))
-    if price[-1] <= 0:
-        price[-1] = 1
 
 
-plt.plot(price)
+for l in range(0, 5):
+    price = [53]
+    for i in range(1, 100000):
+        price.append(0.01 + price[-1] + np.random.normal(0,1))
+        # if price[-1] <= 0:
+        #     price[-1] = 1
+
+
+    plt.plot(price)
 plt.show()

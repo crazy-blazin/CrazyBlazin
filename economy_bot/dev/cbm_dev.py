@@ -136,10 +136,13 @@ class Stonks:
     
     def move_price(self):
         self.price.append(round(self.drift + self.price[-1] + np.random.normal(0, self.variance), 2))
+        price_collapse = False
         if self.price[-1] <= 0:
-            self.price[-1] = 1
+            self.price[-1] = 153
+            price_collapse = True
 
         self.current_price = round(self.price[-1], 2)
+        return price_collapse
 
     @staticmethod
     def plot_results():
@@ -167,7 +170,7 @@ class Stonks:
 
 
 
-cocaine = Stonks(name = 'Cocaine', init_price = 146.61, drift = 0.02, variance = 2)
+cocaine = Stonks(name = 'Cocaine', init_price = 146.61, drift = 0.04, variance = 2)
 Ingamersh = Stonks(name = 'Ingamersh verksted', init_price = 476.17, drift = 0.01, variance = 10)
 
 
@@ -309,7 +312,13 @@ class MyClient(discord.Client):
 
 
         for stonk in Stonks.stonks:
-            stonk.move_price() # move cocaine price
+            price_collapse = stonk.move_price() # move cocaine price
+            if price_collapse: # Remove all if price collapse
+                for key in users:
+                    if stonk.name == 'Ingamersh verksted':
+                        users[key]['ingamersh'] = 0
+                    if stonk.name == 'Cocaine':
+                        users[key]['cocaine'] = 0
         Stonks.plot_results()
 
 
@@ -650,7 +659,7 @@ async def on_message(message):
 
 
     if message.content.startswith('!stonks'):
-        embed = discord.Embed(title=f"Stonks", description=f"Historical and current price of stonks. Buy item use !buy stonks <index> <amount> and !sell stonks <index> <amount>. You can view stonks in real time at http://5eb1bcab2782.ngrok.io/stonk") #,color=Hex code
+        embed = discord.Embed(title=f"Stonks", description=f"Historical and current price of stonks. Buy item use !buy stonks <index> <amount> and !sell stonks <index> <amount>. You can view stonks in real time at http://5eb1bcab2782.ngrok.io/stonks") #,color=Hex code
         file = discord.File("stonk.jpg", filename="stonk.jpg")
         await message.channel.send(file = file, embed=embed)
 

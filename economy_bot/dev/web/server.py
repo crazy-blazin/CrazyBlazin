@@ -201,7 +201,7 @@ def obs_donation():
     return render_template('obs_donation.html')
 
 
-@app.route("/stonk")
+@app.route("/stonks")
 def stonk():
     return render_template('stonk.html')
 
