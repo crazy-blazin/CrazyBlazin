@@ -16,17 +16,26 @@ import numpy as np
 
 
 
-for l in range(0, 10):
-    price = [53]
+for l in range(0, 5):
+    price = [5]
+    tot = 0
     for i in range(1, 1000):
-        price.append(0.1 + price[-1] + np.random.normal(0, 5))
+        x = 0.12 + price[-1]  + np.random.normal(0, 30)
+        price.append(x)
+        if x <= 0:
+            tot += 1
         # if price[-1] <= 0:
         #     price[-1] = 1
 
 
     plt.plot(price)
+print(tot/5)
+print(np.mean(price))
+print(np.std(price))
 plt.show()
 
+
+print((7 - 2)*100)
 
 # from pantheon import pantheon
 # import asyncio

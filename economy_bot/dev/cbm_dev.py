@@ -25,7 +25,6 @@ import io
 #https://discordapp.com/developers
 
 
-
 shop_items = {'Snake gun': [10, 100, 1, ':snake:'], 
                 'Revolver': [24, 200, 2, ':gun:'], 
                 'Acid dispenser': [38, 300, 3, ':leafy_green:'], 
@@ -125,23 +124,32 @@ class Gullfugl:
 class Stonks:
     ind = 0
     stonks = []
-    def __init__(self, name = 'Cocaine', init_price = 53, drift = 0.002, variance = 1):
+    def __init__(self, name = 'Cocaine', init_price = 53, drift = 0.002, mean = 0, variance = 1, include_order = True):
         self.price = [init_price]
         self.current_price = self.price[-1]
         self.name = name
         self.variance = variance
+        self.mean = mean
         self.drift = drift
+        self.include_order = include_order
         self.stonks.append(self)
 
     
     def move_price(self):
-        self.price.append(round(self.drift + self.price[-1] + np.random.normal(0, self.variance), 2))
+        if self.include_order:
+            self.price.append(round(self.drift + self.price[-1] + np.random.normal(self.mean, self.variance), 2))
+        else:
+            self.price.append(round(self.drift + np.random.normal(self.mean, self.variance), 2))
         price_collapse = False
         if self.price[-1] <= 0:
-            self.price[-1] = 153
+            if self.include_order:
+                self.price[-1] = 153
+            else:
+                self.price[-1] = 5
             price_collapse = True
 
         self.current_price = round(self.price[-1], 2)
+        self.price_collaps = price_collapse
         return price_collapse
 
     @staticmethod
@@ -156,8 +164,11 @@ class Stonks:
             two_stonks.append(stonk.price[-1000:])
             ax[i].plot(stonk.price[-1000:], linewidth = 1, color = colors[i])
             ax[i].plot(len(stonk.price[-1000:])-1, stonk.current_price, 'o', color = color_tip[i])
-            ax[i].plot(len(stonk.price[-1000:])-1, stonk.current_price, 'o', color = color_tip[i], fillstyle = 'none', markersize = 10)
-            ax[i].plot(len(stonk.price[-1000:])-1, stonk.current_price, 'o', color = color_tip[i], fillstyle = 'none', markersize = 15)
+            if stonk.price_collaps:
+                ax[i].plot(len(stonk.price[-1000:])-1, stonk.current_price, 'x', color = 'red', fillstyle = 'none', markersize = 15)
+            else:
+                ax[i].plot(len(stonk.price[-1000:])-1, stonk.current_price, 'o', color = color_tip[i], fillstyle = 'none', markersize = 10)
+                ax[i].plot(len(stonk.price[-1000:])-1, stonk.current_price, 'o', color = color_tip[i], fillstyle = 'none', markersize = 15)
             ax[i].set_title(f'{i+1}. {stonk.name} \n price: {stonk.current_price} \n Volatility: {volatility[i]}')
             ax[i].set_ylabel('Crazy blazin coins')
             ax[i].set_xlabel('Time')
@@ -170,8 +181,8 @@ class Stonks:
 
 
 
-cocaine = Stonks(name = 'Cocaine', init_price = 261.56, drift = 0.10, variance = 5)
-Ingamersh = Stonks(name = 'Ingamersh verksted', init_price = 325.34, drift = 0.10, variance = 30)
+cocaine = Stonks(name = 'Cocaine', init_price = 5, drift = 0, mean = 5, variance = 2, include_order = False)
+Ingamersh = Stonks(name = 'Ingamersh verksted', init_price = 307.54, drift = 0.12, variance = 30)
 
 
 class MyClient(discord.Client):
@@ -311,6 +322,8 @@ class MyClient(discord.Client):
             await channel.send(embed=embed)
 
 
+        channel = client.get_channel(734481490431443068)
+        # channel = client.get_channel(795738540251545620)
         for stonk in Stonks.stonks:
             price_collapse = stonk.move_price() # move cocaine price
             if price_collapse: # Remove all if price collapse
@@ -319,6 +332,9 @@ class MyClient(discord.Client):
                         users[key]['ingamersh'] = 0
                     if stonk.name == 'Cocaine':
                         users[key]['cocaine'] = 0
+                embed = discord.Embed(title=f"Bankrupt!", description=f"We are sorry, but {stonk.name} is bankrupt and everyone lost all their shares!") #,color=Hex code
+                embed.set_image(url="https://media.giphy.com/media/3oriO5t2QB4IPKgxHi/giphy.gif")
+                await channel.send(embed=embed)
         Stonks.plot_results()
 
 
@@ -426,7 +442,7 @@ async def on_message(message):
         if users[message.author.name]['rank'] == 3:
             await message.add_reaction('🥉')
     except KeyError as msg:
-        print(msg + 'RANK')
+        print(msg)
 
 
     if message.content.startswith('!bal'):
@@ -473,6 +489,21 @@ async def on_message(message):
                 await message.channel.send(embed=embed)
                 return
             index += 1
+
+
+    if message.content.startswith('!relief'):
+        str_split = message.content.split(' ')
+        amount = int(str_split[1])
+        role_names = [role.name for role in message.author.roles]
+        if 'Admin' in role_names:
+            users = events_handler.db.read()
+            for key_user in users:
+                users[key_user]['Coins'] += amount
+            events_handler.db.write(users)
+            await message.channel.send(f'The resistance has delived {amount} <:CBCcoin:831506214659293214> to the poor.')
+        else:
+            await message.channel.send(f'You need to be admin for this command!')
+
 
     if message.content.startswith('!raffle'):
         str_split = message.content.split(' ')
@@ -674,14 +705,18 @@ async def on_message(message):
             amount = int(str_split[3])*np.sign(int(str_split[3]))
             index = int(str_split[2])*np.sign(int(str_split[2]))
             if index == 1:
-                price = round(cocaine.current_price*amount,2)
-                if price <= users[message.author.name]['Coins']:
+                if (users[message.author.name]['cocaine']+amount) <= 200:
                     price = round(cocaine.current_price*amount,2)
-                    users[message.author.name]['cocaine'] += amount
-                    users[message.author.name]['Coins'] -= price
-                    await message.channel.send(f'{message.author.name} bought {amount} cocaine :salt: for {price} <:CBCcoin:831506214659293214> @ {round(cocaine.current_price,2)} per cocaine.')
+                    if price <= users[message.author.name]['Coins']:
+                        price = round(cocaine.current_price*amount,2)
+                        users[message.author.name]['cocaine'] += amount
+                        users[message.author.name]['Coins'] -= price
+                        await message.channel.send(f'{message.author.name} bought {amount} cocaine :salt: for {price} <:CBCcoin:831506214659293214> @ {round(cocaine.current_price,2)} per cocaine.')
+                    else:
+                        await message.channel.send(f'{message.author.name} can not afford this much cocaine!')
                 else:
-                    await message.channel.send(f'{message.author.name} can not afford this much cocaine!')
+                    await message.channel.send(f'{message.author.name} The resistance does not want to make you an monopoly. You can hold max 200 cocaine!')
+                
             if index == 2:
                 price = round(Ingamersh.current_price*amount,2)
                 if price <= users[message.author.name]['Coins']:
