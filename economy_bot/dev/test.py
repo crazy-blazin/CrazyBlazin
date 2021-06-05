@@ -16,11 +16,11 @@ import numpy as np
 
 
 
-for l in range(0, 5):
-    price = [15]
+for l in range(0, 10):
+    price = [153]
     tot = 0
-    for i in range(1, 1000):
-        x = np.random.normal(15, 40)
+    for i in range(1, 5000):
+        x = 1.1 + price[-1] + np.random.normal(0, 50)
         price.append(x)
         if x <= 0:
             tot += 1

@@ -184,7 +184,7 @@ class Stonks:
 
 
 cocaine = Stonks(name = 'Cocaine', init_price = 1, drift = 0, mean = 3, variance = 2, include_order = False)
-Ingamersh = Stonks(name = 'Ingamersh verksted', init_price = 202.58, drift = 0.15, variance = 50)
+Ingamersh = Stonks(name = 'Ingamersh verksted', init_price = 340.6, drift = 1.1, variance = 50)
 
 
 class MyClient(discord.Client):
