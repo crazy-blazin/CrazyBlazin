@@ -141,7 +141,7 @@ class Stonks:
         if self.include_order:
             self.price.append(round(self.drift + self.price[-1] + np.random.normal(self.mean, self.variance), 2))
         else:
-            self.price.append(round(self.drift +  1.5*np.sin(self.time*0.2)+ np.random.normal(self.mean, self.variance), 2))
+            self.price.append(round(self.drift +  np.sin(self.time*0.05)+ np.random.normal(self.mean, self.variance), 2))
         price_collapse = False
         self.time += 1 
         if self.price[-1] <= 0:
@@ -181,8 +181,8 @@ class Stonks:
 
 
 
-cocaine = Stonks(name = 'Cocaine', init_price = 1, drift = 0, mean = 4, variance = 2, include_order = False)
-Ingamersh = Stonks(name = 'Ingamersh verksted', init_price = 1236.57, drift = 1.4, variance = 50)
+cocaine = Stonks(name = 'Cocaine', init_price = 10, drift = 0, mean = 14, variance = 2, include_order = False)
+Ingamersh = Stonks(name = 'Ingamersh verksted', init_price = 695.58, drift = 1.4, variance = 50)
 
 
 class MyClient(discord.Client):
@@ -736,7 +736,7 @@ async def on_message(message):
                     price = round(cocaine.current_price*amount,2)
                     if price <= users[message.author.name]['Coins']:
                         price = round(cocaine.current_price*amount,2)
-                        if busted_by_police_chance > 99:
+                        if busted_by_police_chance >= 95:
                             embed = discord.Embed(title=f"Busted by police!", description=f"We are sorry, but you got busted by police and lost all the cocaine!") #,color=Hex code
                             embed.set_image(url=f"{np.random.choice(busted_gifs)}")
                             await message.channel.send(embed=embed)
@@ -778,7 +778,7 @@ async def on_message(message):
             if index == 1:
                 price = round(cocaine.current_price*amount,2)
                 if amount <= users[message.author.name]['cocaine']:
-                    if busted_by_police_chance > 99:
+                    if busted_by_police_chance >= 95:
                         embed = discord.Embed(title=f"Busted by police!", description=f"We are sorry, but you got busted by police and lost all the cocaine!") #,color=Hex code
                         embed.set_image(url=f"{np.random.choice(busted_gifs)}")
                         users[message.author.name]['cocaine'] -= amount
