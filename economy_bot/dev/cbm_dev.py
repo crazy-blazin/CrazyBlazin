@@ -148,7 +148,7 @@ class Stonks:
             if self.include_order:
                 self.price[-1] = 153
             else:
-                self.price[-1] = 3
+                self.price[-1] = 4
             price_collapse = True
 
         self.current_price = round(self.price[-1], 2)
@@ -181,8 +181,8 @@ class Stonks:
 
 
 
-cocaine = Stonks(name = 'Cocaine', init_price = 10, drift = 0, mean = 14, variance = 2, include_order = False)
-Ingamersh = Stonks(name = 'Ingamersh verksted', init_price = 695.58, drift = 1.4, variance = 50)
+cocaine = Stonks(name = 'Cocaine', init_price = 7, drift = 0, mean = 7, variance = 2, include_order = False)
+Ingamersh = Stonks(name = 'Ingamersh verksted', init_price = 885.37, drift = 1.4, variance = 50)
 
 
 class MyClient(discord.Client):
@@ -283,8 +283,7 @@ class MyClient(discord.Client):
             
         print(probability)
         if probability >= 995:
-            # channel = client.get_channel(849752403687374899)
-            channel = client.get_channel(734481490431443068)
+            channel = client.get_channel(849752403687374899)
             events_handler.gullfugl = Gullfugl()
 
             event = []
@@ -294,7 +293,6 @@ class MyClient(discord.Client):
             for key in users:
                 shuffled_users.append(key)
             np.random.shuffle(shuffled_users)
-            print(shuffled_users)
             super_tot_dmg = 0
             for key in shuffled_users:
                 tot_dmg = 0
@@ -324,7 +322,7 @@ class MyClient(discord.Client):
 
         channel = client.get_channel(803982821923356773)
         # channel = client.get_channel(795738540251545620)
-            
+        users = events_handler.db.read()
         for stonk in Stonks.stonks:
             price_collapse = stonk.move_price() # move cocaine price
             if price_collapse: # Remove all if price collapse
@@ -353,13 +351,13 @@ class MyClient(discord.Client):
                             embed.set_image(url=f"{np.random.choice(busted_gifs)}")
                             await channel.send(embed=embed)
                             break
-
+        events_handler.db.write(users)
         Stonks.plot_results()
 
 # embed = discord.Embed(title=f"Bankrupt!", description=f"We are sorry, but {stonk.name} is bankrupt and everyone lost all their shares!") #,color=Hex code
 # embed.set_image(url="https://media.giphy.com/media/3oriO5t2QB4IPKgxHi/giphy.gif")
 # await channel.send(embed=embed)
-
+        users = events_handler.db.read()
         index = 0
         temp_stats = {}
         for key_user in users:
@@ -719,7 +717,6 @@ async def on_message(message):
 
 
     if message.content.startswith('!buy stonks'):
-        users = events_handler.db.read()
 
         str_split = message.content.split(' ')
         busted_gifs = ['https://media2.giphy.com/media/l2SpTqt1GogboNnBm/giphy.gif?cid=ecf05e47brua9wj4cgxm8u0iorb3te6kr4akr33v2dvx61vo&rid=giphy.gif&ct=g',
@@ -729,6 +726,7 @@ async def on_message(message):
         if len(str_split) > 4 or len(str_split) < 4:
             await message.channel.send(f'Too many or few arguments. Use !buy stonks <index> <amount>')
         else:
+            users = events_handler.db.read()
             amount = int(str_split[3])*np.sign(int(str_split[3]))
             index = int(str_split[2])*np.sign(int(str_split[2]))
             if index == 1:
@@ -764,7 +762,6 @@ async def on_message(message):
 
 
     if message.content.startswith('!sell stonks'):
-        users = events_handler.db.read()
         busted_gifs = ['https://media2.giphy.com/media/l2SpTqt1GogboNnBm/giphy.gif?cid=ecf05e47brua9wj4cgxm8u0iorb3te6kr4akr33v2dvx61vo&rid=giphy.gif&ct=g',
                                                         'https://media.giphy.com/media/3oriO5t2QB4IPKgxHi/giphy.gif',
                                                         'https://media.giphy.com/media/l0HlEVps1ahASNDUY/giphy.gif']
@@ -773,6 +770,7 @@ async def on_message(message):
         if len(str_split) > 4 or len(str_split) < 4:
             await message.channel.send(f'Too many or few arguments. Use !sell stonks <index> <amount>')
         else:
+            users = events_handler.db.read()
             amount = int(str_split[3])*np.sign(int(str_split[3]))
             index = int(str_split[2])*np.sign(int(str_split[2]))
             if index == 1:

@@ -17,10 +17,10 @@ import numpy as np
 
 
 for l in range(0, 1):
-    price = [10]
+    price = [7]
     tot = 0
     for i in range(1, 1000):
-        x = np.sin(i*0.05) + np.random.normal(14, 2)
+        x = np.sin(i*0.05) + np.random.normal(7, 2)
         price.append(x)
         if x <= 0:
             tot += 1
