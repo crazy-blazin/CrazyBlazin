@@ -48,7 +48,6 @@ class Database:
 
 
 
-
 class EventHandler:
     def __init__(self):
         self.events = []
@@ -134,6 +133,7 @@ class Stonks:
         self.mean = mean
         self.drift = drift
         self.include_order = include_order
+        self.time = 0
         self.stonks.append(self)
 
     
@@ -141,13 +141,13 @@ class Stonks:
         if self.include_order:
             self.price.append(round(self.drift + self.price[-1] + np.random.normal(self.mean, self.variance), 2))
         else:
-            self.price.append(round(self.drift + np.random.normal(self.mean, self.variance), 2))
+            self.price.append(round(self.drift +  1.5*np.sin(self.time*0.2)+ np.random.normal(self.mean, self.variance), 2))
         price_collapse = False
         if self.price[-1] <= 0:
             if self.include_order:
                 self.price[-1] = 153
             else:
-                self.price[-1] = 1
+                self.price[-1] = 3
             price_collapse = True
 
         self.current_price = round(self.price[-1], 2)
@@ -166,11 +166,8 @@ class Stonks:
             two_stonks.append(stonk.price[-1000:])
             ax[i].plot(stonk.price[-1000:], linewidth = 1, color = colors[i])
             ax[i].plot(len(stonk.price[-1000:])-1, stonk.current_price, 'o', color = color_tip[i])
-            if stonk.price_collaps:
-                ax[i].plot(len(stonk.price[-1000:])-1, stonk.current_price, 'x', color = 'red', fillstyle = 'none', markersize = 15)
-            else:
-                ax[i].plot(len(stonk.price[-1000:])-1, stonk.current_price, 'o', color = color_tip[i], fillstyle = 'none', markersize = 10)
-                ax[i].plot(len(stonk.price[-1000:])-1, stonk.current_price, 'o', color = color_tip[i], fillstyle = 'none', markersize = 15)
+            ax[i].plot(len(stonk.price[-1000:])-1, stonk.current_price, 'o', color = color_tip[i], fillstyle = 'none', markersize = 10)
+            ax[i].plot(len(stonk.price[-1000:])-1, stonk.current_price, 'o', color = color_tip[i], fillstyle = 'none', markersize = 15)
             ax[i].set_title(f'{i+1}. {stonk.name} \n price: {stonk.current_price} \n Volatility: {volatility[i]}')
             ax[i].set_ylabel('Crazy blazin coins')
             ax[i].set_xlabel('Time')
@@ -183,8 +180,8 @@ class Stonks:
 
 
 
-cocaine = Stonks(name = 'Cocaine', init_price = 1, drift = 0, mean = 3, variance = 2, include_order = False)
-Ingamersh = Stonks(name = 'Ingamersh verksted', init_price = 340.6, drift = 1.4, variance = 50)
+cocaine = Stonks(name = 'Cocaine', init_price = 1, drift = 0, mean = 4, variance = 2, include_order = False)
+Ingamersh = Stonks(name = 'Ingamersh verksted', init_price = 1236.57, drift = 1.4, variance = 50)
 
 
 class MyClient(discord.Client):
