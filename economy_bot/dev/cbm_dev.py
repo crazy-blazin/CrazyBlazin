@@ -650,7 +650,7 @@ async def on_message(message):
 
 
     if message.content.startswith('!stonks'):
-        embed = discord.Embed(title=f"Stonks", description=f"Historical and current price of stonks. Buy item use !buy stonks <index> <amount> and !sell stonks <index> <amount>") #,color=Hex code
+        embed = discord.Embed(title=f"Stonks", description=f"Historical and current price of stonks. Buy item use !buy stonks <index> <amount> and !sell stonks <index> <amount>. You can view stonks in real time at http://5eb1bcab2782.ngrok.io/stonks") #,color=Hex code
         file = discord.File("stonk.jpg", filename="stonk.jpg")
         await message.channel.send(file = file, embed=embed)
 
