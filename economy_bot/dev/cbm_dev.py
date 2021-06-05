@@ -766,6 +766,10 @@ async def on_message(message):
 
     if message.content.startswith('!sell stonks'):
         users = events_handler.db.read()
+        busted_gifs = ['https://media2.giphy.com/media/l2SpTqt1GogboNnBm/giphy.gif?cid=ecf05e47brua9wj4cgxm8u0iorb3te6kr4akr33v2dvx61vo&rid=giphy.gif&ct=g',
+                                                        'https://media.giphy.com/media/3oriO5t2QB4IPKgxHi/giphy.gif',
+                                                        'https://media.giphy.com/media/l0HlEVps1ahASNDUY/giphy.gif']
+        busted_by_police_chance = np.random.randint(1, 101)
         str_split = message.content.split(' ')
         if len(str_split) > 4 or len(str_split) < 4:
             await message.channel.send(f'Too many or few arguments. Use !sell stonks <index> <amount>')
