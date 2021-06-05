@@ -16,69 +16,64 @@ import numpy as np
 
 
 
-for l in range(0, 10):
-    price = [153]
-    tot = 0
-    for i in range(1, 5000):
-        x = 1.4 + price[-1] + np.random.normal(0, 50)
-        price.append(x)
-        if x <= 0:
-            tot += 1
-        # if price[-1] <= 0:
-        #     price[-1] = 1
+# for l in range(0, 10):
+#     price = [153]
+#     tot = 0
+#     for i in range(1, 1000):
+#         x = 1.4 + price[-1] + np.random.normal(0, 50)
+#         price.append(x)
+#         if x <= 0:
+#             tot += 1
+#         # if price[-1] <= 0:
+#         #     price[-1] = 1
 
 
-    plt.plot(price)
-print(tot/5)
-print(np.mean(price))
-print(np.std(price))
-plt.show()
+#     plt.plot(price)
+# print(tot/5)
+# print(np.mean(price))
+# print(np.std(price))
+# plt.show()
 
 
-print((7 - 2)*100)
+# print((7 - 2)*100)
 
-# from pantheon import pantheon
-# import asyncio
+from riotwatcher import LolWatcher, ApiError
 
-# server = "euw1"
-# api_key = "RGAPI-XXXX"
+lol_watcher = LolWatcher('<your-api-key>')
 
-# def requestsLog(url, status, headers):
-#     print(url)
-#     print(status)
-#     print(headers)
+my_region = 'na1'
 
-# panth = pantheon.Pantheon(server, api_key, errorHandling=True, requestsLoggingFunction=requestsLog, debug=True)
+me = lol_watcher.summoner.by_name(my_region, 'pseudonym117')
+print(me)
 
-# async def getSummonerId(name):
-#     try:
-#         data = await panth.getSummonerByName(name)
-#         return (data['id'],data['accountId'])
-#     except Exception as e:
-#         print(e)
+# all objects are returned (by default) as a dict
+# lets see if i got diamond yet (i probably didnt)
+my_ranked_stats = lol_watcher.league.by_summoner(my_region, me['id'])
+print(my_ranked_stats)
 
+# First we get the latest version of the game from data dragon
+versions = lol_watcher.data_dragon.versions_for_region(my_region)
+champions_version = versions['n']['champion']
 
-# async def getRecentMatchlist(accountId):
-#     try:
-#         data = await panth.getMatchlist(accountId, params={"endIndex":10})
-#         return data
-#     except Exception as e:
-#         print(e)
+# Lets get some champions
+current_champ_list = lol_watcher.data_dragon.champions(champions_version)
+print(current_champ_list)
 
-# async def getRecentMatches(accountId):
-#     try:
-#         matchlist = await getRecentMatchlist(accountId)
-#         tasks = [panth.getMatch(match['gameId']) for match in matchlist['matches']]
-#         return await asyncio.gather(*tasks)
-#     except Exception as e:
-#         print(e)
+# For Riot's API, the 404 status code indicates that the requested data wasn't found and
+# should be expected to occur in normal operation, as in the case of a an
+# invalid summoner name, match ID, etc.
+#
+# The 429 status code indicates that the user has sent too many requests
+# in a given amount of time ("rate limiting").
 
-
-# name = "Canisback"
-
-# loop = asyncio.get_event_loop()  
-
-# (summonerId, accountId) = loop.run_until_complete(getSummonerId(name))
-# print(summonerId)
-# print(accountId)
-# print(loop.run_until_complete(getRecentMatches(accountId)))
+try:
+    response = lol_watcher.summoner.by_name(my_region, 'this_is_probably_not_anyones_summoner_name')
+except ApiError as err:
+    if err.response.status_code == 429:
+        print('We should retry in {} seconds.'.format(err.response.headers['Retry-After']))
+        print('this retry-after is handled by default by the RiotWatcher library')
+        print('future requests wait until the retry-after time passes')
+    elif err.response.status_code == 404:
+        print('Summoner with that ridiculous name not found.')
+    else:
+        raise

@@ -326,11 +326,6 @@ class MyClient(discord.Client):
 
         channel = client.get_channel(803982821923356773)
         # channel = client.get_channel(795738540251545620)
-        bankrupcy_lock = False
-        for key in users:
-            if users[key]['cocaine'] > 0 or users[key]['ingamersh'] > 0:
-                bankrupcy_lock = True
-                break
             
         for stonk in Stonks.stonks:
             price_collapse = stonk.move_price() # move cocaine price
@@ -341,19 +336,25 @@ class MyClient(discord.Client):
                     if stonk.name == 'Cocaine':
                         users[key]['cocaine'] = 0
 
-                if bankrupcy_lock:
-                    if stonk.name == 'Ingamersh verksted':
-                        embed = discord.Embed(title=f"Bankrupt!", description=f"We are sorry, but {stonk.name} is bankrupt and everyone lost all their shares!") #,color=Hex code
-                        embed.set_image(url="https://media.giphy.com/media/3oriO5t2QB4IPKgxHi/giphy.gif")
-                        await channel.send(embed=embed)
-                    if stonk.name == 'Cocaine':
-                        busted_gifs = ['https://media2.giphy.com/media/l2SpTqt1GogboNnBm/giphy.gif?cid=ecf05e47brua9wj4cgxm8u0iorb3te6kr4akr33v2dvx61vo&rid=giphy.gif&ct=g',
-                                                        'https://media.giphy.com/media/3oriO5t2QB4IPKgxHi/giphy.gif',
-                                                        'https://media.giphy.com/media/l0HlEVps1ahASNDUY/giphy.gif']
+                if stonk.name == 'Ingamersh verksted':
+                    for key in users:
+                        if users[key]['ingamersh'] > 0:
+                            embed = discord.Embed(title=f"Bankrupt!", description=f"We are sorry, but {stonk.name} is bankrupt and everyone lost all their shares!") #,color=Hex code
+                            embed.set_image(url="https://media.giphy.com/media/3oriO5t2QB4IPKgxHi/giphy.gif")
+                            await channel.send(embed=embed)
+                            break
+                        
+                if stonk.name == 'Cocaine':
+                    for key in users:
+                        if users[key]['cocaine'] > 0:
+                            busted_gifs = ['https://media2.giphy.com/media/l2SpTqt1GogboNnBm/giphy.gif?cid=ecf05e47brua9wj4cgxm8u0iorb3te6kr4akr33v2dvx61vo&rid=giphy.gif&ct=g',
+                                                            'https://media.giphy.com/media/3oriO5t2QB4IPKgxHi/giphy.gif',
+                                                            'https://media.giphy.com/media/l0HlEVps1ahASNDUY/giphy.gif']
 
-                        embed = discord.Embed(title=f"Busted by police!", description=f"We are sorry, but everyone got busted by police and lost all their cocaine!") #,color=Hex code
-                        embed.set_image(url=f"{np.random.choice(busted_gifs)}")
-                        await channel.send(embed=embed)
+                            embed = discord.Embed(title=f"Busted by police!", description=f"We are sorry, but everyone got busted by police and lost all their cocaine!") #,color=Hex code
+                            embed.set_image(url=f"{np.random.choice(busted_gifs)}")
+                            await channel.send(embed=embed)
+                            break
 
         Stonks.plot_results()
 
