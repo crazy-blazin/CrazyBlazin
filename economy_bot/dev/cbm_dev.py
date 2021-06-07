@@ -117,7 +117,7 @@ class Gullfugl:
         self.dmglog = {}
         self.name_list = ['An armored gullfugl', 'A cute gullfugl', 'A rare gullfugl', 'A retarded gullfugl']
         self.name = np.random.choice(self.name_list, 1)[0]
-        self.hp = np.random.randint(500,25000)
+        self.hp = np.random.randint(500,100000)
         self.drop = self.hp*0.1
 
 
