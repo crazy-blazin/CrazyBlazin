@@ -183,12 +183,13 @@ async def on_message(message):
         if len(msgsplit) > 2 or len(msgsplit) < 2:
             await message.channel.send(f'Too many or few arguments. Use !attack <index>')
         else:
-        
+            with open('web/website.txt', 'r') as f:
+                web = f.read() 
             url = f'http://localhost:5000/api/mob/generate/{message.author.name}/{atknumber}'
             response = requests.get(url).json()
             if response['info'] == True:
                 battleid = response['id']
-                embed = discord.Embed(title=f"Attack message", description=f"{message.author.name} attacked {response['name']} {response['battlereport']} | http://localhost:5000/mob/{battleid}") #,color=Hex code
+                embed = discord.Embed(title=f"Attack message", description=f"{message.author.name} attacked {response['name']} {response['battlereport']} | {web}/mob/{battleid}") #,color=Hex code
                 file = discord.File(f"web/static/{response['img']}", filename=f"web/static/{response['img']}")
                 await message.channel.send(file = file, embed=embed)
             else:
@@ -201,6 +202,8 @@ async def on_message(message):
         if len(msgsplit) > 2 or len(msgsplit) < 2:
             await message.channel.send(f'Too many or few arguments. Use !raid <index>')
         else:
+            with open('web/website.txt', 'r') as f:
+                web = f.read() 
             url = 'http://localhost:5000/api/admin/getinfo'
             users = requests.get(url).json()
             if users[message.author.name]['faction'] == None:
@@ -213,7 +216,7 @@ async def on_message(message):
                 response = requests.get(url).json()
                 if response['info'] == True:
                     battleid = response['id']
-                    embed = discord.Embed(title=f"Raid message", description=f"{users[message.author.name]['faction']} raided {response['name']} | {response['battlereport']} http://localhost:5000/boss/{battleid}") #,color=Hex code
+                    embed = discord.Embed(title=f"Raid message", description=f"{users[message.author.name]['faction']} raided {response['name']} | {response['battlereport']} {web}/boss/{battleid}") #,color=Hex code
                     file = discord.File(f"web/static/{response['img']}", filename=f"web/static/{response['img']}")
                     await message.channel.send(file = file, embed=embed)
                 else:
