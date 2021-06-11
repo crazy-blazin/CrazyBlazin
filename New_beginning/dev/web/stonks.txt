@@ -1,0 +1,14 @@
+{'Hell spawn': {'health': 350,
+                'dmg': [300,400],
+                'armor': 0,
+                'coinpertick': 5,
+                'health_regen': 15
+                },
+'Porta potty': {'health': 500,
+                'dmg': [0,0],
+                'armor': 10,
+                'coinpertick': 5,
+                'health_regen': 20
+                }
+}
+

@@ -51,7 +51,7 @@ sio.start_background_task(target = run)
 
 def ticksystem():
     x = requests.get('http://localhost:5000/api/admin/performtick')
-    time.sleep(2)
+    time.sleep(1800)
     ticksystem()
 
 t = threading.Thread(target=ticksystem)
@@ -438,6 +438,11 @@ async def on_message(message):
                         await message.channel.send(f'{message.author.name} does not have coins <:CBCcoin:831506214659293214>.')
                         return
         await message.channel.send(f'Item does not exist, retard.')
+
+
+    if message.content.startswith('!web'):
+        website = ""
+        await message.channel.send(website)
     
 
 
