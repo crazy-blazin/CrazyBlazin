@@ -28,7 +28,9 @@ stonklist = ['Weapon Factory', 'Real estate GRUNMORS', 'Spellfrik', 'Minekartell
 for stonkname in stonklist:
     drift = np.random.randn()*0.1
     drift = drift*np.sign(drift)
-    Stonk(stonkname, init_value = np.random.randint(1, 50), meanval = 0,  variance = np.random.randn(), drift = drift)
+    var = np.random.randn()
+    var = var*np.sign(var)
+    Stonk(stonkname, init_value = np.random.randint(1, 50), meanval = 0,  variance = var, drift = drift)
 
 
 logging.basicConfig(filename='main.log', level=logging.DEBUG)
