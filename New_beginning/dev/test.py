@@ -17,11 +17,11 @@ import numpy as np
 
 
 for l in range(0, 1):
-    price = [20, 10, 200]
+    price = [10]
     tot = 0
-    for i in range(1, 5000):
+    for i in range(1, 3600):
         #x = np.sin(i*0.05) + np.random.normal(7, 2)
-        x = 0.1*i + 0.3*price[-1] - 0.2*price[-2] + 0.4*price[-3] + np.random.normal(0, 250)
+        x = round(price[-1] + np.random.normal(0, 1),2)
         price.append(x)
         if x <= 0:
             tot += 1
