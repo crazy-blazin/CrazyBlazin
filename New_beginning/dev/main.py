@@ -259,7 +259,7 @@ async def on_message(message):
             for stonk in users[user]['stonksDB']:
                 for st in Stonk.all_stonks:
                     if stonk == st.name:
-                        tot_stonksval += round(st.current_price*users[user]['stonksDB'],2)
+                        tot_stonksval += round(st.current_price*users[user]['stonksDB'][st.name],2)
             temp_stats[user] = power + tot_stonksval
 
         index = 1
@@ -268,9 +268,9 @@ async def on_message(message):
         for key in sorted(temp_stats, key=temp_stats.get, reverse=True):
             if (index < 11):
                 if index < 4:
-                    embed.add_field(name=f"{index}{medaljonger[index-1]}. {key}", value=f'{temp_stats[user]} :zap:')
+                    embed.add_field(name=f"{index}{medaljonger[index-1]}. {key}", value=f'{temp_stats[key]} :zap:')
                 else:
-                    embed.add_field(name=f"{index}. {key}", value=f'{temp_stats[user]} :zap:')
+                    embed.add_field(name=f"{index}. {key}", value=f'{temp_stats[key]} :zap:')
             else:
                 await message.channel.send(embed=embed)
                 return

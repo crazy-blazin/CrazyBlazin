@@ -11622,3 +11622,6 @@ INFO:root:received event "stonk_values" from lC0pHXY-qeRDCOCKAAAB [/]
 INFO:root:emitting event "clientMsg" to all [/]
 INFO:root:received event "stonk_values" from lC0pHXY-qeRDCOCKAAAB [/]
 INFO:root:emitting event "clientMsg" to all [/]
+INFO:werkzeug: * Restarting with stat
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 293-511-986
