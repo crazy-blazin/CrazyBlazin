@@ -128,13 +128,13 @@ async def on_message(message):
         maxtickets = users[message.author.name]['maxtickets']
         embed = discord.Embed(title=f"Balance", description=f"{message.author.name} current stats") #,color=Hex code
 
-        embed.add_field(name=f"Current Health: ", value=f'{[round(health,2), health]} :heart:')
-        embed.add_field(name=f"Coins: ", value=f'{round(value,2)} <:CBCcoin:831506214659293214>, {total_income}:clock1:]')
-        embed.add_field(name=f"Max tickets: ", value=f'{maxtickets}:tickets: ')
-        embed.add_field(name=f"Tickets: ", value=f'{ticket}:ticket: ')
-        embed.add_field(name=f"Attack damage: ", value=f'{dmg} :crossed_swords:')
-        embed.add_field(name=f"Armor: ", value=f'{armor} :shield:')
-        embed.add_field(name=f"Health Regenation: ", value=f'{health_regen} :herb:')
+        embed.add_field(name=f"Current Health :heart:", value=f'{[round(health,2), health]}')
+        embed.add_field(name=f"Coins: <:CBCcoin:831506214659293214> | <:CBCcoin:831506214659293214> :clock1:", value=f'{round(value,2)} | {total_income}]')
+        embed.add_field(name=f"Max tickets :tickets ", value=f'{maxtickets} ')
+        embed.add_field(name=f"Tickets :ticket", value=f'{ticket}')
+        embed.add_field(name=f"Attack damage :crossed_swords: ", value=f'{dmg}')
+        embed.add_field(name=f"Armor :shield: ", value=f'{armor}')
+        embed.add_field(name=f"Health Regeneration :herb:", value=f'{health_regen}')
 
         stonks_msg = ""
         for stonk in stonksDB:
