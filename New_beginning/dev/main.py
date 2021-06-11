@@ -23,12 +23,12 @@ import jsonpickle
 
 
 
-drift1 = np.random.randn()
-drift2 = np.random.randn()
-drift3 = np.random.randn()
-Stonk('Weapon Factory', init_value = 5, meanval = 0,  variance = 5, drift = drift1*np.sign(drift1))
-Stonk('Real estate GRUNMORS', init_value = 100, meanval= 0,  variance = 50, drift = drift2*np.sign(drift2))
-Stonk('Spellfrik', init_value = 50, meanval = 0,  variance = 1, drift = drift3*np.sign(drift3))
+stonklist = ['Weapon Factory', 'Real estate GRUNMORS', 'Spellfrik', 'Minekartellet uftevik', 'Bommulsprodusenten Øldal']
+
+for stonkname in stonklist:
+    drift = np.random.randn()*0.1
+    drift = drift*np.sign(drift)
+    Stonk(stonkname, init_value = np.random.randint(1, 50), meanval = 0,  variance = np.random.randn(), drift = drift)
 
 
 logging.basicConfig(filename='main.log', level=logging.DEBUG)
