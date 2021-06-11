@@ -1,0 +1,30 @@
+{'Asshat compiler': {'health': 1,
+                'dmg': [1,3],
+                'armor': 0,
+                'coinpertick': 0,
+                'health_regen': 0,
+                'cost': 100
+                },
+'Chinese estrogen': {'health': 3,
+                'dmg': [1,5],
+                'armor': 0,
+                'coinpertick': 0,
+                'health_regen': 1,
+                'cost': 200
+                },
+'Luxlime': {'health': 15,
+                'dmg': [3,10],
+                'armor': 2,
+                'coinpertick': 1,
+                'health_regen': 4,
+                'cost': 900
+                },
+'Shitty water': {'health': 3,
+                'dmg': [1,7],
+                'armor': 1,
+                'coinpertick': 1,
+                'health_regen': 1,
+                'cost': 300
+                }
+}
+

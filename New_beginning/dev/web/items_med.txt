@@ -1,0 +1,14 @@
+{'Dusty Helmet': {'health': 26,
+                'dmg': [0,0],
+                'armor': 1,
+                'coinpertick': 1,
+                'health_regen': 1
+                },
+'Prostate protector': {'health': 55,
+                'dmg': [5,10],
+                'armor': 5,
+                'coinpertick': 2,
+                'health_regen': 12
+                }        
+}
+

@@ -1,0 +1,47 @@
+{'Retarded Giant': {'health': 1500,
+                    'dmg': [250,300],
+                    'ticketcost': 10,
+                    'armor': 10,
+                    'img': "bosses_retarded_giant.png",
+                    'loot': ['low', 10]
+                    },
+
+'Forgotten Hero': {'health': 2900,
+                    'dmg': [250, 510],
+                    'ticketcost': 10,
+                    'armor': 14,
+                    'img': "bosses_forgotten_hero",
+                    'loot': ['med', 10]
+                    },
+
+'Legend Of The Sea': {'health': 2900,
+                    'dmg': [1000,1200],
+                    'ticketcost': 10,
+                    'armor': 60,
+                    'img': "bosses_legend_of_the_sea.png",
+                    'loot': ['med', 20]
+                    },
+'Tribal Ghosts': {'health': 5000,
+                    'dmg': [2500,3000],
+                    'ticketcost': 10,
+                    'armor': 150,
+                    'img': "bosses_tribal_ghosts.png",
+                    'loot': ['high', 10]
+                    },
+
+'Banished Cliffhanger': {'health': 6000,
+                    'dmg': [3000,5000],
+                    'ticketcost': 10,
+                    'armor': 150,
+                    'img': "bosses_banished_cliffhanger.png",
+                    'loot': ['high', 14]
+                    },
+
+'Xephera': {'health': 11000,
+                    'dmg': [5000,10000],
+                    'ticketcost': 10,
+                    'armor': 290,
+                    'img': "bosses_Xephera.png",
+                    'loot': ['high', 30]
+                    }
+}

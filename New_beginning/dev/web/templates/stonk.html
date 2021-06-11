@@ -103,8 +103,8 @@
     }
 
     .test {
-      height: 50%;
-      width: 50%;
+      height: 90%;
+      width: 90%;
       justify-content: center;
       margin: 0 auto;
     }
@@ -134,6 +134,13 @@
     <canvas id="myChart"></canvas>
   </div>
   <script>
+
+  socket = io();
+
+  socket.on('datainfo', function (data) {
+    console.log('Client has connected to the server!', data);
+  });
+
     const xAxis = [];
     const properData = [];
     const image = document.getElementById('source');
@@ -199,11 +206,6 @@
       myChart.update();
     };
 
-    socket = io();
-
-    socket.on('connect', function (sid, environ) {
-      console.log('Client has connected to the server!');
-    });
 
     socket.on('clientMsg', function (data) {
       const guid = "{{ stonkid }}"

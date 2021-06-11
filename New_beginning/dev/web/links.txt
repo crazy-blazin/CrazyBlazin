@@ -3,3 +3,6 @@ https://localtunnel.me
 
 npm install -g localtunnel
 lt --port 5000
+
+
+{'Foxxravin': {'basemaxhealth': 100, 'maxtickets': 30, 'health_regen_base': 2, 'health_regen': 2, 'health': 101, 'armor': 0, 'dmg': [2, 3], 'coins': 1850, 'itemsDB': {'Simple knife': 1}, 'total_income': 2, 'faction': 'The Resistance', 'stonksDB': {}, 'coinpertick_base': 2, 'tickets': 30}, 'Larve': {'basemaxhealth': 100, 'maxtickets': 30, 'health_regen_base': 2, 'health_regen': 2, 'health': 100, 'armor': 0, 'dmg': [0, 0], 'coins': 1850, 'itemsDB': {}, 'total_income': 2, 'faction': 'The Resistance', 'stonksDB': {}, 'coinpertick_base': 2, 'tickets': 30}}
