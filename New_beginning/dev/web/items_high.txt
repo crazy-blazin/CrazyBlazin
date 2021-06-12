@@ -5,7 +5,7 @@
                 'health_regen': 15
                 },
 'Porta potty': {'health': 500,
-                'dmg': [0,0],
+                'dmg': [10,15],
                 'armor': 10,
                 'coinpertick': 5,
                 'health_regen': 20
