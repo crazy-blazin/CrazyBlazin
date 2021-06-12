@@ -211,9 +211,9 @@ async def on_message(message):
                 await message.channel.send(f'{message.author.name} need to be a member of a faction to perform raids!')
             else:
                 if users[message.author.name]['faction'] == 'The Resistance':
-                    url = f'http://localhost:5000/api/boss/generate/1/{atknumber}'
-                else:
                     url = f'http://localhost:5000/api/boss/generate/2/{atknumber}'
+                else:
+                    url = f'http://localhost:5000/api/boss/generate/1/{atknumber}'
                 response = requests.get(url).json()
                 if response['info'] == True:
                     battleid = response['id']

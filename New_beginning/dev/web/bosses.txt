@@ -3,7 +3,7 @@
                     'ticketcost': 10,
                     'armor': 10,
                     'img': "bosses_retarded_giant.png",
-                    'loot': ['low', 10]
+                    'loot': ['low', 5]
                     },
 
 'Forgotten Hero': {'health': 2900,
