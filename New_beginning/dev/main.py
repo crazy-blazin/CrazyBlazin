@@ -118,6 +118,7 @@ async def on_message(message):
         # url = 'http://localhost:5000/api/admin/writeinfouser'
         # x = requests.post(url, json = x)
         health = users[message.author.name]['health']
+        maxhealth = users[message.author.name]['maxhealth']
         dmg = users[message.author.name]['dmg']
         armor = users[message.author.name]['armor']
         value = users[message.author.name]['coins']
@@ -128,10 +129,10 @@ async def on_message(message):
         maxtickets = users[message.author.name]['maxtickets']
         embed = discord.Embed(title=f"Balance", description=f"{message.author.name} current stats") #,color=Hex code
 
-        embed.add_field(name=f"Current Health :heart:", value=f'{[round(health,2), health]}')
+        embed.add_field(name=f"Current Health :heart:", value=f'{[round(health,2), maxhealth]}')
         embed.add_field(name=f"Coins: <:CBCcoin:831506214659293214> | <:CBCcoin:831506214659293214> :clock1:", value=f'{round(value,2)} | {total_income}]')
-        embed.add_field(name=f"Max tickets :tickets ", value=f'{maxtickets} ')
-        embed.add_field(name=f"Tickets :ticket", value=f'{ticket}')
+        embed.add_field(name=f"Max tickets :tickets: ", value=f'{maxtickets} ')
+        embed.add_field(name=f"Tickets :ticket:", value=f'{ticket}')
         embed.add_field(name=f"Attack damage :crossed_swords: ", value=f'{dmg}')
         embed.add_field(name=f"Armor :shield: ", value=f'{armor}')
         embed.add_field(name=f"Health Regeneration :herb:", value=f'{health_regen}')
@@ -263,8 +264,8 @@ async def on_message(message):
             for stonk in users[user]['stonksDB']:
                 for st in Stonk.all_stonks:
                     if stonk == st.name:
-                        tot_stonksval += round(st.current_price*users[user]['stonksDB'][st.name],2)
-            temp_stats[user] = power + tot_stonksval
+                        tot_stonksval += st.current_price*users[user]['stonksDB'][st.name]
+            temp_stats[user] = round(power + tot_stonksval,2)
 
         index = 1
         embed = discord.Embed(title="Top players", description="Users with most power") #,color=Hex code
