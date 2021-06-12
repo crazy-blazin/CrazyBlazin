@@ -14,9 +14,9 @@ class Stonk:
         self.current_price = init_value
         self.y = [init_value, init_value, init_value]
         self.x = [1]
-        self.all_stonks.append(self)
         self.onehourdifference = 0
         self.time = 0
+        self.all_stonks.append(self)
 
 
     def get_info(self):
