@@ -263,13 +263,13 @@ async def on_message(message):
         users = requests.get(url).json()
         temp_stats  = {}
         for user in users:
-            power = users[user]['health'] + users[user]['maxhealth'] + users[user]['armor'] + users[user]['dmg'][0] + users[user]['dmg'][1] + users[user]['health_regen'] + users[user]['coins']
+            power = users[user]['health']**2 + users[user]['maxhealth']**2 + users[user]['armor']**2 + users[user]['dmg'][0]**2 + users[user]['dmg'][1]**2 + users[user]['health_regen']**2 + float(np.sqrt(users[user]['coins']))
             tot_stonksval = 0
             for stonk in users[user]['stonksDB']:
                 for st in Stonk.all_stonks:
                     if stonk == st.name:
                         tot_stonksval += st.current_price*users[user]['stonksDB'][st.name]
-            temp_stats[user] = round(power + tot_stonksval,2)
+            temp_stats[user] = round(power + float(np.sqrt(tot_stonksval)),2)
 
         index = 1
         embed = discord.Embed(title="Top players", description="Users with most power") #,color=Hex code
