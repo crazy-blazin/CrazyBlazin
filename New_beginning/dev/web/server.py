@@ -30,7 +30,6 @@ from flask_socketio import SocketIO
 from things import *
 
 
-
 app = Flask(__name__)
 api = Api(app)
 
@@ -90,11 +89,10 @@ class MonsterEventHandler(Resource):
         ticketcheck = mobevent.check_if_possible()
         if ticketcheck:
             User.update()
-            Faction.update()
             feedback = mobevent.doevent()
             User.update()
-            Faction.update()
             User.writetodb()
+            Faction.update()
             Faction.writetodb()
             feedback['id'] = id
             feedback['img'] = mobevent.img
@@ -173,6 +171,15 @@ class GetInfo(Resource):
             database = eval(f.read())
         return database, http.client.OK
 
+class BuyItem(Resource):
+    def get(self, username, payment, itemname, amount):
+        for user in User.all_users:
+            if user.name == username:
+                user.coins -= round(float(payment),2)
+                user.coins = round(user.coins,2)
+                user.add_item(itemname = itemname, amount = int(amount))
+        return {'info': 'Item added.'}, http.client.OK
+
 
 class WriteInfoUser(Resource):
     def post(self):
@@ -223,7 +230,7 @@ api.add_resource(Updateall, '/api/admin/updateall')
 api.add_resource(GetInfo, '/api/admin/getinfo')
 api.add_resource(WriteInfoUser, '/api/admin/writeinfouser')
 api.add_resource(CreateUser, '/api/admin/createuser/<user>')
-
+api.add_resource(BuyItem, '/api/admin/items/<username>/<payment>/<itemname>/<amount>')
 
 
 The_high_council = Faction(name = 'The High Council')

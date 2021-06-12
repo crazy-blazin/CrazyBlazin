@@ -263,6 +263,7 @@ class User:
                     self.health += item.health
     
         User.update()
+        User.writetodb()
 
     @staticmethod
     def update():

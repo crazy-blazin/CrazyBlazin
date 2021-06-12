@@ -22,7 +22,6 @@ import logging
 import jsonpickle
 
 
-k = 'ODMxOTE4MjA5NDA4OTU4NTE0.YHcONQ.NpvbTGPVnboOCchxGvebA59VsEw'
 
 stonklist = ['Weapon Factory', 'Real estate GRUNMORS', 'Spellfrik', 'Minekartellet uftevik', 'Bommulsprodusenten Øldal']
 
@@ -312,22 +311,16 @@ async def on_message(message):
                     users = requests.get(url).json()
                     user_current_money = users[message.author.name]['coins']
                     if (shopitems[item]['cost']*amount) <= user_current_money:
-                        users[message.author.name]['coins'] -= float(round((shopitems[item]['cost']*amount),2))
-
-                        if item in users[message.author.name]['itemsDB']:
-                            users[message.author.name]['itemsDB'][item] += int(amount)
-                        else:
-                            users[message.author.name]['itemsDB'][item] = int(amount)
-                        
-                        url = 'http://localhost:5000/api/admin/writeinfouser'
-                        requests.post(url, json = users)
-                        await message.channel.send(f'{message.author.name} bought {amount} {item} for {round(float(shopitems[item]["cost"]*amount),2)} <:CBCcoin:831506214659293214>.')
+                        payment = float(round((shopitems[item]['cost']*amount),2))
+                        url = f'http://localhost:5000//api/admin/items/{message.author.name}/{payment}/{item}/{amount}'
+                        requests.get(url)
+                        await message.channel.send(f'{message.author.name} bought {amount} {item} for {payment} <:CBCcoin:831506214659293214>.')
                         return
                         
                     else:
-                        await message.channel.send(f'{message.author.name} does not have coins <:CBCcoin:831506214659293214>.')
+                        await message.channel.send(f'{message.author.name} does not have enough coins <:CBCcoin:831506214659293214> for this purchase.')
                         return
-        await message.channel.send(f'Item does not exist, retard.')
+            await message.channel.send(f'Item does not exist, retard.')
             
 
     if message.content.startswith('!items'):
