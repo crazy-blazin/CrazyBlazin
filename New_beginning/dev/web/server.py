@@ -92,6 +92,8 @@ class MonsterEventHandler(Resource):
             User.update()
             Faction.update()
             feedback = mobevent.doevent()
+            User.update()
+            Faction.update()
             User.writetodb()
             Faction.writetodb()
             feedback['id'] = id
@@ -110,6 +112,8 @@ class BossEventHandler(Resource):
             User.update()
             Faction.update()
             feedback = bossevent.doevent()
+            User.update()
+            Faction.update()
             User.writetodb()
             Faction.writetodb()
             feedback['id'] = id

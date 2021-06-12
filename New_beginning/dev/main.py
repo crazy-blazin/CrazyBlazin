@@ -22,6 +22,7 @@ import logging
 import jsonpickle
 
 
+k = 'ODMxOTE4MjA5NDA4OTU4NTE0.YHcONQ.NpvbTGPVnboOCchxGvebA59VsEw'
 
 stonklist = ['Weapon Factory', 'Real estate GRUNMORS', 'Spellfrik', 'Minekartellet uftevik', 'Bommulsprodusenten Øldal']
 

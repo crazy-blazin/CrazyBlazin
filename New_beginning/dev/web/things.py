@@ -221,34 +221,48 @@ class User:
 
     def add_item(self, itemname = '', amount = 1):
         
+        for item in Items.all_items_low:
+            if item.name == itemname:
+                if itemname in self.itemsDB:
+                    self.itemsDB[itemname] += amount
+                    self.health += item.health
+                else:
+                    self.items.append(item)
+                    self.itemsDB[itemname] = amount
+                    self.health += item.health
 
-        if itemname in Items.all_items_low:
-            if itemname in self.itemsDB:
-                self.itemsDB[itemname] += amount
-            else:
-                self.items.append(Items.all_items_low[itemname])
-                self.itemsDB[itemname] = amount
-            
-        if itemname in Items.all_items_high:
-            if itemname in self.itemsDB:
-                self.itemsDB[itemname] += amount
-            else:
-                self.items.append(Items.all_items_high[itemname])
-                self.itemsDB[itemname] = amount
+
+        for item in Items.all_items_med:
+            if item.name == itemname:
+                if itemname in self.itemsDB:
+                    self.itemsDB[itemname] += amount
+                    self.health += item.health
+                else:
+                    self.items.append(item)
+                    self.itemsDB[itemname] = amount
+                    self.health += item.health
+
+        for item in Items.all_items_high:
+            if item.name == itemname:
+                if itemname in self.itemsDB:
+                    self.itemsDB[itemname] += amount
+                    self.health += item.health
+                else:
+                    self.items.append(item)
+                    self.itemsDB[itemname] = amount
+                    self.health += item.health
         
-        if itemname in Items.all_items_med:
-            if itemname in self.itemsDB:
-                self.itemsDB[itemname] += amount
-            else:
-                self.items.append(Items.all_items_med[itemname])
-                self.itemsDB[itemname] = amount
-
-        if itemname in Items.all_items_shop:
-            if itemname in self.itemsDB:
-                self.itemsDB[itemname] += amount
-            else:
-                self.items.append(Items.all_items_shop[itemname])
-                self.itemsDB[itemname] = amount
+        for item in Items.all_items_shop:
+            if item.name == itemname:
+                if itemname in self.itemsDB:
+                    self.itemsDB[itemname] += amount
+                    self.health += item.health
+                else:
+                    self.items.append(item)
+                    self.itemsDB[itemname] = amount
+                    self.health += item.health
+    
+        User.update()
 
     @staticmethod
     def update():
