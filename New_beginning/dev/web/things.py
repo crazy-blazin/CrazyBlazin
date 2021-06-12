@@ -415,6 +415,7 @@ class User:
     ):
         User(name = name,
             basemaxhealth = basemaxhealth,
+            maxhealth = maxhealth,
             maxtickets = maxtickets,
             health_regen_base = health_regen_base,
             health_regen = health_regen,

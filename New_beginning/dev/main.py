@@ -241,6 +241,8 @@ async def on_message(message):
                         await message.channel.send(file = file, embed=embed)
                         url = 'http://localhost:5000/api/admin/writeinfouser'
                         requests.post(url, json = users)
+                        url = 'http://localhost:5000/api/admin/updateall'
+                        requests.get(url)
                     if faction == 'council':
                         embed = discord.Embed(title=f"Faction message", description=f"{message.author.name} joined The High Council!") #,color=Hex code
                         users[message.author.name]['faction'] = 'The High Council'
@@ -248,6 +250,8 @@ async def on_message(message):
                         await message.channel.send(file = file, embed=embed)
                         url = 'http://localhost:5000/api/admin/writeinfouser'
                         requests.post(url, json = users)
+                        url = 'http://localhost:5000/api/admin/updateall'
+                        requests.get(url)
                 else:
                     await message.channel.send(f'You are already part of a faction!')
             else:
