@@ -225,11 +225,11 @@ class User:
             if item.name == itemname:
                 if itemname in self.itemsDB:
                     self.itemsDB[itemname] += amount
-                    self.health += item.health
+                    self.health += item.health*amount
                 else:
                     self.items.append(item)
                     self.itemsDB[itemname] = amount
-                    self.health += item.health
+                    self.health += item.health*amount
 
 
         for item in Items.all_items_med:
@@ -240,27 +240,27 @@ class User:
                 else:
                     self.items.append(item)
                     self.itemsDB[itemname] = amount
-                    self.health += item.health
+                    self.health += item.health*amount
 
         for item in Items.all_items_high:
             if item.name == itemname:
                 if itemname in self.itemsDB:
                     self.itemsDB[itemname] += amount
-                    self.health += item.health
+                    self.health += item.health*amount
                 else:
                     self.items.append(item)
                     self.itemsDB[itemname] = amount
-                    self.health += item.health
+                    self.health += item.health*amount
         
         for item in Items.all_items_shop:
             if item.name == itemname:
                 if itemname in self.itemsDB:
                     self.itemsDB[itemname] += amount
-                    self.health += item.health
+                    self.health += item.health*amount
                 else:
                     self.items.append(item)
                     self.itemsDB[itemname] = amount
-                    self.health += item.health
+                    self.health += item.health*amount
     
         User.update()
         User.writetodb()

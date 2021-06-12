@@ -130,7 +130,7 @@ async def on_message(message):
         embed = discord.Embed(title=f"Balance", description=f"{message.author.name} current stats") #,color=Hex code
 
         embed.add_field(name=f"Current Health :heart:", value=f'{[round(health,2), maxhealth]}')
-        embed.add_field(name=f"Coins: <:CBCcoin:831506214659293214> | <:CBCcoin:831506214659293214> :clock1:", value=f'{round(value,2)} | {total_income}]')
+        embed.add_field(name=f"Coins: <:CBCcoin:831506214659293214> | <:CBCcoin:831506214659293214> :clock1:", value=f'[{round(value,2)} | {total_income}]')
         embed.add_field(name=f"Max tickets :tickets: ", value=f'{maxtickets} ')
         embed.add_field(name=f"Tickets :ticket:", value=f'{ticket}')
         embed.add_field(name=f"Attack damage :crossed_swords: ", value=f'{dmg}')
