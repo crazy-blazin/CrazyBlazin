@@ -185,15 +185,17 @@ class BuyItem(Resource):
 class AddMemberFaction(Resource):
     def get(self, username, faction):
         for user in User.all_users:
-            print(user.name, user.faction, faction)
             if user.name == username:
                 if faction == 'council':
-                    print(user.name, user.faction)
                     user.faction = 'The High Council'
-                    print(user.name, user.faction)
+                    for faction in Faction.all_factions:
+                        if faction.name == user.faction:
+                            faction.add_members(user)
                 else:
-                    print(user.name, user.faction)
                     user.faction = 'The Resistance'
+                    for faction in Faction.all_factions:
+                        if faction.name == user.faction:
+                            faction.add_members(user)
         Faction.update()
         Faction.writetodb()
         User.writetodb()
