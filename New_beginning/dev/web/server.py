@@ -181,6 +181,22 @@ class BuyItem(Resource):
         return {'info': 'Item added.'}, http.client.OK
 
 
+
+class AddMemberFaction(Resource):
+    def get(self, username, faction):
+        for user in User.all_users:
+            if user.name == username:
+                if faction == 'council':
+                    user.faction = 'The High Council'
+                else:
+                    user.faction = 'The Resistance'
+        
+        Faction.update()
+        Faction.writetodb()
+        User.writetodb()
+        return {'info': 'Item added.'}, http.client.OK
+
+
 class WriteInfoUser(Resource):
     def post(self):
         data_incoming = request.get_json()
@@ -231,7 +247,7 @@ api.add_resource(GetInfo, '/api/admin/getinfo')
 api.add_resource(WriteInfoUser, '/api/admin/writeinfouser')
 api.add_resource(CreateUser, '/api/admin/createuser/<user>')
 api.add_resource(BuyItem, '/api/admin/items/<username>/<payment>/<itemname>/<amount>')
-
+api.add_resource(AddMemberFaction, '/api/admin/factionadd/<username>/<faction>')
 
 The_high_council = Faction(name = 'The High Council')
 The_resistance = Faction(name = 'The Resistance')

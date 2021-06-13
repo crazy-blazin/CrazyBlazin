@@ -29,7 +29,7 @@ for stonkname in stonklist:
     drift = 0
     var = np.random.randn()
     var = var*np.sign(var)
-    Stonk(stonkname, init_value = np.random.randint(1, 15), meanval = 0,  variance = var, drift = drift)
+    Stonk(stonkname, init_value = np.random.randint(100, 150), meanval = 0,  variance = var, drift = drift)
 
 
 logging.basicConfig(filename='main.log', level=logging.DEBUG)
@@ -44,7 +44,7 @@ def run():
         for stonk in Stonk.all_stonks:
             stonk.move_stonks()
         sio.emit('stonk_values', Stonk.get_all_stonks_info())
-        sio.sleep(7)
+        sio.sleep(5)
 
 sio.start_background_task(target = run)
 
@@ -236,24 +236,18 @@ async def on_message(message):
                 if users[message.author.name]['faction'] == None:
                     if faction == 'resistance':
                         embed = discord.Embed(title=f"Faction message", description=f"{message.author.name} joined The Resistance!") #,color=Hex code
-                        users[message.author.name]['faction'] = 'The Resistance'
                         file = discord.File("web/static/faction_resistance.png", filename="web/static/faction_resistance2.png")
-                        await message.channel.send(file = file, embed=embed)
-                        url = 'http://localhost:5000/api/admin/writeinfouser'
-                        requests.post(url, json = users)
-                        url = 'http://localhost:5000/api/admin/updateall'
+                        url = 'http://localhost:5000/api/admin/factionadd/{message.author.name}/{faction}'
                         requests.get(url)
+                        await message.channel.send(file = file, embed=embed)
                     if faction == 'council':
                         embed = discord.Embed(title=f"Faction message", description=f"{message.author.name} joined The High Council!") #,color=Hex code
-                        users[message.author.name]['faction'] = 'The High Council'
                         file = discord.File("web/static/faction_high_council.png", filename="web/static/faction_high_council.png")
-                        await message.channel.send(file = file, embed=embed)
-                        url = 'http://localhost:5000/api/admin/writeinfouser'
-                        requests.post(url, json = users)
-                        url = 'http://localhost:5000/api/admin/updateall'
+                        url = 'http://localhost:5000/api/admin/factionadd/{message.author.name}/{faction}'
                         requests.get(url)
+                        await message.channel.send(file = file, embed=embed)
                 else:
-                    await message.channel.send(f'You are already part of a faction!')
+                    await message.channel.send(f'{message.author.name} are already part of a faction!')
             else:
                 await message.channel.send(f'This faction does not exist!, use !join resistance or !join council')
 
@@ -397,7 +391,7 @@ async def on_message(message):
                     if (item.current_price*amount) <= user_current_money:
                         users[message.author.name]['coins'] -= price
 
-                        if item in users[message.author.name]['itemsDB']:
+                        if item.name in users[message.author.name]['itemsDB']:
                             users[message.author.name]['stonksDB'][item.name] += int(amount)
                         else:
                             users[message.author.name]['stonksDB'][item.name] = int(amount)

@@ -32,8 +32,8 @@ class Stonk:
     def move_stonks(self):
 
         y = round(self.drift + self.y[-1] + np.random.normal(self.mean, self.variance),2)
-        if y <= 0:
-            y = 1
+        if y <= 50:
+            y = 50
         #y = round(self.drift*self.time + self.y[-1] + np.random.normal(self.mean, self.variance),2)
         self.time += 1
         if len(self.y) < 1800:
@@ -456,7 +456,6 @@ class Faction:
     
     @staticmethod
     def update():
-        Faction.init_members()
         for faction in Faction.all_factions:
             faction.maxhp = 0
             faction.armor = 0
@@ -524,7 +523,6 @@ class Faction:
     @staticmethod
     def init_members():
         for faction in Faction.all_factions:
-            faction.members = []
             for user in User.all_users:
                 if user.faction == faction.name:
                     faction.add_members(user)
