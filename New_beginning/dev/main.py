@@ -221,7 +221,7 @@ async def on_message(message):
                     file = discord.File(f"web/static/{response['img']}", filename=f"web/static/{response['img']}")
                     await message.channel.send(file = file, embed=embed)
                 else:
-                    await message.channel.send(f'{message.author.name} does not have enough hp or tickets.')
+                    await message.channel.send(f'{users[message.author.name]["faction"]} does not have enough hp or tickets.')
 
     
     if message.content.startswith('!join'):
