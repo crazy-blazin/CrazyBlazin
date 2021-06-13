@@ -130,7 +130,7 @@ async def on_message(message):
         embed = discord.Embed(title=f"Balance", description=f"{message.author.name} current stats") #,color=Hex code
 
         embed.add_field(name=f"Current Health :heart:", value=f'{[round(health,2), maxhealth]}')
-        embed.add_field(name=f"Coins: <:CBCcoin:831506214659293214> | <:CBCcoin:831506214659293214> :clock1:", value=f'[{round(value,2)} | {total_income}]')
+        embed.add_field(name=f"Coins: <:CBCcoin:831506214659293214> | <:CBCcoin:831506214659293214> :clock1:[/30 minutes]", value=f'[{round(value,2)} | {total_income}]')
         embed.add_field(name=f"Max tickets :tickets: ", value=f'{maxtickets} ')
         embed.add_field(name=f"Tickets :ticket:", value=f'{ticket}')
         embed.add_field(name=f"Attack damage :crossed_swords: ", value=f'{dmg}')
@@ -391,10 +391,10 @@ async def on_message(message):
                     if (item.current_price*amount) <= user_current_money:
                         users[message.author.name]['coins'] -= price
 
-                        if item.name in users[message.author.name]['itemsDB']:
-                            users[message.author.name]['stonksDB'][item.name] += int(amount)
-                        else:
+                        if item not in users[message.author.name]['itemsDB']:
                             users[message.author.name]['stonksDB'][item.name] = int(amount)
+                        else:
+                            users[message.author.name]['stonksDB'][item.name] += int(amount)
                         
                         url = 'http://localhost:5000/api/admin/writeinfouser'
                         requests.post(url, json = users)
