@@ -2,11 +2,12 @@ import requests
 
 
 
-url = 'http://localhost:5000/api/admin/getinfo'
+url = 'https://ec081fd7903d.ngrok.io/api/admin/getinfo'
 users = requests.get(url).json()
 
-#### CHANGE
+users['Verzac']['health'] = 114
+users['Verzac']['coins'] += 100
 
-url = 'http://localhost:5000/api/admin/writeinfouser'
-requests.post(url, json = users)
+url = 'https://ec081fd7903d.ngrok.io/api/admin/writeinfouser'
+x = requests.post(url, json = users)
 

@@ -456,6 +456,7 @@ class Faction:
     
     @staticmethod
     def update():
+        Faction.init_members()
         for faction in Faction.all_factions:
             faction.maxhp = 0
             faction.armor = 0
@@ -523,6 +524,7 @@ class Faction:
     @staticmethod
     def init_members():
         for faction in Faction.all_factions:
+            faction.members = []
             for user in User.all_users:
                 if user.faction == faction.name:
                     faction.add_members(user)
@@ -647,32 +649,32 @@ class Boss:
                         event = EventUI(f"{member.name} hit {self.name} for {dmg_dealt} damage!, {self.name} has {self.health} HP left.", "green", "30")
                         self.eventlogs.append(event)
                 
-                if self.health <= 0:
-                    event = EventUI(f"{faction.name} WON!", "green", "30")
-                    self.eventlogs.append(event)
-                    count = Counter(self.lootdrops)
-                    lootmsg = ""
-                    for itm in count:
-                        lootmsg += f"{itm}: {count[itm]}, "
-                    event = EventUI(f"LOOT:  {lootmsg}", "black", "30")
-                    self.eventlogs.append(event)
-                    for member in faction.members:
+                    if self.health <= 0:
+                        event = EventUI(f"{faction.name} WON!", "green", "30")
+                        self.eventlogs.append(event)
+                        count = Counter(self.lootdrops)
+                        lootmsg = ""
                         for itm in count:
-                            member.add_item(itemname = itm, amount = count[itm])
-                    return {'info': True, 'battlereport': f'{faction.name} Won! loot: {lootmsg}'}
-                else:
-                    monster_atk = round(np.random.randint(self.dmg[0], self.dmg[1]),2)
-                    dmg_dealt = round(monster_atk - (sigmoid(faction.armor*0.01)  - sigmoid(faction.armor*0.01)/3 )*monster_atk, 2)
-                    faction.health -= dmg_dealt
-                    faction.health = round(faction.health,2)
-                    event = EventUI(f"{self.name} hit {faction.name} for {dmg_dealt} damage!, {faction.name} has {faction.health} HP left.", "red", "30")
-                    self.eventlogs.append(event)
+                            lootmsg += f"{itm}: {count[itm]}, "
+                        event = EventUI(f"LOOT:  {lootmsg}", "black", "30")
+                        self.eventlogs.append(event)
+                        for member in faction.members:
+                            for itm in count:
+                                member.add_item(itemname = itm, amount = count[itm])
+                        return {'info': True, 'battlereport': f'{faction.name} Won! loot: {lootmsg}'}
+                    else:
+                        monster_atk = round(np.random.randint(self.dmg[0], self.dmg[1]),2)
+                        dmg_dealt = round(monster_atk - (sigmoid(faction.armor*0.01)  - sigmoid(faction.armor*0.01)/3 )*monster_atk, 2)
+                        faction.health -= dmg_dealt
+                        faction.health = round(faction.health,2)
+                        event = EventUI(f"{self.name} hit {faction.name} for {dmg_dealt} damage!, {faction.name} has {faction.health} HP left.", "red", "30")
+                        self.eventlogs.append(event)
 
-                if faction.health <= 0:
-                    faction.health = 0
-                    event = EventUI(f"{faction.name} Lost!", "red", "30")
-                    self.eventlogs.append(event)
-                    return {'info': True, 'battlereport': f'{faction.name} Lost!'}
+                    if faction.health <= 0:
+                        faction.health = 0
+                        event = EventUI(f"{faction.name} Lost!", "red", "30")
+                        self.eventlogs.append(event)
+                        return {'info': True, 'battlereport': f'{faction.name} Lost!'}
     
     def check_if_possible(self):
         for faction in Faction.all_factions:

@@ -1,39 +1,39 @@
-# from weakref import KeyedRef
-import matplotlib.pyplot as plt
-import numpy as np
+# # from weakref import KeyedRef
+# import matplotlib.pyplot as plt
+# import numpy as np
 
-# # a = {}
-# # try:
-# #     a['rww'] += 1
-# # except KeyError as msg:
-# #     print(KeyError)
-
-
-# # x = np.random.normal(1,10, 1000)
-
-# # plt.hist(x , bins = 100)
-# # plt.show()
+# # # a = {}
+# # # try:
+# # #     a['rww'] += 1
+# # # except KeyError as msg:
+# # #     print(KeyError)
 
 
+# # # x = np.random.normal(1,10, 1000)
 
-for l in range(0, 1):
-    price = [10]
-    tot = 0
-    for i in range(1, 3600):
-        #x = np.sin(i*0.05) + np.random.normal(7, 2)
-        x = round(price[-1] + np.random.normal(0, 1),2)
-        price.append(x)
-        if x <= 0:
-            tot += 1
-        # if price[-1] <= 0:
-        #     price[-1] = 1
+# # # plt.hist(x , bins = 100)
+# # # plt.show()
 
 
-    plt.plot(price)
-print(tot/5)
-print(np.mean(price))
-print(np.std(price))
-plt.show()
+
+# for l in range(0, 1):
+#     price = [10]
+#     tot = 0
+#     for i in range(1, 3600):
+#         #x = np.sin(i*0.05) + np.random.normal(7, 2)
+#         x = round(price[-1] + np.random.normal(0, 1),2)
+#         price.append(x)
+#         if x <= 0:
+#             tot += 1
+#         # if price[-1] <= 0:
+#         #     price[-1] = 1
+
+
+#     plt.plot(price)
+# print(tot/5)
+# print(np.mean(price))
+# print(np.std(price))
+# plt.show()
 
 
 # # print((7 - 2)*100)
@@ -94,10 +94,10 @@ plt.show()
 
 # print(x)
 
-from collections import Counter
+# from collections import Counter
 
-a = ['larve', 'larve', 'hest', 'neste', 'neste']
+# a = ['larve', 'larve', 'hest', 'neste', 'neste']
 
-z = Counter(a)
-for itm in z:
-    print(itm, z[itm])
+# z = Counter(a)
+# for itm in z:
+#     print(itm, z[itm])

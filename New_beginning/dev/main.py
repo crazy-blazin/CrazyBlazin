@@ -44,7 +44,7 @@ def run():
         for stonk in Stonk.all_stonks:
             stonk.move_stonks()
         sio.emit('stonk_values', Stonk.get_all_stonks_info())
-        sio.sleep(2)
+        sio.sleep(7)
 
 sio.start_background_task(target = run)
 
@@ -237,7 +237,7 @@ async def on_message(message):
                     if faction == 'resistance':
                         embed = discord.Embed(title=f"Faction message", description=f"{message.author.name} joined The Resistance!") #,color=Hex code
                         users[message.author.name]['faction'] = 'The Resistance'
-                        file = discord.File("web/static/faction_resistance.png", filename="web/static/faction_resistance.png")
+                        file = discord.File("web/static/faction_resistance.png", filename="web/static/faction_resistance2.png")
                         await message.channel.send(file = file, embed=embed)
                         url = 'http://localhost:5000/api/admin/writeinfouser'
                         requests.post(url, json = users)
@@ -263,7 +263,7 @@ async def on_message(message):
         users = requests.get(url).json()
         temp_stats  = {}
         for user in users:
-            power = users[user]['health']**2 + users[user]['maxhealth']**2 + users[user]['armor']**2 + users[user]['dmg'][0]**2 + users[user]['dmg'][1]**2 + users[user]['health_regen']**2 + float(np.sqrt(users[user]['coins']))
+            power = users[user]['health'] + users[user]['maxhealth'] + users[user]['armor'] + users[user]['dmg'][0] + users[user]['dmg'][1] + users[user]['health_regen'] + float(np.sqrt(users[user]['coins']))
             tot_stonksval = 0
             for stonk in users[user]['stonksDB']:
                 for st in Stonk.all_stonks:
@@ -408,7 +408,7 @@ async def on_message(message):
                         return
                         
                     else:
-                        await message.channel.send(f'{message.author.name} does not have coins <:CBCcoin:831506214659293214>.')
+                        await message.channel.send(f'{message.author.name} does not have enough coins <:CBCcoin:831506214659293214>.')
                         return
         await message.channel.send(f'Item does not exist, retard.')
 
@@ -438,7 +438,7 @@ async def on_message(message):
                         return
                         
                     else:
-                        await message.channel.send(f'{message.author.name} does not have coins <:CBCcoin:831506214659293214>.')
+                        await message.channel.send(f'{message.author.name} does not have that many {item.name} <:CBCcoin:831506214659293214>.')
                         return
         await message.channel.send(f'Item does not exist, retard.')
 
