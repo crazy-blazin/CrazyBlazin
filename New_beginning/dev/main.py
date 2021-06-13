@@ -21,7 +21,7 @@ from flask import jsonify
 import logging
 import jsonpickle
 
-
+k = 'ODMxOTE4MjA5NDA4OTU4NTE0.YHcONQ.g6AE1uFTigf0xGVr3RwU8qJS-40'
 
 stonklist = ['Weapon Factory', 'Real estate GRUNMORS', 'Spellfrik', 'Minekartellet uftevik', 'Bommulsprodusenten Øldal']
 
@@ -237,13 +237,13 @@ async def on_message(message):
                     if faction == 'resistance':
                         embed = discord.Embed(title=f"Faction message", description=f"{message.author.name} joined The Resistance!") #,color=Hex code
                         file = discord.File("web/static/faction_resistance.png", filename="web/static/faction_resistance2.png")
-                        url = 'http://localhost:5000/api/admin/factionadd/{message.author.name}/{faction}'
+                        url = f'http://localhost:5000/api/admin/factionadd/{message.author.name}/{faction}'
                         requests.get(url)
                         await message.channel.send(file = file, embed=embed)
                     if faction == 'council':
                         embed = discord.Embed(title=f"Faction message", description=f"{message.author.name} joined The High Council!") #,color=Hex code
                         file = discord.File("web/static/faction_high_council.png", filename="web/static/faction_high_council.png")
-                        url = 'http://localhost:5000/api/admin/factionadd/{message.author.name}/{faction}'
+                        url = f'http://localhost:5000/api/admin/factionadd/{message.author.name}/{faction}'
                         requests.get(url)
                         await message.channel.send(file = file, embed=embed)
                 else:
