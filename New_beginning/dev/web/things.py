@@ -3,6 +3,30 @@ import uuid
 import numpy as np
 from collections import Counter
 
+
+
+
+def adding_items(user, itemname, items, amount):
+    for item in items:
+        if item.name == itemname:
+            if itemname in user.itemsDB:
+                itemgain = user.itemsDB[itemname] + amount
+                if itemgain > 10:
+                    return False
+                else:
+                    user.itemsDB[itemname] += amount
+                    user.health += item.health*amount
+                    return True
+            else:
+                if amount > 10:
+                    return False
+                else:
+                    user.items.append(item)
+                    user.itemsDB[itemname] = amount
+                    user.health += item.health*amount
+                    return True
+
+
 class Stonk:
     all_stonks = []
     def __init__(self, name, init_value = 5, meanval= 0,  variance = 5, drift = 1.1):
@@ -220,50 +244,15 @@ class User:
 
 
     def add_item(self, itemname = '', amount = 1):
-        
-        for item in Items.all_items_low:
-            if item.name == itemname:
-                if itemname in self.itemsDB:
-                    self.itemsDB[itemname] += amount
-                    self.health += item.health*amount
-                else:
-                    self.items.append(item)
-                    self.itemsDB[itemname] = amount
-                    self.health += item.health*amount
 
-
-        for item in Items.all_items_med:
-            if item.name == itemname:
-                if itemname in self.itemsDB:
-                    self.itemsDB[itemname] += amount
-                    self.health += item.health
-                else:
-                    self.items.append(item)
-                    self.itemsDB[itemname] = amount
-                    self.health += item.health*amount
-
-        for item in Items.all_items_high:
-            if item.name == itemname:
-                if itemname in self.itemsDB:
-                    self.itemsDB[itemname] += amount
-                    self.health += item.health*amount
-                else:
-                    self.items.append(item)
-                    self.itemsDB[itemname] = amount
-                    self.health += item.health*amount
-        
-        for item in Items.all_items_shop:
-            if item.name == itemname:
-                if itemname in self.itemsDB:
-                    self.itemsDB[itemname] += amount
-                    self.health += item.health*amount
-                else:
-                    self.items.append(item)
-                    self.itemsDB[itemname] = amount
-                    self.health += item.health*amount
-    
+        feedback = adding_items(self, itemname, Items.all_items_low, amount)
+        feedback = adding_items(self, itemname, Items.all_items_med, amount)
+        feedback = adding_items(self, itemname, Items.all_items_high, amount)
+        feedback = adding_items(self, itemname, Items.all_items_shop, amount)
         User.update()
         User.writetodb()
+
+        return feedback
 
     @staticmethod
     def update():

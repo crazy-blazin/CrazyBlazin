@@ -23,30 +23,30 @@ import jsonpickle
 
 k = 'ODMxOTE4MjA5NDA4OTU4NTE0.YHcONQ.g6AE1uFTigf0xGVr3RwU8qJS-40'
 
-stonklist = ['Weapon Factory', 'Real estate GRUNMORS', 'Spellfrik', 'Minekartellet uftevik', 'Bommulsprodusenten Øldal']
+# stonklist = ['Weapon Factory', 'Real estate GRUNMORS', 'Spellfrik', 'Minekartellet uftevik', 'Bommulsprodusenten Øldal']
 
-for stonkname in stonklist:
-    drift = 0
-    var = np.random.randn()
-    var = var*np.sign(var)
-    Stonk(stonkname, init_value = np.random.randint(100, 150), meanval = 0,  variance = var, drift = drift)
-
-
-logging.basicConfig(filename='main.log', level=logging.DEBUG)
-
-sio = socketio.Client(logger=logging)
+# for stonkname in stonklist:
+#     drift = 0
+#     var = np.random.randn()
+#     var = var*np.sign(var)
+#     Stonk(stonkname, init_value = np.random.randint(100, 150), meanval = 0,  variance = var, drift = drift)
 
 
+# logging.basicConfig(filename='main.log', level=logging.DEBUG)
 
-def run():
-    sio.connect('http://127.0.0.1:5000', wait = True)
-    while True:
-        for stonk in Stonk.all_stonks:
-            stonk.move_stonks()
-        sio.emit('stonk_values', Stonk.get_all_stonks_info())
-        sio.sleep(5)
+# sio = socketio.Client(logger=logging)
 
-sio.start_background_task(target = run)
+
+
+# def run():
+#     sio.connect('http://127.0.0.1:5000', wait = True)
+#     while True:
+#         for stonk in Stonk.all_stonks:
+#             stonk.move_stonks()
+#         sio.emit('stonk_values', Stonk.get_all_stonks_info())
+#         sio.sleep(5)
+
+# sio.start_background_task(target = run)
 
 
 
@@ -123,7 +123,7 @@ async def on_message(message):
         armor = users[message.author.name]['armor']
         value = users[message.author.name]['coins']
         ticket = users[message.author.name]['tickets']
-        stonksDB = users[message.author.name]['stonksDB']
+        # stonksDB = users[message.author.name]['stonksDB']
         health_regen = users[message.author.name]['health_regen']
         total_income = users[message.author.name]['total_income']
         maxtickets = users[message.author.name]['maxtickets']
@@ -137,12 +137,12 @@ async def on_message(message):
         embed.add_field(name=f"Armor :shield: ", value=f'{armor}')
         embed.add_field(name=f"Health Regeneration :herb:", value=f'{health_regen}')
 
-        stonks_msg = ""
-        for stonk in stonksDB:
-            for st in Stonk.all_stonks:
-                if stonk == st.name:
-                    stonks_msg += f" {stonk}: {stonksDB[stonk]} [{round(st.current_price*stonksDB[stonk],2)} <:CBCcoin:831506214659293214>] |"
-        embed.add_field(name=f"Stonks", value=f'{stonks_msg} .')
+        # stonks_msg = ""
+        # for stonk in stonksDB:
+        #     for st in Stonk.all_stonks:
+        #         if stonk == st.name:
+        #             stonks_msg += f" {stonk}: {stonksDB[stonk]} [{round(st.current_price*stonksDB[stonk],2)} <:CBCcoin:831506214659293214>] |"
+        # embed.add_field(name=f"Stonks", value=f'{stonks_msg} .')
         await message.channel.send(embed=embed)
 
 
@@ -252,18 +252,27 @@ async def on_message(message):
                 await message.channel.send(f'This faction does not exist!, use !join resistance or !join council')
 
 
+    # if message.content.startswith('!top'):
+    #     url = 'http://localhost:5000/api/admin/getinfo'
+    #     users = requests.get(url).json()
+    #     temp_stats  = {}
+    #     for user in users:
+    #         power = users[user]['health'] + users[user]['maxhealth'] + users[user]['armor'] + users[user]['dmg'][0] + users[user]['dmg'][1] + users[user]['health_regen'] + float(np.sqrt(users[user]['coins']))
+    #         tot_stonksval = 0
+    #         for stonk in users[user]['stonksDB']:
+    #             for st in Stonk.all_stonks:
+    #                 if stonk == st.name:
+    #                     tot_stonksval += st.current_price*users[user]['stonksDB'][st.name]
+    #         temp_stats[user] = round(power + float(np.sqrt(tot_stonksval)),2)
+
+
     if message.content.startswith('!top'):
         url = 'http://localhost:5000/api/admin/getinfo'
         users = requests.get(url).json()
         temp_stats  = {}
         for user in users:
             power = users[user]['health'] + users[user]['maxhealth'] + users[user]['armor'] + users[user]['dmg'][0] + users[user]['dmg'][1] + users[user]['health_regen'] + float(np.sqrt(users[user]['coins']))
-            tot_stonksval = 0
-            for stonk in users[user]['stonksDB']:
-                for st in Stonk.all_stonks:
-                    if stonk == st.name:
-                        tot_stonksval += st.current_price*users[user]['stonksDB'][st.name]
-            temp_stats[user] = round(power + float(np.sqrt(tot_stonksval)),2)
+            temp_stats[user] = round(power,2)
 
         index = 1
         embed = discord.Embed(title="Top players", description="Users with most power") #,color=Hex code
@@ -373,68 +382,68 @@ async def on_message(message):
         await message.channel.send(embed=embed)
 
     
-    if message.content.startswith('!stonkbuy'):
-        msgsplit = message.content.split(' ')
-        if len(msgsplit) > 3 or len(msgsplit) < 3:
-            await message.channel.send(f'Too many or few arguments. Use !stonkbuy <index> <amount>')
-        else:
-            choosenitem = int(msgsplit[1])*np.sign(int(msgsplit[1]))
-            amount = int(msgsplit[2])*np.sign(int(msgsplit[2]))
+    # if message.content.startswith('!stonkbuy'):
+    #     msgsplit = message.content.split(' ')
+    #     if len(msgsplit) > 3 or len(msgsplit) < 3:
+    #         await message.channel.send(f'Too many or few arguments. Use !stonkbuy <index> <amount>')
+    #     else:
+    #         choosenitem = int(msgsplit[1])*np.sign(int(msgsplit[1]))
+    #         amount = int(msgsplit[2])*np.sign(int(msgsplit[2]))
             
-            for index, item in enumerate(Stonk.all_stonks):
-                index += 1
-                if index == choosenitem:
-                    url = 'http://localhost:5000/api/admin/getinfo'
-                    users = requests.get(url).json()
-                    user_current_money = users[message.author.name]['coins']
-                    price = float(round((item.current_price*amount),2))
-                    if (item.current_price*amount) <= user_current_money:
-                        users[message.author.name]['coins'] -= price
+    #         for index, item in enumerate(Stonk.all_stonks):
+    #             index += 1
+    #             if index == choosenitem:
+    #                 url = 'http://localhost:5000/api/admin/getinfo'
+    #                 users = requests.get(url).json()
+    #                 user_current_money = users[message.author.name]['coins']
+    #                 price = float(round((item.current_price*amount),2))
+    #                 if (item.current_price*amount) <= user_current_money:
+    #                     users[message.author.name]['coins'] -= price
 
-                        if item not in users[message.author.name]['itemsDB']:
-                            users[message.author.name]['stonksDB'][item.name] = int(amount)
-                        else:
-                            users[message.author.name]['stonksDB'][item.name] += int(amount)
+    #                     if item not in users[message.author.name]['itemsDB']:
+    #                         users[message.author.name]['stonksDB'][item.name] = int(amount)
+    #                     else:
+    #                         users[message.author.name]['stonksDB'][item.name] += int(amount)
                         
-                        url = 'http://localhost:5000/api/admin/writeinfouser'
-                        requests.post(url, json = users)
-                        await message.channel.send(f'{message.author.name} bought {amount} {item.name} for {price} <:CBCcoin:831506214659293214>.')
-                        return
+    #                     url = 'http://localhost:5000/api/admin/writeinfouser'
+    #                     requests.post(url, json = users)
+    #                     await message.channel.send(f'{message.author.name} bought {amount} {item.name} for {price} <:CBCcoin:831506214659293214>.')
+    #                     return
                         
-                    else:
-                        await message.channel.send(f'{message.author.name} does not have enough coins <:CBCcoin:831506214659293214>.')
-                        return
-        await message.channel.send(f'Item does not exist, retard.')
+    #                 else:
+    #                     await message.channel.send(f'{message.author.name} does not have enough coins <:CBCcoin:831506214659293214>.')
+    #                     return
+    #     await message.channel.send(f'Item does not exist, retard.')
 
 
-    if message.content.startswith('!stonksell'):
-        msgsplit = message.content.split(' ')
-        if len(msgsplit) > 3 or len(msgsplit) < 3:
-            await message.channel.send(f'Too many or few arguments. Use !stonksell <index> <amount>')
-        else:
-            choosenitem = int(msgsplit[1])*np.sign(int(msgsplit[1]))
-            amount = int(msgsplit[2])*np.sign(int(msgsplit[2]))
+    # if message.content.startswith('!stonksell'):
+    #     msgsplit = message.content.split(' ')
+    #     if len(msgsplit) > 3 or len(msgsplit) < 3:
+    #         await message.channel.send(f'Too many or few arguments. Use !stonksell <index> <amount>')
+    #     else:
+    #         choosenitem = int(msgsplit[1])*np.sign(int(msgsplit[1]))
+    #         amount = int(msgsplit[2])*np.sign(int(msgsplit[2]))
             
-            for index, item in enumerate(Stonk.all_stonks):
-                index += 1
-                if index == choosenitem:
-                    url = 'http://localhost:5000/api/admin/getinfo'
-                    users = requests.get(url).json()
-                    user_current_amount = users[message.author.name]['stonksDB'][item.name]
-                    price = float(round((item.current_price*amount),2))
-                    if amount <= user_current_amount:
-                        users[message.author.name]['coins'] += price
-                        users[message.author.name]['stonksDB'][item.name] -= int(amount)
+    #         for index, item in enumerate(Stonk.all_stonks):
+    #             index += 1
+    #             if index == choosenitem:
+    #                 url = 'http://localhost:5000/api/admin/getinfo'
+    #                 users = requests.get(url).json()
+    #                 user_current_amount = users[message.author.name]['stonksDB'][item.name]
+    #                 price = float(round((item.current_price*amount),2))
+    #                 if amount <= user_current_amount:
+    #                     users[message.author.name]['coins'] += price
+    #                     users[message.author.name]['stonksDB'][item.name] -= int(amount)
 
-                        url = 'http://localhost:5000/api/admin/writeinfouser'
-                        requests.post(url, json = users)
-                        await message.channel.send(f'{message.author.name} sold {amount} {item.name} for {price} <:CBCcoin:831506214659293214>.')
-                        return
+    #                     url = 'http://localhost:5000/api/admin/writeinfouser'
+    #                     requests.post(url, json = users)
+    #                     await message.channel.send(f'{message.author.name} sold {amount} {item.name} for {price} <:CBCcoin:831506214659293214>.')
+    #                     return
                         
-                    else:
-                        await message.channel.send(f'{message.author.name} does not have that many {item.name} <:CBCcoin:831506214659293214>.')
-                        return
-        await message.channel.send(f'Item does not exist, retard.')
+    #                 else:
+    #                     await message.channel.send(f'{message.author.name} does not have that many {item.name} <:CBCcoin:831506214659293214>.')
+    #                     return
+    #     await message.channel.send(f'Item does not exist, retard.')
 
 
     if message.content.startswith('!web'):

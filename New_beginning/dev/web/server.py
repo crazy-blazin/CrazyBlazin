@@ -175,10 +175,11 @@ class BuyItem(Resource):
     def get(self, username, payment, itemname, amount):
         for user in User.all_users:
             if user.name == username:
-                user.coins -= round(float(payment),2)
-                user.coins = round(user.coins,2)
-                user.add_item(itemname = itemname, amount = int(amount))
-        return {'info': 'Item added.'}, http.client.OK
+                feedback = user.add_item(itemname = itemname, amount = int(amount))
+                if feedback:
+                    user.coins -= round(float(payment),2)
+                    user.coins = round(user.coins,2)
+        return {'info': feedback}, http.client.OK
 
 
 
