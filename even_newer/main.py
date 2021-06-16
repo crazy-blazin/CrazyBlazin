@@ -124,8 +124,6 @@ async def on_message(message):
     
 
     if message.content.startswith('!bal'):
-        with open('database.txt', 'r') as f:
-            database = eval(f.read())
         value = database[message.author.name]['coins']
         embed = discord.Embed(title=f"Balance", description=f"{message.author.name} current balance") #,color=Hex code
 
