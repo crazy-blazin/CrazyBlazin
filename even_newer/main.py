@@ -111,6 +111,8 @@ t.start()
 
 @client.event
 async def on_voice_state_update(member, before, after):
+    if member.name not in database:
+        database[member.name] = {'coins': 1000}
     database[member.name]['status'] = after
     print(database)
 
