@@ -19,6 +19,7 @@ import requests
 from flask import jsonify
 
 
+
 # stonklist = ['Weapon Factory', 'Real estate GRUNMORS', 'Spellfrik', 'Minekartellet uftevik', 'Bommulsprodusenten Øldal']
 
 # for stonkname in stonklist:
@@ -78,6 +79,7 @@ with open('database.txt', 'r') as f:
 
 def ticksystem():
     time.sleep(10)
+    tmp = database
     for user in database:
         if 'status' in database[user]:
             state = database[user]['status']
@@ -100,8 +102,9 @@ def ticksystem():
                 print(f'Coins to : {user}')
         else:
             pass
+    tmp.pop('status', None)
     with open('database.txt', 'w') as f:
-        f.write(str(database))
+        f.write(str(tmp))
     ticksystem()
 
 t = threading.Thread(target=ticksystem)
