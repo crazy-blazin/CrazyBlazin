@@ -19,7 +19,6 @@ import requests
 from flask import jsonify
 
 
-
 # stonklist = ['Weapon Factory', 'Real estate GRUNMORS', 'Spellfrik', 'Minekartellet uftevik', 'Bommulsprodusenten Øldal']
 
 # for stonkname in stonklist:
@@ -74,15 +73,16 @@ intents.members = True
 client = MyClient(intents = intents)
 
 
+temp_status  = {}
+
 with open('database.txt', 'r') as f:
     database = eval(f.read())
 
 def ticksystem():
     time.sleep(10)
-    tmp = database
     for user in database:
-        if 'status' in database[user]:
-            state = database[user]['status']
+        if user in temp_status:
+            state = temp_status[user]
             channel_state = str(state.channel)
             stream_state = state.self_stream
             if channel_state != 'None':
@@ -102,9 +102,8 @@ def ticksystem():
                 print(f'Coins to : {user}')
         else:
             pass
-    tmp.pop('status', None)
-    with open('database.txt', 'w') as f:
-        f.write(str(tmp))
+    with open('database.txt', 'w', encoding='utf-8') as f:
+        f.write(str(database))
     ticksystem()
 
 t = threading.Thread(target=ticksystem)
@@ -116,9 +115,7 @@ t.start()
 async def on_voice_state_update(member, before, after):
     if member.name not in database:
         database[member.name] = {'coins': 1000}
-    database[member.name]['status'] = after
-    print(database)
-
+    temp_status[member.name] = after
 
 @client.event
 async def on_message(message):
