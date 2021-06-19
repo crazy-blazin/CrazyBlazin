@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6" crossorigin="anonymous" />
+</head>
+
+<body>
+
+
+    <style>
+    body {
+        color: white;
+        font-family: 'Open Sans', sans-serif;
+        font-weight: 300;
+        background-color:black;
+    }
+h1,
+h1+p {
+	width:30%;
+	margin: auto;
+	font-weight: 100;
+    font-size: 15px;
+}
+
+
+h1+p a {
+	color:white;
+}
+h1+p a:hover {
+	text-decoration: none;
+    color:white;
+}
+h2 {
+    margin-left: -80px;
+	padding: 0;
+	font-weight: 300;
+}
+h2 span {
+	margin-left: 1em;
+	color: white;
+	font-size: 85%;
+}
+.main {
+  margin: auto;
+  width:65%;
+  /* border: 3px solid green; */
+  /* padding: 10px; */
+}
+.column {
+	/* margin: 15px 15px 0; */
+    margin: auto;
+	padding: 0;
+}
+.column:last-child {
+	padding-bottom: 60px;
+}
+.column::after {
+	content: '';
+	clear: both;
+	display: block;
+}
+.column div {
+	position: relative;
+	float: left;
+	width: 570px;
+	height: 415px;
+	/* margin: 0 0 0 25px; */
+    margin: auto;
+	padding: 0;
+}
+.column div:first-child {
+	margin-left: 0;
+}
+.column div span {
+	position: relative;
+	bottom: -20px;
+	left: 0;
+	z-index: -1;
+	display: block;
+	width: 100%;
+	margin: auto;
+	padding: 0;
+	color: #444;
+	font-size: 18px;
+	text-decoration: none;
+	text-align: center;
+	-webkit-transition: .3s ease-in-out;
+	transition: .3s ease-in-out;
+	opacity: 0;
+}
+figure {
+	width: 570px;
+	height: 415px;
+	margin: auto;
+	padding: 5px;
+	overflow: hidden;
+}
+figure:hover+span {
+	position: fixed;
+	top: 40%;
+    left: 40%;
+	opacity: 1;
+    color:white;
+}
+
+/* Zoom Out #1 */
+.hover03 figure img {
+	-webkit-transform: scale(1.5);
+	transform: scale(1.5);
+	-webkit-transition: .3s ease-in-out;
+	transition: .3s ease-in-out;
+}
+.hover03 figure:hover img {
+	-webkit-transform: scale(1);
+	transform: scale(1);
+}
+
+
+/* Blur */
+.hover07 figure img {
+	-webkit-filter: blur(3px);
+	filter: blur(3px);
+	-webkit-transition: .3s ease-in-out;
+	transition: .3s ease-in-out;
+}
+.hover07 figure:hover img {
+	-webkit-filter: blur(0);
+	filter: blur(0);
+}
+
+/* Gray Scale */
+.hover08 figure img {
+	-webkit-filter: grayscale(100%);
+	filter: grayscale(100%);
+	-webkit-transition: .3s ease-in-out;
+	transition: .3s ease-in-out;
+}
+.hover08 figure:hover img {
+	-webkit-filter: grayscale(0);
+	filter: grayscale(0);
+}
+
+
+
+/* Shine */
+.hover14 figure {
+	position: relative;
+}
+.hover14 figure::before {
+	position: absolute;
+	top: 6%;
+	left: -75%;
+	z-index: 2;
+	display: block;
+	content: '';
+	width: 50%;
+	height: 100%;
+	background: -webkit-linear-gradient(left, rgba(255,255,255,0) 0%, rgba(255,255,255,.3) 100%);
+	background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,.3) 100%);
+	-webkit-transform: skewX(-25deg);
+	transform: skewX(-25deg);
+}
+.hover14 figure:hover::before {
+	-webkit-animation: shine .75s;
+	animation: shine .75s;
+    
+}
+@-webkit-keyframes shine {
+	100% {
+		left: 125%;
+	}
+}
+@keyframes shine {
+	100% {
+		left: 125%;
+	}
+}
+
+ /* The sidebar menu */
+ .sidenav {
+  height: 100%; /* Full-height: remove this if you want "auto" height */
+  width: 160px; /* Set the width of the sidebar */
+  z-index: 1; /* Stay on top */
+  top: 30%; /* Stay at the top */
+  left: 5%;
+  background-color:black; /* Black */
+  overflow-x: hidden; /* Disable horizontal scroll */
+  padding-top: 20px;
+}
+
+/* The navigation menu links */
+.sidenav a {
+  padding: 6px 8px 6px 16px;
+  text-decoration: none;
+  font-size: 25px;
+  color: white;
+  display: block;
+}
+
+/* When you mouse over the navigation links, change their color */
+.sidenav a:hover {
+  color: purple;
+}
+
+/* On smaller screens, where height is less than 450px, change the style of the sidebar (less padding and a smaller font size) */
+@media screen and (max-height: 450px) {
+  .sidenav {padding-top: 15px;}
+  .sidenav a {font-size: 18px;}
+}
+
+
+        </style>
+        </head>
+		<body style="text-align:center;">
+			<div class="sidenav">
+				<a href="/">Home</a>
+				<a href="/bosses">Bosses</a>
+				<a href="/mobs">Mobs</a>
+				<a href="/factions">Factions</a>
+				<a href="/stonks">Stonks</a>
+			  </div>
+
+
+
+
+
+
+				<!-- <script>
+				const mobs = {{mobs|safe}};
+				console.log(mobs.length);
+
+				let container = $("#mobpanel")
+				//e9729c33-a500-11eb-bd96-40167e77d41a
+				let loop = async () => {
+					for (let i = 0; i < mobs.length; i++) {
+						let log = mobs[i];
+						let div = document.createElement("div");
+						// let jDiv = $(div)
+						// jDiv.css('font-size', `${log.size}px`)
+						// jDiv.css('color', `${log.color}`)
+						// jDiv.text(log.text)
+						// jDiv.addClass('action')
+						mobpanel.append(div)
+					}
+				}
+				loop();
+
+				</script> -->
+				<div class="main">
+            <div class="hover14 hover08 column">
+                <h2>MOBS</h2>
+              <div>
+                <figure>
+                    <h1>1. Vampire Johnson</h1>
+                    <img src="{{ url_for('static', filename='mob_vampire_johnson.png') }}" />
+                </figure>
+                <span>
+                    Level: 1 Vampire Johnson is very scary
+                    <br><br>
+                    To attack this mob use: !attack 1  COST 4 tickets
+                </span>
+              </div>
+			  
+			  <div>
+                <figure>
+                    <h1>2. Phantom Sylvester</h1>
+                    <img src="{{ url_for('static', filename='mob_vampire_sylvester.png') }}" />
+                </figure>
+                <span>
+                    Level: 2 Vampire Johnson is very scary
+                    <br><br>
+                    To attack this mob use: !attack 2  COST 4 tickets
+                </span>
+              </div>
+            </div>
+
+
+			<div class="hover14 hover08 column">
+              <div>
+                <figure>
+                    <h1>3. Poison rat</h1>
+                    <img src="{{ url_for('static', filename='mob_poison_rat.png') }}" />
+                </figure>
+                <span>
+                    Level: 11 Poison rat is very scary
+                    <br><br>
+                    To attack this mob use: !attack 3  COST 4 tickets
+                </span>
+              </div>
+
+			  <div>
+                <figure>
+                    <h1>4. Corrupt Judge</h1>
+                    <img src="{{ url_for('static', filename='mob_corrupt_judge.png') }}" />
+                </figure>
+                <span>
+                    Level: 15 Corrupt Judge is very scary
+                    <br><br>
+                    To attack this mob use: !attack 4  COST 4 tickets
+                </span>
+              </div>
+            </div>
+
+
+			<div class="hover14 hover08 column">
+				<div>
+				  <figure>
+					  <h1>5. Underground monster</h1>
+					  <img src="{{ url_for('static', filename='mob_underground_monster.png') }}" />
+				  </figure>
+				  <span>
+					  Level: 21 Underground monster is very scary
+					  <br><br>
+					  To attack this mob use: !attack 5  COST 4 tickets
+				  </span>
+				</div>
+  
+				<div>
+				  <figure>
+					  <h1>6. Oktar Ghosts</h1>
+					  <img src="{{ url_for('static', filename='mob_oktar_ghosts.png') }}" />
+				  </figure>
+				  <span>
+					  Level: 35 Oktar Ghosts is very scary
+					  <br><br>
+					  To attack this mob use: !attack 6  COST 4 tickets
+				  </span>
+				</div>
+			  </div> 
+
+        </div>
+
+
+
+		
+</body>
+
+</html>

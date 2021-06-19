@@ -19,13 +19,8 @@ import requests
 from flask import jsonify
 
 
-# stonklist = ['Weapon Factory', 'Real estate GRUNMORS', 'Spellfrik', 'Minekartellet uftevik', 'Bommulsprodusenten Øldal']
 
-# for stonkname in stonklist:
-#     drift = 0
-#     var = np.random.randn()
-#     var = var*np.sign(var)
-#     Stonk(stonkname, init_value = np.random.randint(100, 150), meanval = 0,  variance = var, drift = drift)
+k = ''
 
 
 # logging.basicConfig(filename='main.log', level=logging.DEBUG)
@@ -65,7 +60,7 @@ class MyClient(discord.Client):
                 if 'Bots' in role_names:
                     pass
                 else:
-                    database[member.name] = {'coins': 1000}
+                    database[member.name] = {'coins': 100}
         
 
 intents = discord.Intents.default()
@@ -78,36 +73,41 @@ temp_status  = {}
 with open('database.txt', 'r') as f:
     database = eval(f.read())
 
-def ticksystem():
-    time.sleep(10)
-    for user in database:
-        if user in temp_status:
-            state = temp_status[user]
-            channel_state = str(state.channel)
-            stream_state = state.self_stream
-            if channel_state != 'None':
-                if stream_state:
-                    try:
-                        database[user]['coins'] = round(database[user]['coins'] + 1, 2)
-                    except KeyError as msg:
-                        print(msg)
-                        pass
-                    print(f'Stream activity: {user}')
-                else:
-                    try:
-                        database[user]['coins'] = round(database[user]['coins'] + 0.33, 2)
-                    except KeyError as msg:
-                        print(msg)
-                        pass
-                print(f'Coins to : {user}')
+
+
+
+def add_coins(stream_state, user, cointype):
+    if stream_state:
+        if cointype in database[user]:
+            database[user][cointype] = round(database[user][cointype] + 1, 2)
         else:
-            pass
-    with open('database.txt', 'w', encoding='utf-8') as f:
-        f.write(str(database))
-    ticksystem()
+            database[user][cointype] =  100
+    else:
+        if cointype in database[user]:
+            database[user][cointype] = round(database[user][cointype] + 0.33, 2)
+        else:
+            database[user][cointype] =  100
+    print(f'Coins to : {user}')
+
+
+def ticksystem():
+    while True:
+        for user in database:
+            if user in temp_status:
+                state = temp_status[user]
+                channelid = str(state.channel.id)
+                channel_state = str(state.channel)
+                stream_state = state.self_stream
+                if channelid != str(847583212926009374):
+                    add_coins(stream_state, user, 'coins')
+                else:
+                    add_coins(stream_state, user, 'shekels')
+        with open('database.txt', 'w', encoding='utf-8') as f:
+            f.write(str(database))
+        time.sleep(10)
 
 t = threading.Thread(target=ticksystem)
-t.daemon = True
+t.daemon = False
 t.start()
 
 
@@ -122,13 +122,17 @@ async def on_message(message):
     if message.author == client.user:
         return
     
-
     if message.content.startswith('!bal'):
         value = database[message.author.name]['coins']
+        if 'shekels' in database[message.author.name]:
+            shekval = database[message.author.name]['shekels']
+        else:
+            shekval = 100
+            database[message.author.name]['shekels'] = shekval
         embed = discord.Embed(title=f"Balance", description=f"{message.author.name} current balance") #,color=Hex code
 
-        embed.add_field(name=f"<:CBCcoin:831506214659293214> (CBC)", value=f'{round(value,2)}')
+        embed.add_field(name=f"Crazy Blazin Coins", value=f'{round(value,2)} <:CBCcoin:831506214659293214>')
+        embed.add_field(name=f"Shekels", value=f'{round(shekval,2)} ₪')
         await message.channel.send(embed=embed)
-
 
 client.run(k)
