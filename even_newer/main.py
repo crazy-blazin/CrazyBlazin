@@ -117,10 +117,11 @@ def ticksystem():
                     channelid = str(0)
                 channel_state = str(state.channel)
                 stream_state = state.self_stream
-                if channelid != str(847583212926009374):
-                    add_coins(stream_state, user, 'coins')
-                else:
-                    add_coins(stream_state, user, 'shekels')
+                if channel_state != 'None':
+                    if channelid != str(847583212926009374):
+                        add_coins(stream_state, user, 'coins')
+                    else:
+                        add_coins(stream_state, user, 'shekels')
         with open('database.txt', 'w', encoding='utf-8') as f:
             f.write(str(database))
         time.sleep(10)
