@@ -56,8 +56,6 @@
 
         socket.on('clientMsg', function (data) {
             console.log('Received a message from the server!', data);
-            console.log(data);
-
 
             // [{'id': '1390a04d-c6c5-11eb-82c1-40167e77d41a', 'name': 'larve1', 'values': [5]}, {'id': '1390c76e-c6c5-11eb-aec9-40167e77d41a', 'name': 'larve2', 'values': [5]}, {'id': '1390c76f-c6c5-11eb-8f04-40167e77d41a', 'name': 'larve3', 'values': [5]}]
 
@@ -65,14 +63,14 @@
             tbody.innerHTML = null
             data.forEach((element, index) => {
                 const tr = document.createElement("tr");
-                const td2 = document.createElement("td");
                 const td = document.createElement("td");
-                const td4 = document.createElement("td");
+                const td2 = document.createElement("td");
                 const td3 = document.createElement("td");
-                td3.innerText = index + 1 + '.';
-                td4.innerText = element[1];
-                td.innerText = element[0];
+                const td4 = document.createElement("td");
+                td.innerText = index + 1 + '.';                   //link, upvotes, addedby
                 td2.innerText = element[2];
+                td3.innerText = element[0];
+                td4.innerText = element[1];
 
                 // td.innerHTML = element[0];  //element.difference, element.differerence_text;
 
@@ -88,8 +86,9 @@
                     window.location = element[0];
                 };
                 tr.classList.add('tablerow')
-                tr.appendChild(td3);
                 tr.appendChild(td);
+                tr.appendChild(td2);
+                tr.appendChild(td3);
                 tr.appendChild(td4);
                 tbody.appendChild(tr);
             });

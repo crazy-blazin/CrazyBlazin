@@ -23,39 +23,35 @@ import logging
 
 
 
-
 # logging.basicConfig(filename='main.log', level=logging.DEBUG)
 
-# sio = socketio.Client(logger=logging)
+sio = socketio.Client()
 
 
 
-# with open('musicdatabase.txt', 'r') as f:
-#     musicdatabase = eval(f.read())
+with open('musicdatabase.txt', 'r') as f:
+    musicdatabase = eval(f.read())
 
 
-# musicdatabase = {'larve1': ["https://www.youtube.com/watch?v=_10L-LYoqXU", 10, 'Foxxravin'], 'larve2': ["https://www.youtube.com/watch?v=_10L-LYoqXU", 20, 'Foxxravin'], 'larve3': ["https://www.youtube.com/watch?v=_10L-LYoqXU", 5, 'Foxxravin']}
+with open('musicdatabase.txt', 'r') as f:
+    musicdatabase = eval(f.read())
 
+def run():
+    sio.connect('http://127.0.0.1:5000', wait = True)
+    while True:
+        with open('musicdatabase.txt', 'r') as f:
+            musicdatabase = eval(f.read())
+        ordered = {}
+        final = []
+        for music in musicdatabase:
+            if 'upvotes' in musicdatabase[music]:
+                ordered[music] = len(musicdatabase[music]['upvotes'])
+        for link in sorted(ordered, key=ordered.get, reverse=True):
+            final.append([link, ordered[link], musicdatabase[link]['added_by']])
+        sio.emit('msg', final)
+        sio.sleep(3)
 
-# with open('musicdatabase.txt', 'r') as f:
-#     musicdatabase = eval(f.read())
-
-# def run():
-#     with open('musicdatabase.txt', 'r') as f:
-#         musicdatabase = eval(f.read())
-#     sio.connect('http://127.0.0.1:5000', wait = True)
-#     while True:
-#         ordered = {}
-#         final = []
-#         for music in musicdatabase:
-#             ordered[music] = musicdatabase[music][1]
-#         ordered = sorted(ordered, key=ordered.get, reverse=True)
-#         for music in ordered:
-#             final.append(musicdatabase[music])
-#         sio.emit('msg', final)
-#         sio.sleep(3)
-
-# sio.start_background_task(target = run)
+sio.start_background_task(target = run)
 
 
 with open('database.txt', 'r') as f:
@@ -139,32 +135,45 @@ async def on_voice_state_update(member, before, after):
 
 
 
-# @client.event
-# async def on_reaction_add(reaction, user):
-#     if str(reaction.message.id) == str(795738617300385883):
-#         if reaction.emoji == ['👍']:
-#             with open('musicdatabase.txt', 'r') as f:
-#                 musicdatabase = eval(f.read())
+@client.event
+async def on_reaction_add(reaction, user):
+    if str(reaction.message.channel.id) == str(802515211348213760):
+        if reaction.emoji == '💥':
+            with open('musicdatabase.txt', 'r') as f:
+                musicdatabase = eval(f.read())
+            if reaction.message.content in musicdatabase:
+                musicdatabase[reaction.message.content]['upvotes'].append(reaction.message.author.name)
             
-#             if reaction.message.content in musicdatabase:
-#                 musicdatabase[reaction.message.content][1] += 1
-#             else:
-#                 pass
+            with open('musicdatabase.txt', 'w') as f:
+                f.write(str(musicdatabase))
 
+
+@client.event
+async def on_reaction_remove(reaction, user):
+    if str(reaction.message.channel.id) == str(802515211348213760):
+        if reaction.emoji == '💥':
+            with open('musicdatabase.txt', 'r') as f:
+                musicdatabase = eval(f.read())
+            if reaction.message.content in musicdatabase:
+                if reaction.message.author.name in musicdatabase[reaction.message.content]['upvotes']:
+                    musicdatabase[reaction.message.content]['upvotes'].remove(reaction.message.author.name)
+            with open('musicdatabase.txt', 'w') as f:
+                f.write(str(musicdatabase))
 
 @client.event
 async def on_message(message):
     if message.author == client.user:
         return
 
-    # if str(message.channel.id) == str(795738617300385883):
-    #     with open('musicdatabase.txt', 'r') as f:
-    #         musicdatabase = eval(f.read())
-    #     if str(message.content) not in musicdatabase:
-    #         musicdatabase[message.content] = [message.content, 1, message.author.name.]
-        
-        # with open('database.txt', 'w') as f:
-        #     f.write(str(musicdatabase))
+    if str(message.channel.id) == str(802515211348213760):
+        with open('musicdatabase.txt', 'r') as f:
+            musicdatabase = eval(f.read())
+        if str(message.content) not in musicdatabase:
+            musicdatabase[message.content] = {}
+            musicdatabase[message.content]['upvotes'] = []
+            musicdatabase[message.content]['added_by'] = message.author.name
+        with open('musicdatabase.txt', 'w') as f:
+            f.write(str(musicdatabase))
     
     if message.content.startswith('!bal'):
         value = database[message.author.name]['coins']
