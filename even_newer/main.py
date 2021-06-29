@@ -185,6 +185,7 @@ async def on_message(message):
         with open('database.txt', 'r') as f:
             users = eval(f.read())
         value = database[message.author.name]['coins']
+        if 'spankcoin' in 
         valuespank = database[message.author.name]['spankcoin']
         if 'shekels' in database[message.author.name]:
             shekval = database[message.author.name]['shekels']
@@ -201,20 +202,29 @@ async def on_message(message):
 
     if message.content.startswith('!transfer'):
         msgsplit = message.content.split(' ')
-        if len(msgsplit) > 3 or len(msgsplit) < 3:
-            await message.channel.send(f'Too many or few arguments. Use !transfer <user> <amount>')
-        else:
-            amount = int(msgsplit[2])
-            account = str(msgsplit[1])
-            with open('database.txt', 'r') as f:
-                users = eval(f.read())
-            if account == message.author.name:
-                if 'spankcoin' in database[message.author.name]:
-                    users[message.author.name]['spankcoin'] += amount
-                else:
-                    users[message.author.name]['spankcoin'] = amount
+        if message.author.name == 'Foxxravin':
                 
-            with open('database.txt', 'w') as f:
-                f.write(str(users))
+            if len(msgsplit) > 3 or len(msgsplit) < 3:
+                await message.channel.send(f'Too many or few arguments. Use !transfer <user> <amount>')
+            else:
+                amount = int(msgsplit[2])
+                account = str(msgsplit[1])
+                with open('database.txt', 'r') as f:
+                    users = eval(f.read())
+                if account in users:
+                    if 'spankcoin' in database[account]:
+                        users[account]['spankcoin'] += amount
+                    else:
+                        users[account]['spankcoin'] = amount
+
+                    await message.channel.send(f'{message.author.name} sent {amount} <:raised_hands_tone1:859521216115900457> (spank coins) to {account}')                    
+                    with open('database.txt', 'w') as f:
+                        f.write(str(users))
+                else:
+                    await message.channel.send(f'User does not exist!')
+                
+        else:
+            await message.channel.send(f'You are not Foxxravin. (Spank bank)')
+
 
 client.run(k)
