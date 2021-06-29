@@ -21,8 +21,6 @@ import logging
 
 
 
-
-
 # logging.basicConfig(filename='main.log', level=logging.DEBUG)
 
 sio = socketio.Client()
@@ -33,14 +31,13 @@ with open('musicdatabase.txt', 'r') as f:
     musicdatabase = eval(f.read())
 
 
-with open('musicdatabase.txt', 'r') as f:
-    musicdatabase = eval(f.read())
-
 def run():
     sio.connect('http://127.0.0.1:5000', wait = True)
     while True:
         with open('musicdatabase.txt', 'r') as f:
             musicdatabase = eval(f.read())
+        
+
         ordered = {}
         final = []
         for music in musicdatabase:
@@ -137,12 +134,15 @@ async def on_voice_state_update(member, before, after):
 
 @client.event
 async def on_reaction_add(reaction, user):
-    if str(reaction.message.channel.id) == str(802515211348213760):
+    if str(reaction.message.channel.id) == str(795738540251545620):
         if reaction.emoji == '💥':
             with open('musicdatabase.txt', 'r') as f:
                 musicdatabase = eval(f.read())
             if reaction.message.content in musicdatabase:
                 musicdatabase[reaction.message.content]['upvotes'].append(reaction.message.author.name)
+
+            with open('musicdatabaseBACKUP.txt', 'w') as f:
+                f.write(str(musicdatabase))
             
             with open('musicdatabase.txt', 'w') as f:
                 f.write(str(musicdatabase))
@@ -150,10 +150,12 @@ async def on_reaction_add(reaction, user):
 
 @client.event
 async def on_reaction_remove(reaction, user):
-    if str(reaction.message.channel.id) == str(802515211348213760):
+    if str(reaction.message.channel.id) == str(795738540251545620):
         if reaction.emoji == '💥':
             with open('musicdatabase.txt', 'r') as f:
                 musicdatabase = eval(f.read())
+            with open('musicdatabaseBACKUP.txt', 'w') as f:
+                f.write(str(musicdatabase))
             if reaction.message.content in musicdatabase:
                 if reaction.message.author.name in musicdatabase[reaction.message.content]['upvotes']:
                     musicdatabase[reaction.message.content]['upvotes'].remove(reaction.message.author.name)
@@ -165,9 +167,11 @@ async def on_message(message):
     if message.author == client.user:
         return
 
-    if str(message.channel.id) == str(802515211348213760):
+    if str(message.channel.id) == str(795738540251545620):
         with open('musicdatabase.txt', 'r') as f:
             musicdatabase = eval(f.read())
+        with open('musicdatabaseBACKUP.txt', 'w') as f:
+                f.write(str(musicdatabase))
         if str(message.content) not in musicdatabase:
             musicdatabase[message.content] = {}
             musicdatabase[message.content]['upvotes'] = []
@@ -176,7 +180,12 @@ async def on_message(message):
             f.write(str(musicdatabase))
     
     if message.content.startswith('!bal'):
+        with open('musicdatabase.txt', 'r') as f:
+            musicdatabase = eval(f.read())
+        with open('database.txt', 'r') as f:
+            users = eval(f.read())
         value = database[message.author.name]['coins']
+        valuespank = database[message.author.name]['spankcoin']
         if 'shekels' in database[message.author.name]:
             shekval = database[message.author.name]['shekels']
         else:
@@ -184,8 +193,28 @@ async def on_message(message):
             database[message.author.name]['shekels'] = shekval
         embed = discord.Embed(title=f"Balance", description=f"{message.author.name} current balance") #,color=Hex code
 
+        embed.add_field(name=f"Spank coins", value=f'{round(valuespank,2)} <:raised_hands_tone1:859521216115900457>')
         embed.add_field(name=f"Crazy Blazin Coins", value=f'{round(value,2)} <:CBCcoin:831506214659293214>')
-        embed.add_field(name=f"Sheqalim", value=f'{round(shekval,2)} ₪')
+        embed.add_field(name=f"Sheqalim", value=f'₪ {round(shekval,2)}')
         await message.channel.send(embed=embed)
+
+
+    if message.content.startswith('!transfer'):
+        msgsplit = message.content.split(' ')
+        if len(msgsplit) > 3 or len(msgsplit) < 3:
+            await message.channel.send(f'Too many or few arguments. Use !transfer <user> <amount>')
+        else:
+            amount = int(msgsplit[2])
+            account = str(msgsplit[1])
+            with open('database.txt', 'r') as f:
+                users = eval(f.read())
+            if account == message.author.name:
+                if 'spankcoin' in database[message.author.name]:
+                    users[message.author.name]['spankcoin'] += amount
+                else:
+                    users[message.author.name]['spankcoin'] = amount
+                
+            with open('database.txt', 'w') as f:
+                f.write(str(users))
 
 client.run(k)
