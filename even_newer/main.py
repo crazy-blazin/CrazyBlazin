@@ -20,7 +20,6 @@ from flask import jsonify
 import logging
 
 
-
 # logging.basicConfig(filename='main.log', level=logging.DEBUG)
 
 sio = socketio.Client()
@@ -37,7 +36,6 @@ def run():
         with open('musicdatabase.txt', 'r') as f:
             musicdatabase = eval(f.read())
         
-
         ordered = {}
         final = []
         for music in musicdatabase:
@@ -178,12 +176,12 @@ async def on_message(message):
             musicdatabase[message.content]['added_by'] = message.author.name
         with open('musicdatabase.txt', 'w') as f:
             f.write(str(musicdatabase))
-    
+
     if message.content.startswith('!bal'):
         with open('musicdatabase.txt', 'r') as f:
             musicdatabase = eval(f.read())
         with open('database.txt', 'r') as f:
-            users = eval(f.read())
+            database = eval(f.read())
         value = database[message.author.name]['coins']
         if 'spankcoin' in database[message.author.name]:
             valuespank = database[message.author.name]['spankcoin']
@@ -213,7 +211,7 @@ async def on_message(message):
                 with open('database.txt', 'r') as f:
                     users = eval(f.read())
                 if account in users:
-                    if 'spankcoin' in database[account]:
+                    if 'spankcoin' in users[account]:
                         users[account]['spankcoin'] += amount
                     else:
                         users[account]['spankcoin'] = amount
