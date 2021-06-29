@@ -185,8 +185,8 @@ async def on_message(message):
         with open('database.txt', 'r') as f:
             users = eval(f.read())
         value = database[message.author.name]['coins']
-        if 'spankcoin' in 
-        valuespank = database[message.author.name]['spankcoin']
+        if 'spankcoin' in database[message.author.name]:
+            valuespank = database[message.author.name]['spankcoin']
         if 'shekels' in database[message.author.name]:
             shekval = database[message.author.name]['shekels']
         else:
@@ -194,7 +194,8 @@ async def on_message(message):
             database[message.author.name]['shekels'] = shekval
         embed = discord.Embed(title=f"Balance", description=f"{message.author.name} current balance") #,color=Hex code
 
-        embed.add_field(name=f"Spank coins", value=f'{round(valuespank,2)} <:raised_hands_tone1:859521216115900457>')
+        if 'spankcoin' in database[message.author.name]:
+            embed.add_field(name=f"Spank coins", value=f'{round(valuespank,2)} <:raised_hands_tone1:859521216115900457>')
         embed.add_field(name=f"Crazy Blazin Coins", value=f'{round(value,2)} <:CBCcoin:831506214659293214>')
         embed.add_field(name=f"Sheqalim", value=f'₪ {round(shekval,2)}')
         await message.channel.send(embed=embed)
