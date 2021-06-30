@@ -79,11 +79,10 @@ client = MyClient(intents = intents)
 
 temp_status  = {}
 
-with open('database.txt', 'r') as f:
-    database = eval(f.read())
-
 
 def add_coins(stream_state, user, cointype):
+    with open('database.txt', 'r') as f:
+        database = eval(f.read())
     if stream_state:
         if cointype in database[user]:
             database[user][cointype] = round(database[user][cointype] + 1, 2)
@@ -99,6 +98,8 @@ def add_coins(stream_state, user, cointype):
 
 def ticksystem():
     while True:
+        with open('database.txt', 'r') as f:
+            database = eval(f.read())
         for user in database:
             if user in temp_status:
                 state = temp_status[user]
