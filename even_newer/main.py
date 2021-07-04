@@ -104,7 +104,8 @@ def ticksystem():
     while True:
         with open('database.txt', 'r') as f:
             database = eval(f.read())
-        for user in database:
+        names = [user for user in database]
+        for user in names:
             if user in temp_status:
                 state = temp_status[user]
                 try:
@@ -124,11 +125,6 @@ def ticksystem():
                     database[user]['Timer'] = 0
                 else:
                     database[user]['Timer'] -= 10
-        
-
-
-        with open('database.txt', 'w', encoding='utf-8') as f:
-            f.write(str(database))
         time.sleep(10)
 
 t = threading.Thread(target=ticksystem)
