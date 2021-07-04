@@ -22,6 +22,8 @@ import logging
 
 # logging.basicConfig(filename='main.log', level=logging.DEBUG)
 
+
+
 sio = socketio.Client()
 
 
@@ -94,6 +96,8 @@ def add_coins(stream_state, user, cointype):
         else:
             database[user][cointype] =  100
     print(f'Coins to : {user}')
+    with open('database.txt', 'w', encoding='utf-8') as f:
+        f.write(str(database))
 
 
 def ticksystem():
@@ -114,6 +118,15 @@ def ticksystem():
                         add_coins(stream_state, user, 'coins')
                     else:
                         add_coins(stream_state, user, 'shekels')
+            
+            if 'Timer' in database[user]:
+                if database[user]['Timer'] <= 0:
+                    database[user]['Timer'] = 0
+                else:
+                    database[user]['Timer'] -= 10
+        
+
+
         with open('database.txt', 'w', encoding='utf-8') as f:
             f.write(str(database))
         time.sleep(10)
@@ -125,9 +138,18 @@ t.start()
 
 @client.event
 async def on_voice_state_update(member, before, after):
+    with open('database.txt', 'r') as f:
+        database = eval(f.read())
     if member.name not in database:
         database[member.name] = {'coins': 1000}
     temp_status[member.name] = after
+    if member.name in database:
+        if 'Timer' in database[member.name]:
+            curr_timer = database[member.name]['Timer']
+            role_names = [role.name for role in member.guild.roles]
+            if curr_timer <= 0 and 'Crazy Blazin Gold' in role_names:
+                role = get(member.guild.roles, name='Crazy Blazin Gold')
+                await member.remove_roles(role)
 
 
 
@@ -179,8 +201,6 @@ async def on_message(message):
             f.write(str(musicdatabase))
 
     if message.content.startswith('!bal'):
-        with open('musicdatabase.txt', 'r') as f:
-            musicdatabase = eval(f.read())
         with open('database.txt', 'r') as f:
             database = eval(f.read())
         value = database[message.author.name]['coins']
@@ -226,5 +246,31 @@ async def on_message(message):
         else:
             await message.channel.send(f'You are not Foxxravin. (Spank bank)')
 
+
+    
+    if message.content.startswith('!buy gold'):
+        
+        str_split = message.content.split(' ')
+        if len(str_split) > 2 or len(str_split) < 2:
+            await message.channel.send(f'Too many or few arguments. Use !buy gold')
+        else:
+            with open('database.txt', 'r') as f:
+                users = eval(f.read())
+            if 1000 <= users[message.author.name]['coins']:
+                users[message.author.name]['coins'] -= 1000
+
+                member = message.author
+                role = get(member.guild.roles, name='Crazy Blazin Gold')
+                await member.add_roles(role)
+                # await bot.remove_roles(user, 'member')
+                await message.channel.send(f'{message.author.name} Bought Crazy Blazin Gold Role for one month!')
+
+                users[message.author.name]['Timer'] = 2592000
+                with open('database.txt', 'w') as f:
+                    f.write(str(users))
+
+            else:
+                await message.channel.send(f'{message.author.name} does not have enough <:CBCcoin:831506214659293214> (CBC) to buy Crazy Blazin Gold! Price: 1000 <:CBCcoin:831506214659293214> (CBC)')
+                
 
 client.run(k)
