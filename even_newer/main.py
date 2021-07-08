@@ -269,4 +269,49 @@ async def on_message(message):
                 await message.channel.send(f'{message.author.name} does not have enough <:CBCcoin:831506214659293214> (CBC) to buy Crazy Blazin Gold! Price: 1000 <:CBCcoin:831506214659293214> (CBC)')
                 
 
+    if message.content.startswith('!gamble '):
+        str_split = message.content.split(' ')
+        if len(str_split) > 2 or len(str_split) < 2:
+            await message.channel.send(f'Too many or few arguments. Use !gamble <amount>')
+        else:
+            with open('database.txt', 'r') as f:
+                users = eval(f.read())
+            amount = float(str_split[1])*np.sign(float(str_split[1]))
+            if amount <= users[message.author.name]['coins']:
+                users[message.author.name]['coins'] -= amount
+
+                roll = np.random.randint(0, 101)
+                if roll > 50:
+                    users[message.author.name]['coins'] += 2*amount
+                    users[message.author.name]['coins'] = round(users[message.author.name]['coins'], 2)
+                    await message.channel.send(f'{message.author.name} Rolled {roll} and won {round(2*amount,2)}<:CBCcoin:831506214659293214>  :partying_face:')
+                else:
+                    await message.channel.send(f'{message.author.name} Rolled {roll} and lost {amount} <:CBCcoin:831506214659293214>! :frowning2:')
+
+                with open('database.txt', 'w') as f:
+                    f.write(str(users))
+
+            else:
+                await message.channel.send(f'{message.author.name} does not have enough <:CBCcoin:831506214659293214> (CBC) to gamble!')
+
+
+    if message.content.startswith('!uwuprison'):
+        str_split = message.content.split(' ')
+        if len(str_split) > 2 or len(str_split) < 2:
+            await message.channel.send(f'Too many or few arguments. Use !uwuprison <target>')
+        else:
+            with open('database.txt', 'r') as f:
+                users = eval(f.read())
+            
+            target = str(str_split[1])
+            if 1 <= users[message.author.name]['coins']:
+                users[message.author.name]['coins'] -= 1
+
+                await message.channel.send(f'{message.author.name} sent {target} to UwU prison <:aegao:849030455189438485> !')
+                with open('database.txt', 'w') as f:
+                    f.write(str(users))
+            else:
+                await message.channel.send(f'{message.author.name} does not have enough <:CBCcoin:831506214659293214> (CBC) to send {target} to UwU prison!')
+                
+
 client.run(k)
