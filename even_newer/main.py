@@ -138,6 +138,11 @@ async def on_voice_state_update(member, before, after):
         database = eval(f.read())
     if member.name not in database:
         database[member.name] = {'coins': 1000}
+        print(member.name)
+        with open('database.txt', 'w', encoding='utf-8') as f:
+            f.write(str(database))
+    
+
     temp_status[member.name] = after
     if member.name in database:
         if 'Timer' in database[member.name]:
