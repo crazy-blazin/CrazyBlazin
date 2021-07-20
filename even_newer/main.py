@@ -23,32 +23,31 @@ import logging
 # logging.basicConfig(filename='main.log', level=logging.DEBUG)
 
 
-
-sio = socketio.Client()
-
+# sio = socketio.Client()
 
 
-with open('musicdatabase.txt', 'r') as f:
-    musicdatabase = eval(f.read())
+
+# with open('musicdatabase.txt', 'r') as f:
+#     musicdatabase = eval(f.read())
 
 
-def run():
-    sio.connect('http://127.0.0.1:5000', wait = True)
-    while True:
-        with open('musicdatabase.txt', 'r') as f:
-            musicdatabase = eval(f.read())
+# def run():
+#     sio.connect('http://127.0.0.1:5000', wait = True)
+#     while True:
+#         with open('musicdatabase.txt', 'r') as f:
+#             musicdatabase = eval(f.read())
         
-        ordered = {}
-        final = []
-        for music in musicdatabase:
-            if 'upvotes' in musicdatabase[music]:
-                ordered[music] = len(musicdatabase[music]['upvotes'])
-        for link in sorted(ordered, key=ordered.get, reverse=True):
-            final.append([link, ordered[link], musicdatabase[link]['added_by']])
-        sio.emit('msg', final)
-        sio.sleep(3)
+#         ordered = {}
+#         final = []
+#         for music in musicdatabase:
+#             if 'upvotes' in musicdatabase[music]:
+#                 ordered[music] = len(musicdatabase[music]['upvotes'])
+#         for link in sorted(ordered, key=ordered.get, reverse=True):
+#             final.append([link, ordered[link], musicdatabase[link]['added_by']])
+#         sio.emit('msg', final)
+#         sio.sleep(3)
 
-sio.start_background_task(target = run)
+# sio.start_background_task(target = run)
 
 
 with open('database.txt', 'r') as f:
@@ -119,12 +118,27 @@ def ticksystem():
                         add_coins(stream_state, user, 'coins')
                     else:
                         add_coins(stream_state, user, 'shekels')
+
+
+            with open('database.txt', 'r') as f:
+                database = eval(f.read())
             
             if 'Timer' in database[user]:
                 if database[user]['Timer'] <= 0:
                     database[user]['Timer'] = 0
                 else:
                     database[user]['Timer'] -= 10
+
+            if database[user]['Crowned']:
+                if 'coins' in database[user]:
+                    database[user]['coins'] = round(database[user]['coins'] + 0.1, 2)
+                    print(f'Crowned Coins to : {user}')
+                else:
+                    database[user]['coins'] =  100
+            
+            with open('database.txt', 'w', encoding='utf-8') as f:
+                f.write(str(database))
+
         time.sleep(10)
 
 t = threading.Thread(target=ticksystem)
@@ -154,35 +168,35 @@ async def on_voice_state_update(member, before, after):
 
 
 
-@client.event
-async def on_reaction_add(reaction, user):
-    if str(reaction.message.channel.id) == str(795738540251545620):
-        if reaction.emoji == '💥':
-            with open('musicdatabase.txt', 'r') as f:
-                musicdatabase = eval(f.read())
-            if reaction.message.content in musicdatabase:
-                musicdatabase[reaction.message.content]['upvotes'].append(reaction.message.author.name)
+# @client.event
+# async def on_reaction_add(reaction, user):
+#     if str(reaction.message.channel.id) == str(795738540251545620):
+#         if reaction.emoji == '💥':
+#             with open('musicdatabase.txt', 'r') as f:
+#                 musicdatabase = eval(f.read())
+#             if reaction.message.content in musicdatabase:
+#                 musicdatabase[reaction.message.content]['upvotes'].append(reaction.message.author.name)
 
-            with open('musicdatabaseBACKUP.txt', 'w') as f:
-                f.write(str(musicdatabase))
+#             with open('musicdatabaseBACKUP.txt', 'w') as f:
+#                 f.write(str(musicdatabase))
             
-            with open('musicdatabase.txt', 'w') as f:
-                f.write(str(musicdatabase))
+#             with open('musicdatabase.txt', 'w') as f:
+#                 f.write(str(musicdatabase))
 
 
-@client.event
-async def on_reaction_remove(reaction, user):
-    if str(reaction.message.channel.id) == str(795738540251545620):
-        if reaction.emoji == '💥':
-            with open('musicdatabase.txt', 'r') as f:
-                musicdatabase = eval(f.read())
-            with open('musicdatabaseBACKUP.txt', 'w') as f:
-                f.write(str(musicdatabase))
-            if reaction.message.content in musicdatabase:
-                if reaction.message.author.name in musicdatabase[reaction.message.content]['upvotes']:
-                    musicdatabase[reaction.message.content]['upvotes'].remove(reaction.message.author.name)
-            with open('musicdatabase.txt', 'w') as f:
-                f.write(str(musicdatabase))
+# @client.event
+# async def on_reaction_remove(reaction, user):
+#     if str(reaction.message.channel.id) == str(795738540251545620):
+#         if reaction.emoji == '💥':
+#             with open('musicdatabase.txt', 'r') as f:
+#                 musicdatabase = eval(f.read())
+#             with open('musicdatabaseBACKUP.txt', 'w') as f:
+#                 f.write(str(musicdatabase))
+#             if reaction.message.content in musicdatabase:
+#                 if reaction.message.author.name in musicdatabase[reaction.message.content]['upvotes']:
+#                     musicdatabase[reaction.message.content]['upvotes'].remove(reaction.message.author.name)
+#             with open('musicdatabase.txt', 'w') as f:
+#                 f.write(str(musicdatabase))
 
 @client.event
 async def on_message(message):
@@ -214,8 +228,8 @@ async def on_message(message):
             database[message.author.name]['shekels'] = shekval
         embed = discord.Embed(title=f"Balance", description=f"{message.author.name} current balance") #,color=Hex code
 
-        if 'spankcoin' in database[message.author.name]:
-            embed.add_field(name=f"Spank coins", value=f'{round(valuespank,2)} <:raised_hands_tone1:859521216115900457>')
+        # if 'spankcoin' in database[message.author.name]:
+        #     embed.add_field(name=f"Spank coins", value=f'{round(valuespank,2)} <:raised_hands_tone1:859521216115900457>')
         embed.add_field(name=f"Crazy Blazin Coins", value=f'{round(value,2)} <:CBCcoin:831506214659293214>')
         embed.add_field(name=f"Sheqalim", value=f'₪ {round(shekval,2)}')
         await message.channel.send(embed=embed)
@@ -318,5 +332,66 @@ async def on_message(message):
             else:
                 await message.channel.send(f'{message.author.name} does not have enough <:CBCcoin:831506214659293214> (CBC) to send {target} to UwU prison!')
                 
+    
+    if message.content.startswith('!crown'):
+        str_split = message.content.split(' ')
+        if len(str_split) > 2 or len(str_split) < 2:
+            await message.channel.send(f'Too many or few arguments. Use !crown <target>')
+        else:
+            if message.author.name == 'JordanLTD':
+                with open('database.txt', 'r') as f:
+                    users = eval(f.read())
+                
+                target = str_split[1]
+                members = client.get_all_members()
+
+                for user in users:
+                    if 'Crowned' not in users[user]:
+                        users[user]['Crowned'] = False
+                    if users[user]['Crowned']:
+                        users[user]['Crowned'] = False
+                    if user == target:
+                        users[user]['Crowned'] = True
+
+                for member in members:
+                    if member.name == target:
+                        role = get(member.guild.roles, name='Crowned')
+                        await member.add_roles(role)
+                    else:
+                        role_names = [role.name for role in member.roles]
+                        if 'Crowned' in role_names:
+                            role = get(member.guild.roles, name='Crowned')
+                            await member.remove_roles(role)
+
+                with open('database.txt', 'w') as f:
+                    f.write(str(users))
+
+                await message.channel.send(f'{user} has been crowned by {message.author.name}:princess:, {target} will now have passive <:CBCcoin:831506214659293214> income until the crown is given to someone else or removed!')
+            else:
+                await message.channel.send(f'Only Yarden/Jordan/ירדן‎ :princess: can give someone the crown!‎')
+    
+    if message.content.startswith('!removecrown'):
+        if message.author.name == 'JordanLTD':
+            with open('database.txt', 'r') as f:
+                users = eval(f.read())
+            for user in users:
+                if 'Crowned' not in users[user]:
+                    users[user]['Crowned'] = False
+                if users[user]['Crowned']:
+                    users[user]['Crowned'] = False
+                
+            with open('database.txt', 'w') as f:
+                f.write(str(users))
+
+            members = client.get_all_members()
+            for member in members:
+                role_names = [role.name for role in member.roles]
+                if 'Crowned' in role_names:
+                    role = get(member.guild.roles, name='Crowned')
+                    await member.remove_roles(role)
+
+            await message.channel.send(f'{message.author.name}:princess: has removed the crown from the holder!')
+        else:
+            await message.channel.send(f'Only Yarden/Jordan/ירדן‎ :princess: can remove crown!')
 
 client.run(k)
