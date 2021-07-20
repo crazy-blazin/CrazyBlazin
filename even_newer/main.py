@@ -366,7 +366,7 @@ async def on_message(message):
                 with open('database.txt', 'w') as f:
                     f.write(str(users))
 
-                await message.channel.send(f'{user} has been crowned by {message.author.name}:princess:, {target} will now have passive <:CBCcoin:831506214659293214> income until the crown is given to someone else or removed!')
+                await message.channel.send(f'{target} has been crowned by {message.author.name}:princess:, {target} will now have passive <:CBCcoin:831506214659293214> income until the crown is given to someone else or removed!')
             else:
                 await message.channel.send(f'Only Yarden/Jordan/ירדן‎ :princess: can give someone the crown!‎')
     
