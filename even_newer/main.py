@@ -128,7 +128,10 @@ def ticksystem():
                     database[user]['Timer'] = 0
                 else:
                     database[user]['Timer'] -= 10
-
+            
+            if 'Crowned' not in database[user]:
+                database[user]['Crowned'] = False
+                
             if database[user]['Crowned']:
                 if 'coins' in database[user]:
                     database[user]['coins'] = round(database[user]['coins'] + 0.1, 2)
