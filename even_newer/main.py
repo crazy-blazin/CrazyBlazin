@@ -287,22 +287,25 @@ async def on_message(message):
             await message.channel.send(f'Too many or few arguments. Use !gamble <amount>')
         else:
             database = read_db()
-            amount = float(str_split[1])*np.sign(float(str_split[1]))
-            if amount <= database[message.author.name]['coins']:
-                database[message.author.name]['coins'] -= amount
+            try:
+                amount = float(str_split[1])*np.sign(float(str_split[1]))
+                if amount <= database[message.author.name]['coins']:
+                    database[message.author.name]['coins'] -= amount
 
-                roll = np.random.randint(0, 101)
-                if roll > 49:
-                    database[message.author.name]['coins'] += 2*amount
-                    database[message.author.name]['coins'] = round(database[message.author.name]['coins'], 2)
-                    await message.channel.send(f'{message.author.name} Rolled {roll} and won {round(2*amount,2)}<:CBCcoin:831506214659293214>  :partying_face:')
+                    roll = np.random.randint(0, 101)
+                    if roll > 49:
+                        database[message.author.name]['coins'] += 2*amount
+                        database[message.author.name]['coins'] = round(database[message.author.name]['coins'], 2)
+                        await message.channel.send(f'{message.author.name} Rolled {roll} and won {round(2*amount,2)}<:CBCcoin:831506214659293214>  :partying_face:')
+                    else:
+                        await message.channel.send(f'{message.author.name} Rolled {roll} and lost {amount} <:CBCcoin:831506214659293214>! :frowning2:')
+
+                    write_db(database)
+
                 else:
-                    await message.channel.send(f'{message.author.name} Rolled {roll} and lost {amount} <:CBCcoin:831506214659293214>! :frowning2:')
-
-                write_db(database)
-
-            else:
-                await message.channel.send(f'{message.author.name} does not have enough <:CBCcoin:831506214659293214> (CBC) to gamble!')
+                    await message.channel.send(f'{message.author.name} does not have enough <:CBCcoin:831506214659293214> (CBC) to gamble!')
+            except Exception as e:
+                print(e)
 
 
     if message.content.startswith('!uwuprison'):
