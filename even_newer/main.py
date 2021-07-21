@@ -20,6 +20,8 @@ from flask import jsonify
 import logging
 
 
+
+
 # logging.basicConfig(filename='main.log', level=logging.DEBUG)
 
 
@@ -50,9 +52,19 @@ import logging
 # sio.start_background_task(target = run)
 
 
-with open('database.txt', 'r') as f:
-    database = eval(f.read())
 
+def read_db():
+    with open('database.txt', 'r') as f:
+        database = eval(f.read())
+    return database
+
+
+def write_db(database):
+    with open('database.txt', 'w', encoding='utf-8') as f:
+        f.write(str(database))
+
+
+database = read_db()
 
 class MyClient(discord.Client):
     def __init__(self, *args, **kwargs):
@@ -82,8 +94,7 @@ temp_status  = {}
 
 
 def add_coins(stream_state, user, cointype):
-    with open('database.txt', 'r') as f:
-        database = eval(f.read())
+    database = read_db()
     if stream_state:
         if cointype in database[user]:
             database[user][cointype] = round(database[user][cointype] + 1, 2)
@@ -95,14 +106,12 @@ def add_coins(stream_state, user, cointype):
         else:
             database[user][cointype] =  100
     print(f'Coins to : {user}')
-    with open('database.txt', 'w', encoding='utf-8') as f:
-        f.write(str(database))
+    write_db(database)
 
 
 def ticksystem():
     while True:
-        with open('database.txt', 'r') as f:
-            database = eval(f.read())
+        database = read_db()
         names = [user for user in database]
         for user in names:
             if user in temp_status:
@@ -120,8 +129,7 @@ def ticksystem():
                         add_coins(stream_state, user, 'shekels')
 
 
-            with open('database.txt', 'r') as f:
-                database = eval(f.read())
+            database = read_db()
             
             if 'Timer' in database[user]:
                 if database[user]['Timer'] <= 0:
@@ -139,8 +147,7 @@ def ticksystem():
                 else:
                     database[user]['coins'] =  100
             
-            with open('database.txt', 'w', encoding='utf-8') as f:
-                f.write(str(database))
+            write_db(database)
 
         time.sleep(10)
 
@@ -151,13 +158,11 @@ t.start()
 
 @client.event
 async def on_voice_state_update(member, before, after):
-    with open('database.txt', 'r') as f:
-        database = eval(f.read())
+    database = read_db()
     if member.name not in database:
         database[member.name] = {'coins': 1000}
         print(member.name)
-        with open('database.txt', 'w', encoding='utf-8') as f:
-            f.write(str(database))
+        write_db(database)
     
 
     temp_status[member.name] = after
@@ -206,24 +211,22 @@ async def on_message(message):
     if message.author == client.user:
         return
 
-    if str(message.channel.id) == str(795738540251545620):
-        with open('musicdatabase.txt', 'r') as f:
-            musicdatabase = eval(f.read())
-        with open('musicdatabaseBACKUP.txt', 'w') as f:
-                f.write(str(musicdatabase))
-        if str(message.content) not in musicdatabase:
-            musicdatabase[message.content] = {}
-            musicdatabase[message.content]['upvotes'] = []
-            musicdatabase[message.content]['added_by'] = message.author.name
-        with open('musicdatabase.txt', 'w') as f:
-            f.write(str(musicdatabase))
+    # if str(message.channel.id) == str(795738540251545620):
+    #     with open('musicdatabase.txt', 'r') as f:
+    #         musicdatabase = eval(f.read())
+    #     with open('musicdatabaseBACKUP.txt', 'w') as f:
+    #             f.write(str(musicdatabase))
+    #     if str(message.content) not in musicdatabase:
+    #         musicdatabase[message.content] = {}
+    #         musicdatabase[message.content]['upvotes'] = []
+    #         musicdatabase[message.content]['added_by'] = message.author.name
+    #     with open('musicdatabase.txt', 'w') as f:
+    #         f.write(str(musicdatabase))
 
     if message.content.startswith('!bal'):
-        with open('database.txt', 'r') as f:
-            database = eval(f.read())
+        database = read_db()
         value = database[message.author.name]['coins']
-        if 'spankcoin' in database[message.author.name]:
-            valuespank = database[message.author.name]['spankcoin']
+
         if 'shekels' in database[message.author.name]:
             shekval = database[message.author.name]['shekels']
         else:
@@ -238,31 +241,20 @@ async def on_message(message):
         await message.channel.send(embed=embed)
 
 
-    if message.content.startswith('!transfer'):
-        msgsplit = message.content.split(' ')
+    if message.content.startswith('!refundall'):
+        str_split = message.content.split(' ')
+        amount = float(str_split[1])*np.sign(float(str_split[1]))
         if message.author.name == 'Foxxravin':
-                
-            if len(msgsplit) > 3 or len(msgsplit) < 3:
-                await message.channel.send(f'Too many or few arguments. Use !transfer <user> <amount>')
-            else:
-                amount = int(msgsplit[2])
-                account = str(msgsplit[1])
-                with open('database.txt', 'r') as f:
-                    users = eval(f.read())
-                if account in users:
-                    if 'spankcoin' in users[account]:
-                        users[account]['spankcoin'] += amount
-                    else:
-                        users[account]['spankcoin'] = amount
+            database = read_db()
+            for user in database:
+                if 'coins' in database[user]:
+                    database[user]['coins'] += int(amount)
 
-                    await message.channel.send(f'{message.author.name} sent {amount} <:raised_hands_tone1:859521216115900457> (spank coins) to {account}')                    
-                    with open('database.txt', 'w') as f:
-                        f.write(str(users))
-                else:
-                    await message.channel.send(f'User does not exist!')
-                
+            write_db(database)
+
+            await message.channel.send(f'All users have been refunded {amount} <:CBCcoin:831506214659293214>')
         else:
-            await message.channel.send(f'You are not Foxxravin. (Spank bank)')
+            await message.channel.send(f'You are not Foxxravin!')
 
 
     
@@ -272,10 +264,9 @@ async def on_message(message):
         if len(str_split) > 2 or len(str_split) < 2:
             await message.channel.send(f'Too many or few arguments. Use !buy gold')
         else:
-            with open('database.txt', 'r') as f:
-                users = eval(f.read())
-            if 1000 <= users[message.author.name]['coins']:
-                users[message.author.name]['coins'] -= 1000
+            database = read_db()
+            if 1000 <= database[message.author.name]['coins']:
+                database[message.author.name]['coins'] -= 1000
 
                 member = message.author
                 role = get(member.guild.roles, name='Crazy Blazin Gold')
@@ -283,35 +274,32 @@ async def on_message(message):
                 # await bot.remove_roles(user, 'member')
                 await message.channel.send(f'{message.author.name} Bought Crazy Blazin Gold Role for one month!')
 
-                users[message.author.name]['Timer'] = 2592000
-                with open('database.txt', 'w') as f:
-                    f.write(str(users))
+                database[message.author.name]['Timer'] = 2592000
+                write_db(database)
 
             else:
                 await message.channel.send(f'{message.author.name} does not have enough <:CBCcoin:831506214659293214> (CBC) to buy Crazy Blazin Gold! Price: 1000 <:CBCcoin:831506214659293214> (CBC)')
                 
 
-    if message.content.startswith('!gamble '):
+    if message.content.startswith('!gamble'):
         str_split = message.content.split(' ')
         if len(str_split) > 2 or len(str_split) < 2:
             await message.channel.send(f'Too many or few arguments. Use !gamble <amount>')
         else:
-            with open('database.txt', 'r') as f:
-                users = eval(f.read())
+            database = read_db()
             amount = float(str_split[1])*np.sign(float(str_split[1]))
-            if amount <= users[message.author.name]['coins']:
-                users[message.author.name]['coins'] -= amount
+            if amount <= database[message.author.name]['coins']:
+                database[message.author.name]['coins'] -= amount
 
                 roll = np.random.randint(0, 101)
-                if roll > 50:
-                    users[message.author.name]['coins'] += 2*amount
-                    users[message.author.name]['coins'] = round(users[message.author.name]['coins'], 2)
+                if roll > 49:
+                    database[message.author.name]['coins'] += 2*amount
+                    database[message.author.name]['coins'] = round(database[message.author.name]['coins'], 2)
                     await message.channel.send(f'{message.author.name} Rolled {roll} and won {round(2*amount,2)}<:CBCcoin:831506214659293214>  :partying_face:')
                 else:
                     await message.channel.send(f'{message.author.name} Rolled {roll} and lost {amount} <:CBCcoin:831506214659293214>! :frowning2:')
 
-                with open('database.txt', 'w') as f:
-                    f.write(str(users))
+                write_db(database)
 
             else:
                 await message.channel.send(f'{message.author.name} does not have enough <:CBCcoin:831506214659293214> (CBC) to gamble!')
@@ -322,16 +310,14 @@ async def on_message(message):
         if len(str_split) > 2 or len(str_split) < 2:
             await message.channel.send(f'Too many or few arguments. Use !uwuprison <target>')
         else:
-            with open('database.txt', 'r') as f:
-                users = eval(f.read())
+            database = read_db()
             
             target = str(str_split[1])
-            if 1 <= users[message.author.name]['coins']:
-                users[message.author.name]['coins'] -= 1
+            if 1 <= database[message.author.name]['coins']:
+                database[message.author.name]['coins'] -= 1
 
                 await message.channel.send(f'{message.author.name} sent {target} to UwU prison <:aegao:849030455189438485> !')
-                with open('database.txt', 'w') as f:
-                    f.write(str(users))
+                write_db(database)
             else:
                 await message.channel.send(f'{message.author.name} does not have enough <:CBCcoin:831506214659293214> (CBC) to send {target} to UwU prison!')
                 
@@ -342,19 +328,18 @@ async def on_message(message):
             await message.channel.send(f'Too many or few arguments. Use !crown <target>')
         else:
             if message.author.name == 'JordanLTD':
-                with open('database.txt', 'r') as f:
-                    users = eval(f.read())
+                database = read_db()
                 
                 target = str_split[1]
                 members = client.get_all_members()
 
-                for user in users:
-                    if 'Crowned' not in users[user]:
-                        users[user]['Crowned'] = False
-                    if users[user]['Crowned']:
-                        users[user]['Crowned'] = False
-                    if user == target:
-                        users[user]['Crowned'] = True
+                for user in database:
+                    if 'Crowned' not in database[user]:
+                        database[user]['Crowned'] = False
+                    if database[user]['Crowned']:
+                        database[user]['Crowned'] = False
+                    if user == target and target != 'JordanLTD':
+                        database[user]['Crowned'] = True
 
                 for member in members:
                     if member.name == target:
@@ -366,8 +351,7 @@ async def on_message(message):
                             role = get(member.guild.roles, name='Crowned')
                             await member.remove_roles(role)
 
-                with open('database.txt', 'w') as f:
-                    f.write(str(users))
+                write_db(database)
 
                 await message.channel.send(f'{target} has been crowned by {message.author.name}:princess:, {target} will now have passive <:CBCcoin:831506214659293214> income until the crown is given to someone else or removed!')
             else:
@@ -375,16 +359,14 @@ async def on_message(message):
     
     if message.content.startswith('!removecrown'):
         if message.author.name == 'JordanLTD':
-            with open('database.txt', 'r') as f:
-                users = eval(f.read())
-            for user in users:
-                if 'Crowned' not in users[user]:
-                    users[user]['Crowned'] = False
-                if users[user]['Crowned']:
-                    users[user]['Crowned'] = False
+            database = read_db()
+            for user in database:
+                if 'Crowned' not in database[user]:
+                    database[user]['Crowned'] = False
+                if database[user]['Crowned']:
+                    database[user]['Crowned'] = False
                 
-            with open('database.txt', 'w') as f:
-                f.write(str(users))
+            write_db(database)
 
             members = client.get_all_members()
             for member in members:
