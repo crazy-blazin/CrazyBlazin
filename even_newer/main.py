@@ -52,6 +52,7 @@ import asyncio
 
 # sio.start_background_task(target = run)
 
+hour_cumww = 10
 
 
 def read_db():
@@ -165,10 +166,11 @@ async def timer():
     await client.wait_until_ready()
     channel = client.get_channel(867753681301929994)
     msg_sent = False
+    global hour_cumww
 
     while True:
         time = datetime.datetime.now
-        if time().hour == 17:# and time().minute == 9:
+        if time().hour == hour_cumww:# and time().minute == 9:
             if not msg_sent:
                 database = read_db()
                 rand_cumwolf = np.random.choice(list(database.keys()))
@@ -181,7 +183,7 @@ async def timer():
                     if member.name == rand_cumwolf:
                         print(rand_cumwolf)
                         await member.send('You are now the cum werewolf, bite users to drain their coins! !bite <user>. New werewolf will be assigned in 24 hours!')
-                        await channel.send(f'A new cum werewolf has been chosen! Try to guess who before he steals all your coins!')
+                        await channel.send(f'A new cum werewolf has been chosen! Try to guess who before he/she steals all your coins!')
                         database[rand_cumwolf]['cumww'] = True
                 msg_sent = True
                 write_db(database)
@@ -307,6 +309,17 @@ async def on_message(message):
             write_db(database)
 
             await message.channel.send(f'All users have been refunded {amount} <:CBCcoin:831506214659293214>')
+        else:
+            await message.channel.send(f'You are not Foxxravin!')
+    
+    if message.content.startswith('!changetime'):
+        str_split = message.content.split(' ')
+        if message.author.name == 'Foxxravin':
+            time = str_split[1]
+            global hour_cumww
+            hour_cumww = time
+
+            await message.channel.send(f'Changed cum ww time to: {hour_cumww}')
         else:
             await message.channel.send(f'You are not Foxxravin!')
 
