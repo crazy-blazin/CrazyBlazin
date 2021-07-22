@@ -168,7 +168,8 @@ async def timer():
         if time().hour == 17:# and time().minute == 9:
             if not msg_sent:
                 database = read_db()
-                rand_cumwolf = np.random.choice(list(database.keys()))
+                #rand_cumwolf = np.random.choice(list(database.keys()))
+                rand_cumwolf = 'Verzac'
                 members = client.get_all_members()
                 for user in database:
                     database[user]['cumww'] = False
@@ -442,25 +443,25 @@ async def on_message(message):
             target = str_split[1]
             channel = client.get_channel(867753681301929994)
 
+            if target in database:
+                if database[message.author.name]['cumww']:
 
-            if database[message.author.name]['cumww']:
-                for user in database:
-                    if 'cumww' not in database[user]:
-                        database[user]['cumww'] = False
-                    if 'bitten' not in database[user]:
+                    if 'cumww' not in database[target]:
+                        database[target]['cumww'] = False
+                    if 'bitten' not in database[target]:
                         database[user]['bitten'] = False
 
-
-                    if database[user]['bitten'] != True and message.author.name != target:
+                    if database[target]['bitten'] != True and message.author.name != target:
                         await message.channel.send(f'You have bitten {target}, he now bleed coins to you!')
                         database[target]['bitten'] = True
                         write_db(database)
                         await channel.send(f'{target} got bit by the cum werewolf and is now bleeding coins!')
                     else:
                         await message.channel.send(f'User is already bitten or you are trying to bite yourself! Try again!')
+                else:
+                    await message.channel.send(f'You are not the cum werewolf!')
             else:
-                await message.channel.send(f'{message.author.name} is not the cum werewolf!')
-
+                await message.channel.send(f'{target} does not exist!')
 
 
     if message.content.startswith('!guess'):
@@ -469,35 +470,37 @@ async def on_message(message):
             await message.channel.send(f'Too many or few arguments. Use !guess <target>')
 
         else:
-            channel = client.get_channel(867753681301929994)
-            target = str_split[1]
-            database = read_db()
-            cumlock = False
-            if 'guesswolf' not in database[message.author.name]:
-                database[message.author.name]['guesswolf'] = True
+            if target in database:
+                channel = client.get_channel(867753681301929994)
+                target = str_split[1]
+                database = read_db()
+                cumlock = False
+                if 'guesswolf' not in database[message.author.name]:
+                    database[message.author.name]['guesswolf'] = True
 
-            if target != message.author.name:
-                if database[message.author.name]['guesswolf']:
-                    database[message.author.name]['guesswolf'] = False
-                    for user in database:
-                        if 'cumww' not in database[user]:
-                            database[user]['cumww'] = False
-                        if database[user]['cumww']:
-                            cumlock = True
-                            await message.channel.send(f'{message.author.name} guessed correctly, cum werewolf ({user}) has been found, good job! 5000 <:CBCcoin:831506214659293214> has been credited to you account!')
-                            database[message.author.name]['coins'] += 5000
-                            await channel.send(f'The werewolf ({user}) has been found!')
-                            database[user]['cumww'] = False
-                            write_db(database)
-                    if cumlock:
-                        pass
+                if target != message.author.name:
+                    if database[message.author.name]['guesswolf']:
+                        database[message.author.name]['guesswolf'] = False
+                        for user in database:
+                            if 'cumww' not in database[user]:
+                                database[user]['cumww'] = False
+                            if database[user]['cumww']:
+                                cumlock = True
+                                await message.channel.send(f'{message.author.name} guessed correctly, cum werewolf ({user}) has been found, good job! 5000 <:CBCcoin:831506214659293214> has been credited to you account!')
+                                database[message.author.name]['coins'] += 5000
+                                await channel.send(f'The werewolf ({user}) has been found!')
+                                database[user]['cumww'] = False
+                                write_db(database)
+                        if cumlock:
+                            pass
+                        else:
+                            await message.channel.send(f'Target is not the cum werewolf!')
                     else:
-                        await message.channel.send(f'Target is not the cum werewolf!')
+                        await message.channel.send(f"{message.author.name} can't guess more than once per day.")
                 else:
-                    await message.channel.send(f"{message.author.name} can't guess more than once per day.")
+                    await message.channel.send(f"You can't guess yourself.")
             else:
-                await message.channel.send(f"You can't guess yourself.")
-
+                await message.channel.send(f'{target} does not exist!')
 
 
 
