@@ -176,6 +176,8 @@ async def timer():
                 members = client.get_all_members()
                 for user in database:
                     database[user]['cumww'] = False
+                    database[member.name]['guesswolf'] = False
+                    database[member.name]['bitten'] = False
                 for member in members:
                     if member.name == rand_cumwolf:
                         print(rand_cumwolf)
@@ -262,6 +264,7 @@ async def on_message(message):
                 database[member.name]['bitten'] = False
                 database[member.name]['coins'] = 100
                 database[member.name]['shekels'] = 100
+                database[member.name]['guesswolf'] = False
     write_db(database)
     # if str(message.channel.id) == str(795738540251545620):
     #     with open('musicdatabase.txt', 'r') as f:
@@ -507,7 +510,6 @@ async def on_message(message):
                     await message.channel.send(f"You can't guess yourself.")
             else:
                 await message.channel.send(f'{target} does not exist!')
-
 
 
 client.run(k)
