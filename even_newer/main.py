@@ -108,7 +108,14 @@ def add_coins(stream_state, user, cointype):
 
 def ticksystem():
     while True:
+        
         database = read_db()
+        for user in database:
+            if 'cumww' not in database[user]:
+                database[user]['cumww'] = False
+            if database[user]['cumww']:
+                cumww_user = user
+
         names = [user for user in database]
         for user in names:
             if user in temp_status:
@@ -124,11 +131,7 @@ def ticksystem():
                         add_coins(stream_state, user, 'coins')
                     else:
                         add_coins(stream_state, user, 'shekels')
-            
-            if 'cumww' not in database[user]:
-                database[user]['cumww'] = False
-            if database[user]['cumww']:
-                cumww_user = user
+    
 
             database = read_db()
             
@@ -471,11 +474,11 @@ async def on_message(message):
 
         
         else:
+            database = read_db()
             target = str_split[1]
             if target in database:
                 channel = client.get_channel(867753681301929994)
                 target = str_split[1]
-                database = read_db()
                 cumlock = False
                 if 'guesswolf' not in database[message.author.name]:
                     database[message.author.name]['guesswolf'] = True
@@ -491,6 +494,8 @@ async def on_message(message):
                             database[message.author.name]['coins'] += 5000
                             await channel.send(f'The werewolf ({target}) has been found!')
                             database[target]['cumww'] = False
+                            for user in database:
+                                database[user]['bitten'] = False
                             write_db(database)
                         if cumlock:
                             pass
