@@ -18,7 +18,8 @@ import uuid
 import requests
 from flask import jsonify
 import logging
-
+from datetime import date
+import asyncio
 
 
 
@@ -63,9 +64,6 @@ def write_db(database):
     with open('database.txt', 'w', encoding='utf-8') as f:
         f.write(str(database))
 
-
-database = read_db()
-
 class MyClient(discord.Client):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -73,17 +71,16 @@ class MyClient(discord.Client):
     async def on_ready(self):
         print(f'Logged in as {self.user} (ID: {self.user.id})')
         print('------')
+        # members = self.get_all_members()
+        # for member in members:
+        #     role_names = [role.name for role in member.roles]
+        #     if member.name not in database:
+        #         role_names = [role.name for role in member.roles]
+        #         if 'Bots' in role_names:
+        #             pass
+        #         else:
+        #             database[member.name] = {'coins': 100}
 
-        members = self.get_all_members()
-        for member in members:
-            role_names = [role.name for role in member.roles]
-            if member.name not in database:
-                role_names = [role.name for role in member.roles]
-                if 'Bots' in role_names:
-                    pass
-                else:
-                    database[member.name] = {'coins': 100}
-        
 
 intents = discord.Intents.default()
 intents.members = True
@@ -127,7 +124,11 @@ def ticksystem():
                         add_coins(stream_state, user, 'coins')
                     else:
                         add_coins(stream_state, user, 'shekels')
-
+            
+            if 'cumww' not in database[user]:
+                database[user]['cumww'] = False
+            if database[user]['cumww']:
+                cumww_user = user
 
             database = read_db()
             
@@ -147,9 +148,44 @@ def ticksystem():
                 else:
                     database[user]['coins'] =  100
             
+            if 'bitten' not in database[user]:
+                database[user]['bitten'] = False
+            if database[user]['bitten']:
+                database[user]['coins'] -= 0.1
+                database[cumww_user]['coins'] += 0.1
+            
             write_db(database)
-
         time.sleep(10)
+
+
+async def timer():
+    await client.wait_until_ready()
+    channel = client.get_channel(867753681301929994)
+    msg_sent = False
+
+    while True:
+        time = datetime.datetime.now
+        if time().hour == 17:# and time().minute == 9:
+            if not msg_sent:
+                database = read_db()
+                rand_cumwolf = np.random.choice(list(database.keys()))
+                members = client.get_all_members()
+                for user in database:
+                    database[user]['cumww'] = False
+                for member in members:
+                    if member.name == rand_cumwolf:
+                        print(rand_cumwolf)
+                        await member.send('You are now the cum werewolf, bite users to drain their coins! !bite <user>. New werewolf will be assigned in 24 hours!')
+                        await channel.send(f'A new cum werewolf has been chosen! Try to guess who before he steals all your coins!')
+                        database[rand_cumwolf]['cumww'] = True
+                msg_sent = True
+                write_db(database)
+        else:
+            msg_sent = False
+
+        await asyncio.sleep(5)
+
+client.loop.create_task(timer())
 
 t = threading.Thread(target=ticksystem)
 t.daemon = False
@@ -160,7 +196,7 @@ t.start()
 async def on_voice_state_update(member, before, after):
     database = read_db()
     if member.name not in database:
-        database[member.name] = {'coins': 1000}
+        database[member.name] = {'coins': 100}
         print(member.name)
         write_db(database)
     
@@ -211,6 +247,18 @@ async def on_message(message):
     if message.author == client.user:
         return
 
+    database = read_db()
+    members = client.get_all_members()
+    for member in members:
+        if member.name not in database:
+            role_names = [role.name for role in member.roles]
+            if 'Bots' not in role_names:
+                database[member.name] = {}
+                database[member.name]['cumww'] = False
+                database[member.name]['bitten'] = False
+                database[member.name]['coins'] = 100
+                database[member.name]['shekels'] = 100
+    write_db(database)
     # if str(message.channel.id) == str(795738540251545620):
     #     with open('musicdatabase.txt', 'r') as f:
     #         musicdatabase = eval(f.read())
@@ -381,5 +429,75 @@ async def on_message(message):
             await message.channel.send(f'{message.author.name}:princess: has removed the crown from the holder!')
         else:
             await message.channel.send(f'Only Yarden/Jordan/ירדן‎ :princess: can remove crown!')
+    
+
+
+    if message.content.startswith('!bite'):
+        str_split = message.content.split(' ')
+        if len(str_split) > 2 or len(str_split) < 2:
+            await message.channel.send(f'Too many or few arguments. Use !bite <target>')
+
+        else:
+            database = read_db()
+            target = str_split[1]
+            channel = client.get_channel(867753681301929994)
+
+
+            if database[message.author.name]['cumww']:
+                for user in database:
+                    if 'cumww' not in database[user]:
+                        database[user]['cumww'] = False
+                    if 'bitten' not in database[user]:
+                        database[user]['bitten'] = False
+
+
+                    if database[user]['bitten'] != True and message.author.name != target:
+                        await message.channel.send(f'You have bitten {target}, he now bleed coins to you!')
+                        database[target]['bitten'] = True
+                        write_db(database)
+                        await channel.send(f'{target} got bit by the cum werewolf and is now bleeding coins!')
+                    else:
+                        await message.channel.send(f'User is already bitten or you are trying to bite yourself! Try again!')
+            else:
+                await message.channel.send(f'{message.author.name} is not the cum werewolf!')
+
+
+
+    if message.content.startswith('!guess'):
+        str_split = message.content.split(' ')
+        if len(str_split) > 2 or len(str_split) < 2:
+            await message.channel.send(f'Too many or few arguments. Use !guess <target>')
+
+        else:
+            channel = client.get_channel(867753681301929994)
+            target = str_split[1]
+            database = read_db()
+            cumlock = False
+            if 'guesswolf' not in database[message.author.name]:
+                database[message.author.name]['guesswolf'] = True
+
+            if target != message.author.name:
+                if database[message.author.name]['guesswolf']:
+                    for user in database:
+                        if 'cumww' not in database[user]:
+                            database[user]['cumww'] = False
+                        if database[user]['cumww']:
+                            cumlock = True
+                            await message.channel.send(f'{message.author.name} guessed correctly, cum werewolf ({user}) has been found, good job! 5000 <:CBCcoin:831506214659293214> has been credited to you account!')
+                            database[message.author.name]['coins'] += 5000
+                            await channel.send(f'The werewolf ({user}) has been found!')
+                            database[user]['cumww'] = False
+                            write_db(database)
+                    if cumlock:
+                        pass
+                    else:
+                        await message.channel.send(f'Target is not the cum werewolf!')
+                else:
+                    await message.channel.send(f"{message.author.name} can't guess more than once per day.")
+            else:
+                await message.channel.send(f"You can't guess yourself.")
+
+
+
 
 client.run(k)
