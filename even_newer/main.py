@@ -486,7 +486,7 @@ async def on_message(message):
                     database[message.author.name]['guesswolf'] = True
 
                 if target != message.author.name:
-                    if database[message.author.name]['guesswolf']:
+                    if not database[message.author.name]['guesswolf']:
                         database[message.author.name]['guesswolf'] = False
                         if 'cumww' not in database[target]:
                             database[user]['cumww'] = False
