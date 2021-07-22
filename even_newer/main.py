@@ -171,13 +171,12 @@ async def timer():
         if time().hour == 17:# and time().minute == 9:
             if not msg_sent:
                 database = read_db()
-                #rand_cumwolf = np.random.choice(list(database.keys()))
-                rand_cumwolf = 'Verzac'
+                rand_cumwolf = np.random.choice(list(database.keys()))
                 members = client.get_all_members()
                 for user in database:
                     database[user]['cumww'] = False
-                    database[member.name]['guesswolf'] = False
-                    database[member.name]['bitten'] = False
+                    database[user]['guesswolf'] = False
+                    database[user]['bitten'] = False
                 for member in members:
                     if member.name == rand_cumwolf:
                         print(rand_cumwolf)
