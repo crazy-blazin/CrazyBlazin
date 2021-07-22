@@ -481,16 +481,15 @@ async def on_message(message):
                 if target != message.author.name:
                     if database[message.author.name]['guesswolf']:
                         database[message.author.name]['guesswolf'] = False
-                        for user in database:
-                            if 'cumww' not in database[user]:
-                                database[user]['cumww'] = False
-                            if database[user]['cumww']:
-                                cumlock = True
-                                await message.channel.send(f'{message.author.name} guessed correctly, cum werewolf ({user}) has been found, good job! 5000 <:CBCcoin:831506214659293214> has been credited to you account!')
-                                database[message.author.name]['coins'] += 5000
-                                await channel.send(f'The werewolf ({user}) has been found!')
-                                database[user]['cumww'] = False
-                                write_db(database)
+                        if 'cumww' not in database[target]:
+                            database[user]['cumww'] = False
+                        if database[target]['cumww']:
+                            cumlock = True
+                            await message.channel.send(f'{message.author.name} guessed correctly, cum werewolf ({target}) has been found, good job! 5000 <:CBCcoin:831506214659293214> has been credited to you account!')
+                            database[message.author.name]['coins'] += 5000
+                            await channel.send(f'The werewolf ({target}) has been found!')
+                            database[target]['cumww'] = False
+                            write_db(database)
                         if cumlock:
                             pass
                         else:
