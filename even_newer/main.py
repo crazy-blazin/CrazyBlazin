@@ -469,7 +469,9 @@ async def on_message(message):
         if len(str_split) > 2 or len(str_split) < 2:
             await message.channel.send(f'Too many or few arguments. Use !guess <target>')
 
+        
         else:
+            target = str_split[1]
             if target in database:
                 channel = client.get_channel(867753681301929994)
                 target = str_split[1]
