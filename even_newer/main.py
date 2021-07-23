@@ -181,7 +181,7 @@ async def timer():
                 for member in members:
                     if member.name == rand_cumwolf:
                         print(rand_cumwolf)
-                        await member.send('You are now the cum werewolf, bite users to drain their coins! !bite <user>. New werewolf will be assigned in 24 hours!')
+                        await member.send('You are now the cum werewolf, bite users to drain their coins! !bite <user>. New werewolf will be assigned in 24 hours! NB! You should send the command directly to this bot so no one sees it! If you do not want to be cum werewolf write !cumresign.')
                         await channel.send(f'A new cum werewolf has been chosen! Try to guess who before he/she steals all your coins!')
                         database[rand_cumwolf]['cumww'] = True
                 msg_sent = True
@@ -399,6 +399,7 @@ async def on_message(message):
         embed.add_field(name=f"Buy gold account price: 1000 CBC", value=f'!buy gold')
         embed.add_field(name=f"Bite a user to make them bleed coins to you if you are the cum werewolf", value=f'!bite <user>')
         embed.add_field(name=f"Guess who is the cum werewolf to get the price and to shut him down", value=f'!guess <user>')
+        embed.add_field(name=f"Resign as the cum werewolf. This function will select a new one.", value=f'!cumresign')
         await message.channel.send(embed=embed)
         
                 
@@ -488,16 +489,39 @@ async def on_message(message):
                     else:
                         await message.channel.send(f'User is already bitten or you are trying to bite yourself! Try again!')
                 else:
-                    await message.channel.send(f'You are not the cum werewolf!')
+                    pass
             else:
                 await message.channel.send(f'{target} does not exist!')
+        await client.delete_message(message)
+
+
+
+    if message.content.startswith('!cumresign'):
+        channel = client.get_channel(867753681301929994)
+        if database[message.author.name]['cumww']:
+            await channel.send(f'The cum werewolf resigned, a new cum werewolf is chosen!')
+            database = read_db()
+            rand_cumwolf = np.random.choice(list(database.keys()))
+            members = client.get_all_members()
+            for user in database:
+                database[user]['cumww'] = False
+                database[user]['guesswolf'] = False
+                database[user]['bitten'] = False
+            for member in members:
+                if member.name == rand_cumwolf:
+                    print(rand_cumwolf)
+                    await member.send('You are now the cum werewolf, bite users to drain their coins! !bite <user>. New werewolf will be assigned in 24 hours! NB! You should send the command directly to this bot so no one sees it! If you do not want to be cum werewolf write !cumresign.')
+                    await channel.send(f'A new cum werewolf has been chosen! Try to guess who before he/she steals all your coins!')
+                    database[rand_cumwolf]['cumww'] = True
+            write_db(database)
+
 
 
     if message.content.startswith('!guess'):
         str_split = message.content.split(' ')
         if len(str_split) > 2 or len(str_split) < 2:
             await message.channel.send(f'Too many or few arguments. Use !guess <target>')
-
+        
         
         else:
             database = read_db()
@@ -526,11 +550,11 @@ async def on_message(message):
                         if cumlock:
                             pass
                         else:
-                            await message.channel.send(f'Target is not the cum werewolf!')
+                            await message.channel.send(f'{target} is not the cum werewolf!')
                     else:
                         await message.channel.send(f"{message.author.name} can't guess more than once per day.")
                 else:
-                    await message.channel.send(f"You can't guess yourself.")
+                    await message.channel.send(f"{message.author.name} can't guess him/herself.")
             else:
                 await message.channel.send(f'{target} does not exist!')
 
