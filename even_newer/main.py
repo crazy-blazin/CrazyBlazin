@@ -185,16 +185,21 @@ async def timer():
                 rand_cumwolf = np.random.choice(list(database.keys()))
                 members = client.get_all_members()
                 for user in database:
+                    if 'wascumww' in database[user]:
+                        if database[user]['wascumww']:
+                            await channel.send(f'Last cum werewolf was: {user}!')
                     database[user]['cumww'] = False
                     database[user]['guesswolf'] = False
                     database[user]['bitten'] = False
                     database[user]['active_wolf'] = False
+                    database[user]['wascumww'] = False
                 for member in members:
                     if member.name == rand_cumwolf:
                         print(rand_cumwolf)
                         await member.send('You are now the cum werewolf, bite users to drain their coins! !bite <user>. New werewolf will be assigned in 24 hours! NB! You should send the command directly to this bot so no one sees it! If you do not want to be cum werewolf write !cumresign.')
                         await channel.send(f'A new cum werewolf has been chosen! Try to guess who before he/she steals all your coins!')
                         database[rand_cumwolf]['cumww'] = True
+                        database[rand_cumwolf]['wascumww'] = True
                 msg_sent = True
                 write_db(database)
         else:
@@ -547,7 +552,8 @@ async def on_message(message):
     if message.content.startswith('!cumresign'):
         channel = client.get_channel(867753681301929994)
         if database[message.author.name]['cumww']:
-            await channel.send(f'The cum werewolf resigned, a new cum werewolf is chosen!')
+
+            await channel.send(f'The cum werewolf "{message.author.name}" resigned, a new cum werewolf is chosen!')
             database = read_db()
             rand_cumwolf = np.random.choice(list(database.keys()))
             members = client.get_all_members()
