@@ -117,8 +117,7 @@ def ticksystem():
             if database[user]['cumww']:
                 cumww_user = user
 
-        names = [user for user in database]
-        for user in names:
+        for user in database:
             if user in temp_status:
                 state = temp_status[user]
                 try:
@@ -390,6 +389,18 @@ async def on_message(message):
                 write_db(database)
             else:
                 await message.channel.send(f'{message.author.name} does not have enough <:CBCcoin:831506214659293214> (CBC) to send {target} to UwU prison!')
+
+
+    if message.content.startswith('!help'):
+        embed = discord.Embed(title=f"Commands", description=f"All commands for crazy blazin server")
+        embed.add_field(name=f"Balance", value=f'!bal')
+        embed.add_field(name=f"Gamble crazy blazin coins", value=f'!gamble <amount>')
+        embed.add_field(name=f"Send user to uwuprison", value=f'!uwuprison <name>')
+        embed.add_field(name=f"Buy gold account price: 1000 CBC", value=f'!buy gold')
+        embed.add_field(name=f"Bite a user to make them bleed coins to you if you are the cum werewolf", value=f'!bite <user>')
+        embed.add_field(name=f"Guess who is the cum werewolf to get the price and to shut him down", value=f'!guess <user>')
+        await message.channel.send(embed=embed)
+        
                 
     
     if message.content.startswith('!crown'):
