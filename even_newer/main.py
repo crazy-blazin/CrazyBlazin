@@ -123,6 +123,8 @@ def ticksystem():
             else:
                 if database[user]['coins'] >= database[user]['topcoins']:
                     database[user]['topcoins'] = database[user]['coins']
+            write_db(database)
+            database = read_db()
 
         for user in database:
             if user in temp_status:
