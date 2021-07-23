@@ -91,6 +91,7 @@ client = MyClient(intents = intents)
 temp_status  = {}
 
 
+
 def add_coins(stream_state, user, cointype):
     database = read_db()
     if stream_state:
@@ -116,6 +117,12 @@ def ticksystem():
                 database[user]['cumww'] = False
             if database[user]['cumww']:
                 cumww_user = user
+            
+            if 'topcoins' not in database[user]:
+                database[user]['topcoins'] = database[user]['coins']
+            else:
+                if database[user]['coins'] >= database[user]['topcoins']:
+                    database[user]['topcoins'] = database[user]['coins']
 
         for user in database:
             if user in temp_status:
@@ -179,6 +186,7 @@ async def timer():
                     database[user]['cumww'] = False
                     database[user]['guesswolf'] = False
                     database[user]['bitten'] = False
+                    database[user]['active_wolf'] = False
                 for member in members:
                     if member.name == rand_cumwolf:
                         print(rand_cumwolf)
@@ -191,13 +199,13 @@ async def timer():
             msg_sent = False
         
         time = datetime.datetime.now
-        if time().minute == 20:# and time().minute == 9:
+        if time().hour%4 == 0:# and time().minute == 9:
             if not msg_sent_reveal:
                 for user in database:
                     if database[user]['cumww']:
                         rand_cumwolf_split = [char for char in user]
                         random_letter = np.random.choice(rand_cumwolf_split)
-                        await channel.send(f'Hint: Random letter from username is: {random_letter}')
+                        await channel.send(f'Hint: Random letter/number from username is: {random_letter}')
                 msg_sent_reveal = True
         else:
             msg_sent_reveal = False
@@ -378,6 +386,9 @@ async def on_message(message):
                         await message.channel.send(f'{message.author.name} Rolled {roll} and won {round(2*amount,2)}<:CBCcoin:831506214659293214>  :partying_face:')
                     else:
                         await message.channel.send(f'{message.author.name} Rolled {roll} and lost {amount} <:CBCcoin:831506214659293214>! :frowning2:')
+                    
+                    if database[user]['coins'] >= database[user]['topcoins']:
+                        database[user]['topcoins'] = database[user]['coins']
 
                     write_db(database)
 
@@ -474,6 +485,27 @@ async def on_message(message):
         else:
             await message.channel.send(f'Only Yarden/Jordan/ירדן‎ :princess: can remove crown!')
     
+
+    if message.content.startswith('!top'):
+        database = read_db()
+        temp_stats  = {}
+        for user in database:
+            coins = database[user]['topcoins']
+            temp_stats[user] = round(coins,2)
+
+        index = 1
+        embed = discord.Embed(title="Top coins history", description="Users that have had the most coins ever") #,color=Hex code
+        medaljonger = [':first_place:', ':second_place:', ':third_place:']
+        for key in sorted(temp_stats, key=temp_stats.get, reverse=True):
+            if (index < 11):
+                if index < 4:
+                    embed.add_field(name=f"{index}{medaljonger[index-1]}. {key}", value=f'{temp_stats[key]} <:CBCcoin:831506214659293214>')
+                else:
+                    embed.add_field(name=f"{index}. {key}", value=f'{temp_stats[key]} <:CBCcoin:831506214659293214>')
+            else:
+                await message.channel.send(embed=embed)
+                return
+            index += 1
 
 
     if message.content.startswith('!bite'):
