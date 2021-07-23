@@ -52,7 +52,7 @@ import asyncio
 
 # sio.start_background_task(target = run)
 
-hour_cumww = 10
+hour_cumww = 12
 
 
 def read_db():
@@ -170,7 +170,7 @@ async def timer():
 
     while True:
         time = datetime.datetime.now
-        if time().hour == hour_cumww:# and time().minute == 9:
+        if time().hour == int(hour_cumww):# and time().minute == 9:
             if not msg_sent:
                 database = read_db()
                 rand_cumwolf = np.random.choice(list(database.keys()))
@@ -317,7 +317,7 @@ async def on_message(message):
         if message.author.name == 'Foxxravin':
             time = str_split[1]
             global hour_cumww
-            hour_cumww = time
+            hour_cumww = int(time)
 
             await message.channel.send(f'Changed cum ww time to: {hour_cumww}')
         else:
