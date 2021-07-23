@@ -389,10 +389,10 @@ async def on_message(message):
                     else:
                         await message.channel.send(f'{message.author.name} Rolled {roll} and lost {amount} <:CBCcoin:831506214659293214>! :frowning2:')
                     
-                    if database[user]['coins'] >= database[user]['topcoins']:
-                        database[user]['topcoins'] = database[user]['coins']
-
+                    if database[message.author.name]['coins'] >= database[message.author.name]['topcoins']:
+                        database[message.author.name]['topcoins'] = database[message.author.name]['coins']
                     write_db(database)
+
 
                 else:
                     await message.channel.send(f'{message.author.name} does not have enough <:CBCcoin:831506214659293214> (CBC) to gamble!')
@@ -426,6 +426,7 @@ async def on_message(message):
         embed.add_field(name=f"Bite a user to make them bleed coins to you if you are the cum werewolf", value=f'!bite <user>')
         embed.add_field(name=f"Guess who is the cum werewolf to get the price and to shut him down", value=f'!guess <user>')
         embed.add_field(name=f"Resign as the cum werewolf. This function will select a new one.", value=f'!cumresign')
+        embed.add_field(name=f"Show users with historically most coins.", value=f'!top')
         await message.channel.send(embed=embed)
         
                 
