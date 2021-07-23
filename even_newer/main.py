@@ -169,10 +169,10 @@ async def timer():
     global hour_cumww
 
     while True:
+        database = read_db()
         time = datetime.datetime.now
         if time().hour == int(hour_cumww):# and time().minute == 9:
             if not msg_sent:
-                database = read_db()
                 rand_cumwolf = np.random.choice(list(database.keys()))
                 members = client.get_all_members()
                 for user in database:
@@ -193,9 +193,9 @@ async def timer():
         time = datetime.datetime.now
         if time().minute == 20:# and time().minute == 9:
             if not msg_sent_reveal:
-                for member in members:
-                    if member.name == rand_cumwolf:
-                        rand_cumwolf_split = [char for char in rand_cumwolf]
+                for user in database:
+                    if database[user]['cumww']:
+                        rand_cumwolf_split = [char for char in user]
                         random_letter = np.random.choice(rand_cumwolf_split)
                         await channel.send(f'Hint: Random letter from username is: {random_letter}')
                 msg_sent_reveal = True
