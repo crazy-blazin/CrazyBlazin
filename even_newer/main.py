@@ -165,6 +165,7 @@ async def timer():
     await client.wait_until_ready()
     channel = client.get_channel(867753681301929994)
     msg_sent = False
+    msg_sent_reveal = False
     global hour_cumww
 
     while True:
@@ -188,6 +189,18 @@ async def timer():
                 write_db(database)
         else:
             msg_sent = False
+        
+        time = datetime.datetime.now
+        if time().minute == 20:# and time().minute == 9:
+            if not msg_sent_reveal:
+                for member in members:
+                    if member.name == rand_cumwolf:
+                        rand_cumwolf_split = [char for char in rand_cumwolf]
+                        random_letter = np.random.choice(rand_cumwolf_split)
+                        await channel.send(f'Hint: Random letter from username is: {random_letter}')
+                msg_sent_reveal = True
+        else:
+            msg_sent_reveal = False
 
         await asyncio.sleep(5)
 
