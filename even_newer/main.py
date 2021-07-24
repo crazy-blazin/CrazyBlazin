@@ -189,7 +189,7 @@ async def timer():
                         if database[user]['wascumww']:
                             await channel.send(f'Last cum werewolf was: {user}!')
                     database[user]['cumww'] = False
-                    database[user]['guesswolf'] = False
+                    database[user]['guesswolf'] = True
                     database[user]['bitten'] = False
                     database[user]['active_wolf'] = False
                     database[user]['wascumww'] = False
@@ -292,7 +292,7 @@ async def on_message(message):
                 database[member.name]['bitten'] = False
                 database[member.name]['coins'] = 100
                 database[member.name]['shekels'] = 100
-                database[member.name]['guesswolf'] = False
+                database[member.name]['guesswolf'] = True
     write_db(database)
     # if str(message.channel.id) == str(795738540251545620):
     #     with open('musicdatabase.txt', 'r') as f:
@@ -559,7 +559,7 @@ async def on_message(message):
             members = client.get_all_members()
             for user in database:
                 database[user]['cumww'] = False
-                database[user]['guesswolf'] = False
+                database[user]['guesswolf'] = True
                 database[user]['bitten'] = False
             for member in members:
                 if member.name == rand_cumwolf:
@@ -588,7 +588,7 @@ async def on_message(message):
                     database[message.author.name]['guesswolf'] = True
 
                 if target != message.author.name:
-                    if not database[message.author.name]['guesswolf']:
+                    if database[message.author.name]['guesswolf']:
                         database[message.author.name]['guesswolf'] = False
                         if 'cumww' not in database[target]:
                             database[user]['cumww'] = False
