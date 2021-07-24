@@ -434,7 +434,7 @@ async def on_message(message):
             database = read_db()
             
             amount = round(float(str_split[1])*np.sign(float(str_split[1])),2)
-            if amount <= database[message.author.name]['coins']:
+            if amount <= database[message.author.name]['shekels']:
                 database[message.author.name]['shekels'] -= amount
                 database[message.author.name]['coins'] += amount
 
