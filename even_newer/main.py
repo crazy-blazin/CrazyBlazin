@@ -23,6 +23,7 @@ import asyncio
 
 
 
+
 # logging.basicConfig(filename='main.log', level=logging.DEBUG)
 
 
@@ -52,7 +53,7 @@ import asyncio
 
 # sio.start_background_task(target = run)
 
-hour_cumww = 12
+hour_cumww = 10
 
 
 def read_db():
@@ -373,6 +374,9 @@ async def on_message(message):
 
             else:
                 await message.channel.send(f'{message.author.name} does not have enough <:CBCcoin:831506214659293214> (CBC) to buy Crazy Blazin Gold! Price: 1000 <:CBCcoin:831506214659293214> (CBC)')
+    
+
+
                 
 
     if message.content.startswith('!gamble'):
@@ -421,6 +425,25 @@ async def on_message(message):
             else:
                 await message.channel.send(f'{message.author.name} does not have enough <:CBCcoin:831506214659293214> (CBC) to send {target} to UwU prison!')
 
+    
+    if message.content.startswith('!coinswap'):
+        str_split = message.content.split(' ')
+        if len(str_split) > 2 or len(str_split) < 2:
+            await message.channel.send(f'Too many or few arguments. Use !coinswap <amount>')
+        else:
+            database = read_db()
+            
+            amount = round(float(str_split[1])*np.sign(float(str_split[1])),2)
+            if amount <= database[message.author.name]['coins']:
+                database[message.author.name]['shekels'] -= amount
+                database[message.author.name]['coins'] += amount
+
+                await message.channel.send(f'{message.author.name} swapped ₪ {amount} for {amount} <:CBCcoin:831506214659293214>!')
+                write_db(database)
+            else:
+                await message.channel.send(f'{message.author.name} does not have enough ₪ to swap to (CBC)!')
+
+
 
     if message.content.startswith('!help'):
         embed = discord.Embed(title=f"Commands", description=f"All commands for crazy blazin server")
@@ -432,6 +455,7 @@ async def on_message(message):
         embed.add_field(name=f"Guess who is the cum werewolf to get the price and to shut him down", value=f'!guess <user>')
         embed.add_field(name=f"Resign as the cum werewolf. This function will select a new one.", value=f'!cumresign')
         embed.add_field(name=f"Show users with historically most coins.", value=f'!top')
+        embed.add_field(name=f"Swap ₪ shekels for crazy blazin coins <:CBCcoin:831506214659293214>", value=f'!coinswap <amount>')
         await message.channel.send(embed=embed)
         
                 
@@ -545,7 +569,10 @@ async def on_message(message):
                     pass
             else:
                 await message.channel.send(f'{target} does not exist!')
-        await client.delete_message(message)
+        try:
+            await client.delete_message(message)
+        except:
+            print('msg sent private')
 
 
 
@@ -568,7 +595,7 @@ async def on_message(message):
                     await channel.send(f'A new cum werewolf has been chosen! Try to guess who before he/she steals all your coins!')
                     database[rand_cumwolf]['cumww'] = True
             write_db(database)
-
+    
 
 
     if message.content.startswith('!guess'):
