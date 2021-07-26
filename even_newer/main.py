@@ -22,7 +22,7 @@ from datetime import date
 import asyncio
 
 
-
+k = 'ODMxOTE4MjA5NDA4OTU4NTE0.YHcONQ.3csgpSPP2vK6CisUkz0y-VYX-rk'
 
 # logging.basicConfig(filename='main.log', level=logging.DEBUG)
 
@@ -176,12 +176,14 @@ async def timer():
     channel = client.get_channel(867753681301929994)
     msg_sent = False
     msg_sent_reveal = False
-    global hour_cumww
 
     while True:
+        global hour_cumww
         database = read_db()
         time = datetime.datetime.now
+        print(hour_cumww)
         if time().hour == int(hour_cumww):# and time().minute == 9:
+            print('TIME IS ON ', hour_cumww)
             if not msg_sent:
                 rand_cumwolf = np.random.choice(list(database.keys()))
                 members = client.get_all_members()
@@ -196,7 +198,6 @@ async def timer():
                     database[user]['wascumww'] = False
                 for member in members:
                     if member.name == rand_cumwolf:
-                        print(rand_cumwolf)
                         await member.send('You are now the cum werewolf, bite users to drain their coins! !bite <user>. New werewolf will be assigned in 24 hours! NB! You should send the command directly to this bot so no one sees it! If you do not want to be cum werewolf write !cumresign.')
                         await channel.send(f'A new cum werewolf has been chosen! Try to guess who before he/she steals all your coins!')
                         database[rand_cumwolf]['cumww'] = True
@@ -460,62 +461,62 @@ async def on_message(message):
         
                 
     
-    if message.content.startswith('!crown'):
-        str_split = message.content.split(' ')
-        if len(str_split) > 2 or len(str_split) < 2:
-            await message.channel.send(f'Too many or few arguments. Use !crown <target>')
-        else:
-            if message.author.name == 'JordanLTD':
-                database = read_db()
+    # if message.content.startswith('!crown'):
+    #     str_split = message.content.split(' ')
+    #     if len(str_split) > 2 or len(str_split) < 2:
+    #         await message.channel.send(f'Too many or few arguments. Use !crown <target>')
+    #     else:
+    #         if message.author.name == 'JordanLTD':
+    #             database = read_db()
                 
-                target = str_split[1]
-                members = client.get_all_members()
+    #             target = str_split[1]
+    #             members = client.get_all_members()
 
-                for user in database:
-                    if 'Crowned' not in database[user]:
-                        database[user]['Crowned'] = False
-                    if database[user]['Crowned']:
-                        database[user]['Crowned'] = False
-                    if user == target and target != 'JordanLTD':
-                        database[user]['Crowned'] = True
+    #             for user in database:
+    #                 if 'Crowned' not in database[user]:
+    #                     database[user]['Crowned'] = False
+    #                 if database[user]['Crowned']:
+    #                     database[user]['Crowned'] = False
+    #                 if user == target and target != 'JordanLTD':
+    #                     database[user]['Crowned'] = True
 
-                for member in members:
-                    if member.name == target:
-                        role = get(member.guild.roles, name='Crowned')
-                        await member.add_roles(role)
-                    else:
-                        role_names = [role.name for role in member.roles]
-                        if 'Crowned' in role_names:
-                            role = get(member.guild.roles, name='Crowned')
-                            await member.remove_roles(role)
+    #             for member in members:
+    #                 if member.name == target:
+    #                     role = get(member.guild.roles, name='Crowned')
+    #                     await member.add_roles(role)
+    #                 else:
+    #                     role_names = [role.name for role in member.roles]
+    #                     if 'Crowned' in role_names:
+    #                         role = get(member.guild.roles, name='Crowned')
+    #                         await member.remove_roles(role)
 
-                write_db(database)
+    #             write_db(database)
 
-                await message.channel.send(f'{target} has been crowned by {message.author.name}:princess:, {target} will now have passive <:CBCcoin:831506214659293214> income until the crown is given to someone else or removed!')
-            else:
-                await message.channel.send(f'Only Yarden/Jordan/ירדן‎ :princess: can give someone the crown!‎')
+    #             await message.channel.send(f'{target} has been crowned by {message.author.name}:princess:, {target} will now have passive <:CBCcoin:831506214659293214> income until the crown is given to someone else or removed!')
+    #         else:
+    #             await message.channel.send(f'Only Yarden/Jordan/ירדן‎ :princess: can give someone the crown!‎')
     
-    if message.content.startswith('!removecrown'):
-        if message.author.name == 'JordanLTD':
-            database = read_db()
-            for user in database:
-                if 'Crowned' not in database[user]:
-                    database[user]['Crowned'] = False
-                if database[user]['Crowned']:
-                    database[user]['Crowned'] = False
+    # if message.content.startswith('!removecrown'):
+    #     if message.author.name == 'JordanLTD':
+    #         database = read_db()
+    #         for user in database:
+    #             if 'Crowned' not in database[user]:
+    #                 database[user]['Crowned'] = False
+    #             if database[user]['Crowned']:
+    #                 database[user]['Crowned'] = False
                 
-            write_db(database)
+    #         write_db(database)
 
-            members = client.get_all_members()
-            for member in members:
-                role_names = [role.name for role in member.roles]
-                if 'Crowned' in role_names:
-                    role = get(member.guild.roles, name='Crowned')
-                    await member.remove_roles(role)
+    #         members = client.get_all_members()
+    #         for member in members:
+    #             role_names = [role.name for role in member.roles]
+    #             if 'Crowned' in role_names:
+    #                 role = get(member.guild.roles, name='Crowned')
+    #                 await member.remove_roles(role)
 
-            await message.channel.send(f'{message.author.name}:princess: has removed the crown from the holder!')
-        else:
-            await message.channel.send(f'Only Yarden/Jordan/ירדן‎ :princess: can remove crown!')
+    #         await message.channel.send(f'{message.author.name}:princess: has removed the crown from the holder!')
+    #     else:
+    #         await message.channel.send(f'Only Yarden/Jordan/ירדן‎ :princess: can remove crown!')
     
 
     if message.content.startswith('!top'):
@@ -570,7 +571,8 @@ async def on_message(message):
             else:
                 await message.channel.send(f'{target} does not exist!')
         try:
-            await client.delete_message(message)
+            pass
+            # await client.delete_message(message)
         except:
             print('msg sent private')
 
