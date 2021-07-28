@@ -55,16 +55,21 @@ k = 'ODMxOTE4MjA5NDA4OTU4NTE0.YHcONQ.3csgpSPP2vK6CisUkz0y-VYX-rk'
 
 hour_cumww = 10
 
-
 def read_db():
-    with open('database.txt', 'r') as f:
-        database = eval(f.read())
+    try:
+        with open('database.txt', 'r') as f:
+            database = eval(f.read())
+    except:
+        print('read error')
     return database
 
 
 def write_db(database):
-    with open('database.txt', 'w', encoding='utf-8') as f:
-        f.write(str(database))
+    try:
+        with open('database.txt', 'w', encoding='utf-8') as f:
+            f.write(str(database))
+    except:
+        print('write error')
 
 class MyClient(discord.Client):
     def __init__(self, *args, **kwargs):
@@ -340,6 +345,23 @@ async def on_message(message):
             await message.channel.send(f'All users have been refunded {amount} <:CBCcoin:831506214659293214>')
         else:
             await message.channel.send(f'You are not Foxxravin!')
+
+
+
+    if message.content.startswith('!transfer'):
+        str_split = message.content.split(' ')
+        if len(str_split) > 3 or len(str_split) < 3:
+            await message.channel.send(f'Too many or few arguments. Use !transfer <target> <amount>')
+        amount = round(float(str_split[2]),2)
+        target = str_split[1]
+        database = read_db()
+        if message.author.name == 'Foxxravin' and target in database:
+            if 'coins' in database[target]:
+                database[target]['coins'] += amount
+            write_db(database)
+            await message.channel.send(f'{message.author.name} transfered {amount} <:CBCcoin:831506214659293214> to {target}.')
+        else:
+            await message.channel.send(f'You are not Foxxravin!')
     
     if message.content.startswith('!changetime'):
         str_split = message.content.split(' ')
@@ -603,8 +625,7 @@ async def on_message(message):
     if message.content.startswith('!guess'):
         str_split = message.content.split(' ')
         if len(str_split) > 2 or len(str_split) < 2:
-            await message.channel.send(f'Too many or few arguments. Use !guess <target>')
-        
+            await message.channel.send(f'Too many or few arguments. Use !guess <target>')        
         
         else:
             database = read_db()
@@ -612,7 +633,6 @@ async def on_message(message):
             if target in database:
                 channel = client.get_channel(867753681301929994)
                 target = str_split[1]
-                cumlock = False
                 if 'guesswolf' not in database[message.author.name]:
                     database[message.author.name]['guesswolf'] = True
 
@@ -622,16 +642,12 @@ async def on_message(message):
                         if 'cumww' not in database[target]:
                             database[user]['cumww'] = False
                         if database[target]['cumww']:
-                            cumlock = True
                             await message.channel.send(f'{message.author.name} guessed correctly, cum werewolf ({target}) has been found, good job! 5000 <:CBCcoin:831506214659293214> has been credited to your account!')
                             database[message.author.name]['coins'] += 5000
                             await channel.send(f'The werewolf ({target}) has been found!')
                             database[target]['cumww'] = False
                             for user in database:
                                 database[user]['bitten'] = False
-                            write_db(database)
-                        if cumlock:
-                            pass
                         else:
                             await message.channel.send(f'{target} is not the cum werewolf!')
                     else:
@@ -640,6 +656,7 @@ async def on_message(message):
                     await message.channel.send(f"{message.author.name} can't guess him/herself.")
             else:
                 await message.channel.send(f'{target} does not exist!')
+            write_db(database)
 
 
 client.run(k)
