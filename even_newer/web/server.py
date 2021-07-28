@@ -33,33 +33,46 @@ from things import *
 app = Flask(__name__)
 api = Api(app)
 
-logging.basicConfig(filename='server.log', level=logging.DEBUG)
-socketio = SocketIO(app, cors_allowed_origins="*", logger = logging)
+# logging.basicConfig(filename='server.log', level=logging.DEBUG)
+# socketio = SocketIO(app, cors_allowed_origins="*", logger = logging)
 
-@socketio.on('msg')
-def msg(msg):
-    socketio.emit('clientMsg', msg, broadcast=True, include_self=False)
+# @socketio.on('msg')
+# def msg(msg):
+#     socketio.emit('clientMsg', msg, broadcast=True, include_self=False)
 
-@socketio.on('connect')
-def test_connect():
-    socketio.emit('datainfo', {'data': 'Connected'})
+# @socketio.on('connect')
+# def test_connect():
+#     socketio.emit('datainfo', {'data': 'Connected'})
 
-@socketio.on('disconnect')
-def test_disconnect():
-    print('Client disconnected')
+# @socketio.on('disconnect')
+# def test_disconnect():
+#     print('Client disconnected')
 
 # @app.route("/stonks")
 # def front():
 #     return render_template('stonks.html')
 
+
+
+def read_db():
+    try:
+        with open('../database.txt', 'r') as f:
+            database = eval(f.read())
+        return database
+    except:
+        print('read error')
+
 @app.route("/")
 def frontpage():
-    return render_template('music.html')
+    return 'frontpage'
 
-#ed0ce8c7-a4fe-11eb-badb-40167e77d41a
+@app.route("/admin/userinfo")
+def userinfo():
+    database = read_db()
+    return database
 
 
 
-
-# if __name__ == "__main__":
-socketio.run(app, debug=True)
+if __name__ == "__main__":
+    # socketio.run(app, debug=True)
+    app.run(debug=True)

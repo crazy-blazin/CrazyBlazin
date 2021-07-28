@@ -19,7 +19,7 @@ import requests
 from flask import jsonify
 import logging
 from datetime import date
-import asyncio
+import asyncio 
 
 
 
@@ -76,7 +76,7 @@ class MyClient(discord.Client):
     async def on_ready(self):
         print(f'Logged in as {self.user} (ID: {self.user.id})')
         print('------')
-        bot_version = '0.1'
+        bot_version = '0.12'
         await client.wait_until_ready()
         channel = client.get_channel(803982821923356773)
         await channel.send(f'Bot online, version: {bot_version}')

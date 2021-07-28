@@ -10453,3 +10453,9 @@ INFO:root:received event "msg" from HwF06evHZofPERfSAAAB [/]
 INFO:root:emitting event "clientMsg" to all [/]
 INFO:root:received event "msg" from HwF06evHZofPERfSAAAB [/]
 INFO:root:emitting event "clientMsg" to all [/]
+WARNING:werkzeug:WebSocket transport not available. Install simple-websocket for improved performance.
+INFO:werkzeug: * Restarting with stat
+WARNING:werkzeug:WebSocket transport not available. Install simple-websocket for improved performance.
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 458-540-327
+INFO:werkzeug: * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
