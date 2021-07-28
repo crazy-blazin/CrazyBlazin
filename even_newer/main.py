@@ -538,6 +538,7 @@ async def on_message(message):
         embed.add_field(name=f"Resign as the cum werewolf. This function will select a new one.", value=f'!cumresign')
         embed.add_field(name=f"Show users with historically most coins.", value=f'!top')
         embed.add_field(name=f"Swap ₪ shekels for crazy blazin coins <:CBCcoin:831506214659293214>", value=f'!coinswap <amount>')
+        embed.add_field(name=f"Grab your daily loot! Can only be used once per day.", value=f'!daily')
         await message.channel.send(embed=embed)
 
     
