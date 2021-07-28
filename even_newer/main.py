@@ -85,13 +85,13 @@ def create_gif(username, price):
     text_price = f"Looted {price} CBS!!!!"
 
     # load the font
-    font = ImageFont.truetype("ShortBaby-Mg2w.ttf", 60)
+    font = ImageFont.truetype("ShortBaby-Mg2w.ttf", 30)
     # draw = ImageDraw.Draw(img_background)
 
     # add text to each frame
     frames = []
     for N, frame in enumerate(ImageSequence.Iterator(gif_image)):
-        frame = frame.copy().convert('RGB')
+        frame = frame.copy().convert('RGB').resize((400, 300), resample=(0))
         draw = ImageDraw.Draw(frame)
         draw.text((x+110, y), text_name, pink, font=font)
         draw.text((x+50, y+200), text_price, pink, font=font)
@@ -103,17 +103,16 @@ def create_gif(username, price):
             draw.text((x+50, y+200), text_price, white, font=font)
         # draw.text((x+10, y+10), text_price, silver, font=font)
         # draw.text((x+10, y+10), text_price, white, font=font)
-        # frame.save("./frames/{}.png".format(str(N).zfill(3)))
-        frames.append(frame)
+        frame.save("./frames/{}.png".format(str(N).zfill(3)))
 
-    frames[0].save('out.gif', save_all=True, append_images=frames[1:])
+    # frames[0].save('out.gif', save_all=True, append_images=frames[1:])
 
     # # output the result
-    # os.system('ffmpeg -framerate 5 -i frames/%03d.png -c:v ffv1 -r 5 -y out.avi')
-    # os.system('ffmpeg -y -i out.avi out.gif')
+    os.system('ffmpeg -framerate 15 -i frames/%03d.png -c:v ffv1 -r 15 -y out.avi')
+    os.system('ffmpeg -y -i out.avi out.gif')
 
     # clean up
-    # shutil.rmtree('frames')
+    shutil.rmtree('frames')
 
 
 hour_cumww = 10
