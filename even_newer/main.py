@@ -20,7 +20,14 @@ from flask import jsonify
 import logging
 from datetime import date
 import asyncio 
+# OS modules
+import os
+import shutil
 
+# Image modules
+from PIL import ImageFont
+from PIL import Image
+from PIL import ImageDraw
 
 
 # logging.basicConfig(filename='main.log', level=logging.DEBUG)
@@ -52,6 +59,57 @@ import asyncio
 
 # sio.start_background_task(target = run)
 
+
+
+
+def create_gif(username, price):
+    # create/delete our temp files folder
+    if os.path.exists('frames'):
+        shutil.rmtree('frames')
+    os.mkdir('frames')
+
+    # load in the background image
+    img_background = Image.open('background.png')
+    img = Image.new("RGBA", img_background.size, (0, 0, 0, 255))
+
+    # set up colours and vars
+    x = 10
+    y = 10
+    silver = (100, 100, 100, 255)
+    purple = (100, 0, 200, 255)
+    pink = (255, 0, 255, 255)
+    black = (0, 0, 0, 0)
+
+    text_name = f"{username}"
+    text_price = f"Looted {price} CBS!!!!"
+
+    # load the font
+    font = ImageFont.truetype("ShortBaby-Mg2w.ttf", 60)
+    draw = ImageDraw.Draw(img)
+
+    # add text to each frame
+    for N in range(0, 50):
+        img.paste(img_background, (0, 0))
+        draw.text((x+110, y), text_name, silver, font=font)
+        draw.text((x, y+350), text_price, silver, font=font)
+        # draw.text((x, y), text_name, silver, font=font)
+        # draw.text((x, y), text_name, white, font=font)
+
+        if N%10 == 0:
+            draw.text((x+110, y), text_name, pink, font=font)
+            draw.text((x, y+350), text_price, pink, font=font)
+        # draw.text((x+10, y+10), text_price, silver, font=font)
+        # draw.text((x+10, y+10), text_price, white, font=font)
+        img.save("./frames/{}.png".format(str(N).zfill(3)))
+
+    # output the result
+    os.system('ffmpeg -framerate 5 -i frames/%03d.png -c:v ffv1 -r 5 -y out.avi')
+    os.system('ffmpeg -y -i out.avi out.gif')
+
+    # clean up
+    shutil.rmtree('frames')
+
+
 hour_cumww = 10
 
 def read_db():
@@ -76,7 +134,7 @@ class MyClient(discord.Client):
     async def on_ready(self):
         print(f'Logged in as {self.user} (ID: {self.user.id})')
         print('------')
-        bot_version = '0.12'
+        bot_version = '0.15'
         await client.wait_until_ready()
         channel = client.get_channel(803982821923356773)
         await channel.send(f'Bot online, version: {bot_version}')
@@ -116,8 +174,7 @@ def add_coins(stream_state, user, cointype):
     print(f'Coins to : {user}')
     write_db(database)
 
-
-def ticksystem():
+async def ticksystem():
     while True:
         
         database = read_db()
@@ -176,7 +233,7 @@ def ticksystem():
                 database[cumww_user]['coins'] += 0.1
             
             write_db(database)
-        time.sleep(10)
+        await asyncio.sleep(10)
 
 
 async def timer():
@@ -186,6 +243,7 @@ async def timer():
     msg_sent_reveal = False
 
     while True:
+        print('timer running')
         global hour_cumww
         database = read_db()
         time = datetime.datetime.now
@@ -204,9 +262,10 @@ async def timer():
                     database[user]['bitten'] = False
                     database[user]['active_wolf'] = False
                     database[user]['wascumww'] = False
+                    database[user]['lootbox'] = True
                 for member in members:
                     if member.name == rand_cumwolf:
-                        await member.send('You are now the cum werewolf, bite users to drain their coins! !bite <user>. New werewolf will be assigned in 24 hours! NB! You should send the command directly to this bot so no one sees it! If you do not want to be cum werewolf write !cumresign.')
+                        #await member.send('You are now the cum werewolf, bite users to drain their coins! !bite <user>. New werewolf will be assigned in 24 hours! NB! You should send the command directly to this bot so no one sees it! If you do not want to be cum werewolf write !cumresign.')
                         await channel.send(f'A new cum werewolf has been chosen! Try to guess who before he/she steals all your coins!')
                         database[rand_cumwolf]['cumww'] = True
                         database[rand_cumwolf]['wascumww'] = True
@@ -222,18 +281,15 @@ async def timer():
                     if database[user]['cumww']:
                         rand_cumwolf_split = [char for char in user]
                         random_letter = np.random.choice(rand_cumwolf_split)
-                        await channel.send(f'Hint: Random letter/number from username is: {random_letter}')
+                        await channel.send(f'Hint: Random letter/number from username is: {random_letter.lower()}')
                 msg_sent_reveal = True
         else:
             msg_sent_reveal = False
 
-        await asyncio.sleep(5)
+        await asyncio.sleep(10)
 
+client.loop.create_task(ticksystem())
 client.loop.create_task(timer())
-
-t = threading.Thread(target=ticksystem)
-t.daemon = False
-t.start()
 
 
 @client.event
@@ -483,7 +539,27 @@ async def on_message(message):
         embed.add_field(name=f"Show users with historically most coins.", value=f'!top')
         embed.add_field(name=f"Swap ₪ shekels for crazy blazin coins <:CBCcoin:831506214659293214>", value=f'!coinswap <amount>')
         await message.channel.send(embed=embed)
-        
+
+    
+    if message.content.startswith('!daily'):
+
+        database = read_db()
+
+        if 'lootbox' not in database[message.author.name]:
+            database[message.author.name]['lootbox'] = True
+
+        if database[message.author.name]['lootbox']:
+            database[message.author.name]['lootbox'] = False
+            price = np.random.randint(10, 10000)
+            database[message.author.name]['coins'] += price
+            write_db(database)
+            create_gif(message.author.name, price)
+            await message.channel.send(file=discord.File('out.gif'))
+        else:
+            await message.channel.send(f'You have already looted today!')
+
+
+
                 
     
     # if message.content.startswith('!crown'):

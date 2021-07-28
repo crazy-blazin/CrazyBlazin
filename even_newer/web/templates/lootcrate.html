@@ -1,0 +1,159 @@
+
+
+<!doctype html>
+<html lang="en">
+    <head>
+
+<style>
+
+@import url('https://fonts.googleapis.com/css?family=Squada+One|Teko');
+
+html, body {
+  height: 100%;
+  width: 100%;
+}
+
+.bg {
+  position: relative;
+  height: 100%;
+  width: 100%;
+  
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bg video {
+  position: fixed;
+  right: 0; 
+  bottom: 0;
+  min-width: 100%; 
+  min-height: 100%;
+  width: auto; 
+  height: auto;
+  z-index: -100;
+}
+
+.alert {
+  height: 400px;
+  width: 500px;
+  overflow: hidden;
+
+  background-color: rgba(20, 20, 20, 0.76);
+  
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  
+  transition: height 1s;
+}
+
+.alert.hide {
+  height: 0;
+}
+
+.alert .border {
+  background-color: #fff;
+  height: 2px;
+
+  position: absolute;
+  left: 0;
+  right: 0;
+}
+
+.alert .border.top {
+  top: 0;
+}
+.alert .border.bottom {
+  bottom: 0;
+}
+
+.alert .viewer {
+  color: #fff;
+  font-family: 'Teko', sans-serif;
+  font-size: 55px;
+  line-height: 1;
+
+  margin: 10px 0;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.alert .image {
+  height: 250px;
+  
+  background-color: rgba(17, 11, 22, 0.75);
+  border: 4px solid #976fba;
+}
+
+.alert .image img {
+  height: 100%;
+  width: auto;
+}
+
+.alert .description {
+  color: #fff;
+  font-family: 'Teko', sans-serif;
+  font-size: 32px;
+  line-height: 1;
+
+  margin: 20px 0;
+  text-align: center;
+}
+
+</style>
+
+<title>Hello, world!</title>
+</head>
+
+
+<body>
+
+
+<script>
+
+var expanded = false;
+
+setInterval(function() {
+  if (expanded) {
+    expanded = false;
+    document.querySelector(".alert").classList.add("hide");
+  } else {
+    expanded = true;
+    document.querySelector(".alert").classList.remove("hide");
+  }
+}, 10000);
+
+
+</script>
+
+
+<div class="bg">
+    <video autoplay loop muted>
+      <source src="http://teragigame.ga/files/madcowfilms.webm" type="video/webm">
+    </video>
+  
+    <div class="alert hide">
+      <div class="border top"></div>
+      <div class="border bottom"></div>
+  
+      <div class="viewer">
+        <span class="display_name">SoAndSo</span> Received
+      </div>
+      
+      <div class="image">
+        <img src="https://steamuserimages-a.akamaihd.net/ugc/939437582927019730/096E1FF572F90D9EA3D893F05CE4C0BCFAA4C3CC/">
+      </div>
+      
+      <div class="description">
+        <span class="channel-name">Penis</span> Custom Gun
+      </div>
+    </div>
+  </div>
+
+
+</body>
+
+</html>

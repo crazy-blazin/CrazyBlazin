@@ -72,6 +72,11 @@ def userinfo():
     return database
 
 
+@app.route("/test")
+def test():
+    return render_template('lootcrate.html')
+
+
 
 if __name__ == "__main__":
     # socketio.run(app, debug=True)
