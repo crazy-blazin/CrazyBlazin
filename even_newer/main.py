@@ -140,7 +140,7 @@ class MyClient(discord.Client):
     async def on_ready(self):
         print(f'Logged in as {self.user} (ID: {self.user.id})')
         print('------')
-        bot_version = '0.15'
+        bot_version = '0.16'
         await client.wait_until_ready()
         channel = client.get_channel(803982821923356773)
         await channel.send(f'Bot online, version: {bot_version}')
@@ -271,7 +271,7 @@ async def timer():
                     database[user]['lootbox'] = True
                 for member in members:
                     if member.name == rand_cumwolf:
-                        #await member.send('You are now the cum werewolf, bite users to drain their coins! !bite <user>. New werewolf will be assigned in 24 hours! NB! You should send the command directly to this bot so no one sees it! If you do not want to be cum werewolf write !cumresign.')
+                        await member.send('You are now the cum werewolf, bite users to drain their coins! !bite <user>. New werewolf will be assigned in 24 hours! NB! You should send the command directly to this bot so no one sees it! If you do not want to be cum werewolf write !cumresign.')
                         await channel.send(f'A new cum werewolf has been chosen! Try to guess who before he/she steals all your coins!')
                         database[rand_cumwolf]['cumww'] = True
                         database[rand_cumwolf]['wascumww'] = True
