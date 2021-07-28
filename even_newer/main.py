@@ -32,6 +32,14 @@ from PIL import ImageDraw, ImageSequence
 
 
 
+
+
+with open('version.txt', 'r') as f:
+    version = float(f.read())
+
+with open('../../key.txt', 'r') as f:
+    k = str(f.read())
+
 # logging.basicConfig(filename='main.log', level=logging.DEBUG)
 
 
@@ -91,7 +99,7 @@ def create_gif(username, price):
     # add text to each frame
     frames = []
     for N, frame in enumerate(ImageSequence.Iterator(gif_image)):
-        frame = frame.copy().convert('RGB').resize((400, 300), resample=(0))
+        frame = frame.copy().convert('RGB').resize((400, 300), resample=(1))
         draw = ImageDraw.Draw(frame)
         draw.text((x+110, y), text_name, pink, font=font)
         draw.text((x+50, y+200), text_price, pink, font=font)
@@ -103,19 +111,29 @@ def create_gif(username, price):
             draw.text((x+50, y+200), text_price, white, font=font)
         # draw.text((x+10, y+10), text_price, silver, font=font)
         # draw.text((x+10, y+10), text_price, white, font=font)
-        frame.save("./frames/{}.png".format(str(N).zfill(3)))
+        # frame.save("./frames/{}.png".format(str(N).zfill(3)))
+        frames.append(frame)
 
-    # frames[0].save('out.gif', save_all=True, append_images=frames[1:])
+    frames[0].save('out.gif', save_all=True, append_images=frames[1:])
+    del frames
 
     # # output the result
-    os.system('ffmpeg -framerate 15 -i frames/%03d.png -c:v ffv1 -r 15 -y out.avi')
-    os.system('ffmpeg -y -i out.avi out.gif')
+    # os.system('ffmpeg -framerate 15 -i frames/%03d.png -c:v ffv1 -r 15 -y out.avi')
+    # os.system('ffmpeg -y -i out.avi out.gif')
 
     # clean up
     shutil.rmtree('frames')
 
 
 hour_cumww = 10
+
+
+def check_version():
+    global version
+    with open('version.txt', 'r') as f:
+        ver = float(f.read())
+    if version < ver:
+        exit()
 
 def read_db():
     try:
@@ -139,7 +157,9 @@ class MyClient(discord.Client):
     async def on_ready(self):
         print(f'Logged in as {self.user} (ID: {self.user.id})')
         print('------')
-        bot_version = '0.16'
+        with open('version.txt', 'r') as f:
+            ver = float(f.read())
+        bot_version = f'{ver}'
         await client.wait_until_ready()
         channel = client.get_channel(803982821923356773)
         await channel.send(f'Bot online, version: {bot_version}')
@@ -291,7 +311,9 @@ async def timer():
         else:
             msg_sent_reveal = False
 
+        check_version()
         await asyncio.sleep(10)
+        
 
 client.loop.create_task(ticksystem())
 client.loop.create_task(timer())
@@ -555,7 +577,7 @@ async def on_message(message):
             database[message.author.name]['lootbox'] = True
 
         if database[message.author.name]['lootbox']:
-            #database[message.author.name]['lootbox'] = False
+            database[message.author.name]['lootbox'] = False
             price = np.random.randint(10, 10000)
             database[message.author.name]['coins'] += price
             write_db(database)
