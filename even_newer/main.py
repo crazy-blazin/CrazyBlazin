@@ -22,7 +22,6 @@ from datetime import date
 import asyncio
 
 
-k = 'ODMxOTE4MjA5NDA4OTU4NTE0.YHcONQ.3csgpSPP2vK6CisUkz0y-VYX-rk'
 
 # logging.basicConfig(filename='main.log', level=logging.DEBUG)
 
@@ -59,10 +58,9 @@ def read_db():
     try:
         with open('database.txt', 'r') as f:
             database = eval(f.read())
+        return database
     except:
         print('read error')
-    return database
-
 
 def write_db(database):
     try:
@@ -78,6 +76,11 @@ class MyClient(discord.Client):
     async def on_ready(self):
         print(f'Logged in as {self.user} (ID: {self.user.id})')
         print('------')
+        bot_version = '0.1'
+        await client.wait_until_ready()
+        channel = client.get_channel(803982821923356773)
+        await channel.send(f'Bot online, version: {bot_version}')
+
         # members = self.get_all_members()
         # for member in members:
         #     role_names = [role.name for role in member.roles]
