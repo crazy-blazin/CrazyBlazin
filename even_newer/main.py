@@ -27,7 +27,9 @@ import shutil
 # Image modules
 from PIL import ImageFont
 from PIL import Image
-from PIL import ImageDraw
+from PIL import ImageDraw, ImageSequence
+
+
 
 
 # logging.basicConfig(filename='main.log', level=logging.DEBUG)
@@ -69,45 +71,49 @@ def create_gif(username, price):
     os.mkdir('frames')
 
     # load in the background image
-    img_background = Image.open('background.png')
-    img = Image.new("RGBA", img_background.size, (0, 0, 0, 255))
+    gif_image = Image.open('background.gif')
 
     # set up colours and vars
     x = 10
     y = 10
-    silver = (100, 100, 100, 255)
-    purple = (100, 0, 200, 255)
-    pink = (255, 0, 255, 255)
-    black = (0, 0, 0, 0)
+    silver = (100, 100, 100)
+    purple = (100, 0, 200)
+    pink = (255, 0, 255)
+    white = (255, 255, 255)
 
     text_name = f"{username}"
     text_price = f"Looted {price} CBS!!!!"
 
     # load the font
     font = ImageFont.truetype("ShortBaby-Mg2w.ttf", 60)
-    draw = ImageDraw.Draw(img)
+    # draw = ImageDraw.Draw(img_background)
 
     # add text to each frame
-    for N in range(0, 50):
-        img.paste(img_background, (0, 0))
-        draw.text((x+110, y), text_name, silver, font=font)
-        draw.text((x, y+350), text_price, silver, font=font)
+    frames = []
+    for N, frame in enumerate(ImageSequence.Iterator(gif_image)):
+        frame = frame.copy().convert('RGB')
+        draw = ImageDraw.Draw(frame)
+        draw.text((x+110, y), text_name, pink, font=font)
+        draw.text((x+50, y+200), text_price, pink, font=font)
         # draw.text((x, y), text_name, silver, font=font)
         # draw.text((x, y), text_name, white, font=font)
 
         if N%10 == 0:
-            draw.text((x+110, y), text_name, pink, font=font)
-            draw.text((x, y+350), text_price, pink, font=font)
+            draw.text((x+110, y), text_name, white, font=font)
+            draw.text((x+50, y+200), text_price, white, font=font)
         # draw.text((x+10, y+10), text_price, silver, font=font)
         # draw.text((x+10, y+10), text_price, white, font=font)
-        img.save("./frames/{}.png".format(str(N).zfill(3)))
+        # frame.save("./frames/{}.png".format(str(N).zfill(3)))
+        frames.append(frame)
 
-    # output the result
-    os.system('ffmpeg -framerate 5 -i frames/%03d.png -c:v ffv1 -r 5 -y out.avi')
-    os.system('ffmpeg -y -i out.avi out.gif')
+    frames[0].save('out.gif', save_all=True, append_images=frames[1:])
+
+    # # output the result
+    # os.system('ffmpeg -framerate 5 -i frames/%03d.png -c:v ffv1 -r 5 -y out.avi')
+    # os.system('ffmpeg -y -i out.avi out.gif')
 
     # clean up
-    shutil.rmtree('frames')
+    # shutil.rmtree('frames')
 
 
 hour_cumww = 10
@@ -550,7 +556,7 @@ async def on_message(message):
             database[message.author.name]['lootbox'] = True
 
         if database[message.author.name]['lootbox']:
-            database[message.author.name]['lootbox'] = False
+            #database[message.author.name]['lootbox'] = False
             price = np.random.randint(10, 10000)
             database[message.author.name]['coins'] += price
             write_db(database)
