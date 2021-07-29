@@ -208,6 +208,7 @@ def add_coins(stream_state, user, cointype):
 
 async def ticksystem():
     while True:
+        check_version()
         database = read_db()
         for user in database:
             if 'cumww' not in database[user]:
