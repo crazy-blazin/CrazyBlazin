@@ -90,7 +90,7 @@ def create_gif(username, price):
     white = (255, 255, 255)
 
     text_name = f"{username}"
-    text_price = f"Looted {price} CBS!!!!"
+    text_price = f"Looted {price} CBC!!!!"
 
     # load the font
     font = ImageFont.truetype("ShortBaby-Mg2w.ttf", 30)
@@ -261,8 +261,8 @@ async def ticksystem():
             if 'bitten' not in database[user]:
                 database[user]['bitten'] = False
             if database[user]['bitten']:
-                database[user]['coins'] -= 0.1
-                database[cumww_user]['coins'] += 0.1
+                database[user]['coins'] -= 1
+                database[cumww_user]['coins'] += 1
             
             write_db(database)
         await asyncio.sleep(10)
