@@ -99,7 +99,7 @@ def create_gif(username, price):
     # add text to each frame
     # frames = []
     for N, frame in enumerate(ImageSequence.Iterator(gif_image)):
-        frame = frame.copy().convert('RGB').resize((400, 300), resample=(1))
+        frame = frame.copy().convert('RGBA').resize((400, 300), resample=(1))
         draw = ImageDraw.Draw(frame)
         draw.text((x+110, y), text_name, pink, font=font)
         draw.text((x+50, y+200), text_price, pink, font=font)
@@ -118,11 +118,18 @@ def create_gif(username, price):
     # del frames
 
     # # output the result
+
+    os.system('ffmpeg -i frames/%03d.png -vf scale=900:-1:sws_dither=ed,palettegen -y palette.png')
+    # os.system('ffmpeg -i image%d.jpg video.flv')
+    # os.system('ffmpeg -i video.flv -i palette.png -filter_complex "fps=1.2,scale=900:-1:flags=lanczos[x];[x][1:v]paletteuse" out.gif')
     os.system('ffmpeg -framerate 15 -i frames/%03d.png -c:v ffv1 -r 15 -y out.avi')
-    os.system('ffmpeg -y -i out.avi out.gif')
+    os.system('ffmpeg -i out.avi -i palette.png -filter_complex "fps=15,scale=500:-1:flags=lanczos[x];[x][1:v]paletteuse" -y out.gif')
+    # os.system('ffmpeg -y -i out.flv out.gif')
 
     # clean up
     shutil.rmtree('frames')
+    os.remove('out.avi')
+    os.remove('palette.png')
 
 
 hour_cumww = 10
