@@ -165,6 +165,8 @@ def end():
     os._exit(0)
 
 
+print('Server running')
+
 if __name__ == "__main__":
     # socketio.run(app, debug=True)
-    app.run(debug=True)
+    app.run(debug=False)

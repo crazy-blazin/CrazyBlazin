@@ -772,5 +772,5 @@ async def on_message(message):
                 await message.channel.send(f'{target} does not exist!')
             write_db(database)
 
-
+print('Server running')
 client.run(k)
