@@ -144,7 +144,7 @@ def check_version():
 
 def read_db():
     try:
-        with open('database.txt', 'r') as f:
+        with open('../database.txt', 'r') as f:
             database = eval(f.read())
         return database
     except:
@@ -152,7 +152,7 @@ def read_db():
 
 def write_db(database):
     try:
-        with open('database.txt', 'w', encoding='utf-8') as f:
+        with open('../database.txt', 'w', encoding='utf-8') as f:
             f.write(str(database))
     except:
         print('write error')
