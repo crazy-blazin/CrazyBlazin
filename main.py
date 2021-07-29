@@ -140,7 +140,7 @@ def check_version():
     with open('version.txt', 'r') as f:
         ver = float(f.read())
     if version < ver:
-        exit()
+        os._exit(os.EX_OK)
 
 def read_db():
     try:
@@ -208,7 +208,6 @@ def add_coins(stream_state, user, cointype):
 
 async def ticksystem():
     while True:
-        
         database = read_db()
         for user in database:
             if 'cumww' not in database[user]:
@@ -772,5 +771,5 @@ async def on_message(message):
                 await message.channel.send(f'{target} does not exist!')
             write_db(database)
 
-print('Server running')
+
 client.run(k)
