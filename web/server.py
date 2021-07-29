@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 from flask import Flask, render_template, url_for, request, jsonify
 import pickle
 from datetime import datetime, time

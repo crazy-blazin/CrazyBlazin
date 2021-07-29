@@ -1,4 +1,4 @@
-
+#!/usr/bin/env python
 from asyncio.tasks import wait
 import os
 import matplotlib.pyplot as plt
@@ -37,7 +37,7 @@ from PIL import ImageDraw, ImageSequence
 with open('version.txt', 'r') as f:
     version = float(f.read())
 
-with open('../../key.txt', 'r') as f:
+with open('../key.txt', 'r') as f:
     k = str(f.read())
 
 # logging.basicConfig(filename='main.log', level=logging.DEBUG)
