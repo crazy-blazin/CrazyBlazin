@@ -138,7 +138,7 @@ def check_version():
     with open('version.txt', 'r') as f:
         ver = float(f.read())
     if version != ver:
-        os._exit(os.EX_OK)
+        os._exit()
 
 def read_db():
     try:
