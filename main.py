@@ -36,6 +36,7 @@ from PIL import ImageDraw, ImageSequence
 
 with open('version.txt', 'r') as f:
     version = float(f.read())
+    print(version)
 
 with open('../key.txt', 'r') as f:
     k = str(f.read())
