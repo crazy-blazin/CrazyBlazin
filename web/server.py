@@ -1,48 +1,48 @@
-#!/usr/bin/env python
-from flask import Flask, render_template, url_for, request, jsonify
-import pickle
-from datetime import datetime, time
-import numpy as np
-import io
-from PIL import Image
-import matplotlib.pyplot as plt
-import json
-import jsonpickle
-import random
-from flask import Flask, render_template, url_for, request, Response, send_file
-import http.client
-from datetime import datetime, time
-from matplotlib import image
-import numpy as np
-from PIL import Image
-import matplotlib.pyplot as plt
-import os
-from pathlib import Path
-import uuid
-import glob
-import shutil
-import logging
-from werkzeug.datastructures import FileStorage
-from flask_restful import Resource, Api, reqparse
-from werkzeug.utils import secure_filename
+# #!/usr/bin/env python
+# from flask import Flask, render_template, url_for, request, jsonify
+# import pickle
+# from datetime import datetime, time
+# import numpy as np
+# import io
+# from PIL import Image
+# import matplotlib.pyplot as plt
+# import json
+# import jsonpickle
+# import random
+# from flask import Flask, render_template, url_for, request, Response, send_file
+# import http.client
+# from datetime import datetime, time
+# from matplotlib import image
+# import numpy as np
+# from PIL import Image
+# import matplotlib.pyplot as plt
+# import os
+# from pathlib import Path
+# import uuid
+# import glob
+# import shutil
+# import logging
+# from werkzeug.datastructures import FileStorage
+# from flask_restful import Resource, Api, reqparse
+# from werkzeug.utils import secure_filename
 
-from flask_socketio import SocketIO
+# from flask_socketio import SocketIO
 
-from things import *
-import requests
-from tqdm import tqdm
-from zipfile import ZipFile
-import os
-import shutil
-import subprocess
-import time
+# from things import *
+# import requests
+# from tqdm import tqdm
+# from zipfile import ZipFile
+# import os
+# import shutil
+# import subprocess
+# import time
 
 
-with open('version.txt', 'r') as f:
-    version = float(f.read())
+# with open('version.txt', 'r') as f:
+#     version = float(f.read())
 
-app = Flask(__name__)
-api = Api(app)
+# app = Flask(__name__)
+# api = Api(app)
 
 # logging.basicConfig(filename='server.log', level=logging.DEBUG)
 # socketio = SocketIO(app, cors_allowed_origins="*", logger = logging)
@@ -139,7 +139,7 @@ api = Api(app)
 
 def read_db():
     try:
-        with open('../database.txt', 'r') as f:
+        with open('../../database.txt', 'r') as f:
             database = eval(f.read())
         return database
     except:
