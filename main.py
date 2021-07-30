@@ -43,6 +43,43 @@ with open('../key.txt', 'r') as f:
 logging.basicConfig(filename='main.log', level=logging.DEBUG)
 
 
+
+
+
+
+        
+class MyClient(discord.Client):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    async def on_ready(self):
+        print(f'Logged in as {self.user} (ID: {self.user.id})')
+        print('------')
+        global temp_status
+        members = client.get_all_members()
+        database = read_db()
+        for member in members:
+            if member.name in database:
+                temp_status[member.name] = member.voice
+                print(member.voice.channel.id)
+        with open('version.txt', 'r') as f:
+            ver = float(f.read())
+        bot_version = f'{ver}'
+        channel = client.get_channel(803982821923356773)
+        await channel.send(f'Bot online, build version: {bot_version}')
+
+
+        # members = self.get_all_members()
+        # for member in members:
+        #     role_names = [role.name for role in member.roles]
+        #     if member.name not in database:
+        #         role_names = [role.name for role in member.roles]
+        #         if 'Bots' in role_names:
+        #             pass
+        #         else:
+        #             database[member.name] = {'coins': 100}
+
+
 # sio = socketio.Client()
 
 
@@ -159,41 +196,7 @@ def write_db(database):
             f.write(str(database))
     except:
         print('write error')
-        
 
-
-
-        
-class MyClient(discord.Client):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-    async def on_ready(self):
-        print(f'Logged in as {self.user} (ID: {self.user.id})')
-        print('------')
-        global temp_status
-        members = client.get_all_members()
-        database = read_db()
-        for member in members:
-            if member.name in database:
-                temp_status[member.name] = member.voice
-                print(member.voice.channel.id)
-        with open('version.txt', 'r') as f:
-            ver = float(f.read())
-        bot_version = f'{ver}'
-        channel = client.get_channel(803982821923356773)
-        await channel.send(f'Bot online, build version: {bot_version}')
-
-
-        # members = self.get_all_members()
-        # for member in members:
-        #     role_names = [role.name for role in member.roles]
-        #     if member.name not in database:
-        #         role_names = [role.name for role in member.roles]
-        #         if 'Bots' in role_names:
-        #             pass
-        #         else:
-        #             database[member.name] = {'coins': 100}
 
 
 
