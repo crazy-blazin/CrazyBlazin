@@ -283,6 +283,7 @@ async def timer():
         if time().hour == int(hour_cumww):# and time().minute == 9:
             print('TIME IS ON ', hour_cumww)
             if not msg_sent:
+                print('ww is chosen!')
                 rand_cumwolf = np.random.choice(list(database.keys()))
                 members = client.get_all_members()
                 for user in database:
