@@ -44,7 +44,7 @@ logging.basicConfig(filename='main.log', level=logging.DEBUG)
 
 
 
-
+temp_status  = {}
 
 
         
@@ -61,7 +61,6 @@ class MyClient(discord.Client):
         for member in members:
             if member.name in database:
                 temp_status[member.name] = member.voice
-                print(member.voice.channel.id)
         with open('version.txt', 'r') as f:
             ver = float(f.read())
         bot_version = f'{ver}'
@@ -110,7 +109,6 @@ intents = discord.Intents.default()
 intents.members = True
 client = MyClient(intents = intents)
 
-temp_status  = {}
 
 def create_gif(username, price):
     # create/delete our temp files folder
