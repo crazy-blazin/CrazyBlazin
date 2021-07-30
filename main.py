@@ -31,6 +31,8 @@ from PIL import ImageDraw, ImageSequence
 
 
 
+
+
 with open('version.txt', 'r') as f:
     version = float(f.read())
     print(version)
@@ -167,7 +169,7 @@ class MyClient(discord.Client):
         bot_version = f'{ver}'
         await client.wait_until_ready()
         channel = client.get_channel(803982821923356773)
-        await channel.send(f'Bot online, version: {bot_version}')
+        await channel.send(f'Bot online, build version: {bot_version}')
 
         # members = self.get_all_members()
         # for member in members:
@@ -263,7 +265,7 @@ async def ticksystem():
                 database[cumww_user]['coins'] += 1
             
             write_db(database)
-        check_version()
+        # check_version()
         await asyncio.sleep(10)
 
 
@@ -318,7 +320,7 @@ async def timer():
         else:
             msg_sent_reveal = False
 
-        check_version()
+        # check_version()
         await asyncio.sleep(10)
         
 
