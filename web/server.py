@@ -92,7 +92,7 @@ from werkzeug.utils import secure_filename
 
 from flask_socketio import SocketIO
 import asyncio
-
+import subprocess
 
 
 app = Flask(__name__)
@@ -160,9 +160,9 @@ def test():
     return render_template('lootcrate.html')
 
 
-@app.route("/end")
+@app.route("/restart")
 def end():
-    os._exit(0)
+    subprocess.run("start restart.bat", shell=True, check=True)
 
 
 print('Server running')

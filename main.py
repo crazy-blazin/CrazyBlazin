@@ -28,7 +28,7 @@ import shutil
 from PIL import ImageFont
 from PIL import Image
 from PIL import ImageDraw, ImageSequence
-
+import subprocess
 
 
 
@@ -40,7 +40,7 @@ with open('version.txt', 'r') as f:
 with open('../key.txt', 'r') as f:
     k = str(f.read())
 
-# logging.basicConfig(filename='main.log', level=logging.DEBUG)
+logging.basicConfig(filename='main.log', level=logging.DEBUG)
 
 
 # sio = socketio.Client()
@@ -70,7 +70,7 @@ with open('../key.txt', 'r') as f:
 # sio.start_background_task(target = run)
 
 
-
+temp_status  = {}
 
 def create_gif(username, price):
     # create/delete our temp files folder
@@ -164,12 +164,20 @@ class MyClient(discord.Client):
     async def on_ready(self):
         print(f'Logged in as {self.user} (ID: {self.user.id})')
         print('------')
+        global temp_status
+        members = client.get_all_members()
+        database = read_db()
+        for member in members:
+            if member.name in database:
+                temp_status[member.name] = member.voice
+                print(member.voice.channel.id)
         with open('version.txt', 'r') as f:
             ver = float(f.read())
         bot_version = f'{ver}'
         await client.wait_until_ready()
         channel = client.get_channel(803982821923356773)
         await channel.send(f'Bot online, build version: {bot_version}')
+
 
         # members = self.get_all_members()
         # for member in members:
@@ -187,7 +195,7 @@ intents.members = True
 client = MyClient(intents = intents)
 
 
-temp_status  = {}
+
 
 
 
@@ -209,6 +217,7 @@ def add_coins(stream_state, user, cointype):
 
 async def ticksystem():
     while True:
+        global temp_status
         database = read_db()
         for user in database:
             if 'cumww' not in database[user]:
@@ -224,21 +233,21 @@ async def ticksystem():
             write_db(database)
             database = read_db()
 
+
         for user in database:
             if user in temp_status:
                 state = temp_status[user]
-                try:
-                    channelid = str(state.channel.id)
-                except:
-                    channelid = str(0)
-                channel_state = str(state.channel)
-                stream_state = state.self_stream
-                if channel_state != 'None':
-                    if channelid != str(847583212926009374):
-                        add_coins(stream_state, user, 'coins')
+                if state != None:
+                    if state.channel != None:
+                        channelid = str(state.channel.id)
+                        stream_state = state.self_stream
+                        if channelid != 'None':
+                            if channelid != str(847583212926009374):
+                                add_coins(stream_state, user, 'coins')
+                            else:
+                                add_coins(stream_state, user, 'shekels')
                     else:
-                        add_coins(stream_state, user, 'shekels')
-    
+                        channelid = str(0)
 
             database = read_db()
             
@@ -330,6 +339,7 @@ client.loop.create_task(timer())
 
 @client.event
 async def on_voice_state_update(member, before, after):
+    global temp_status
     database = read_db()
     if member.name not in database:
         database[member.name] = {'coins': 100}
@@ -595,6 +605,22 @@ async def on_message(message):
         else:
             await message.channel.send(f'You have already looted today!')
 
+
+
+    if message.content.startswith('!restartserver'):
+        if message.author.name == 'Foxxravin':
+            await message.channel.send(f'Restarting server....')
+            subprocess.run("start python restart.bat", shell=True, check=True)
+        else:
+            await message.channel.send(f'You are not Foxxravin!')
+
+
+    if message.content.startswith('!getuserinfos'):
+        if message.author.name == 'Foxxravin':
+            database = read_db()
+            message.channel.send(str(database))
+        else:
+            message.channel.send(f'You are not Foxxravin!')
 
 
                 
