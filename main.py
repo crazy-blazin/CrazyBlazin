@@ -40,7 +40,7 @@ with open('version.txt', 'r') as f:
 with open('../key.txt', 'r') as f:
     k = str(f.read())
 
-# logging.basicConfig(filename='main.log', level=logging.DEBUG)
+logging.basicConfig(filename='main.log', level=logging.DEBUG)
 
 
 # sio = socketio.Client()
