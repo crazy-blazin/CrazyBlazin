@@ -69,6 +69,9 @@ logging.basicConfig(filename='main.log', level=logging.DEBUG)
 
 # sio.start_background_task(target = run)
 
+intents = discord.Intents.default()
+intents.members = True
+client = MyClient(intents = intents)
 
 temp_status  = {}
 
@@ -156,7 +159,11 @@ def write_db(database):
             f.write(str(database))
     except:
         print('write error')
+        
 
+
+
+        
 class MyClient(discord.Client):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -174,7 +181,6 @@ class MyClient(discord.Client):
         with open('version.txt', 'r') as f:
             ver = float(f.read())
         bot_version = f'{ver}'
-        await client.wait_until_ready()
         channel = client.get_channel(803982821923356773)
         await channel.send(f'Bot online, build version: {bot_version}')
 
@@ -188,11 +194,6 @@ class MyClient(discord.Client):
         #             pass
         #         else:
         #             database[member.name] = {'coins': 100}
-
-
-intents = discord.Intents.default()
-intents.members = True
-client = MyClient(intents = intents)
 
 
 
