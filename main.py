@@ -31,9 +31,6 @@ from PIL import ImageDraw, ImageSequence
 
 
 
-
-
-
 with open('version.txt', 'r') as f:
     version = float(f.read())
     print(version)
@@ -140,7 +137,7 @@ def check_version():
     global version
     with open('version.txt', 'r') as f:
         ver = float(f.read())
-    if version < ver:
+    if version != ver:
         os._exit(os.EX_OK)
 
 def read_db():
@@ -207,9 +204,9 @@ def add_coins(stream_state, user, cointype):
     print(f'Coins to : {user}')
     write_db(database)
 
+
 async def ticksystem():
     while True:
-        check_version()
         database = read_db()
         for user in database:
             if 'cumww' not in database[user]:
@@ -266,6 +263,7 @@ async def ticksystem():
                 database[cumww_user]['coins'] += 1
             
             write_db(database)
+        check_version()
         await asyncio.sleep(10)
 
 
