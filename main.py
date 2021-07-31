@@ -603,7 +603,7 @@ async def on_message(message):
                     # player = vc.create_ffmpeg_player(rpgmusicpath, after=lambda: print('done'))
                     # player.start()
                     vc.play(discord.FFmpegPCMAudio(rpgmusicpath))
-                    await asyncio.sleep(15)
+                    await asyncio.sleep(2)
                     vc.stop()
                     await vc.disconnect()
                 else:
