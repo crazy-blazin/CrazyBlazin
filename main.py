@@ -62,16 +62,12 @@ class MyClient(discord.Client):
             if member.name in database:
                 temp_status[member.name] = member.voice
         with open('version.txt', 'r') as f:
-            ver = float(f.read())
-        bot_version = f'{ver}'
-        channel = client.get_channel(803982821923356773)
-        await channel.send(f'Bot online, build version: {bot_version}')
-
+            bot_version = float(f.read())
         # SEND TO PATCH LOG CHANNEL
         with open('patchnotes.txt', 'r') as f:
             patchnotes = f.read()
         patchchannel = client.get_channel(831638592106921994)
-        embed = discord.Embed(title=f"Crazy Blazin bot patch notes", description=f"Build {ver} patch notes.") #,color=Hex code
+        embed = discord.Embed(title=f"Crazy Blazin bot patch notes", description=f"Build {bot_version} patch notes.") #,color=Hex code
         embed.add_field(name=f"Patch notes:", value=f'{patchnotes}')
         await patchchannel.send(embed=embed)
 
@@ -627,6 +623,7 @@ async def on_message(message):
         embed.add_field(name=f"Show users with historically most coins.", value=f'!top')
         embed.add_field(name=f"Swap ₪ shekels for crazy blazin coins <:CBCcoin:831506214659293214>", value=f'!coinswap <amount>')
         embed.add_field(name=f"Grab your daily loot! Can only be used once per day.", value=f'!daily')
+        embed.add_field(name=f"Give a key to someone you appreciate. Can only be used once per day.", value=f'!givekey <target>')
         await message.channel.send(embed=embed)
 
     
