@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 from asyncio.tasks import wait
 import os
+from discord import voice_client
 import matplotlib.pyplot as plt
 import numpy as np
 import discord
@@ -29,7 +30,7 @@ from PIL import ImageFont
 from PIL import Image
 from PIL import ImageDraw, ImageSequence
 import subprocess
-
+import audioread
 
 
 
@@ -112,6 +113,8 @@ class MyClient(discord.Client):
 intents = discord.Intents.default()
 intents.members = True
 client = MyClient(intents = intents)
+
+
 
 
 def create_gif(username, price):
@@ -579,17 +582,35 @@ async def on_message(message):
         str_split = message.content.split(' ')
         if len(str_split) > 2 or len(str_split) < 2:
             await message.channel.send(f'Too many or few arguments. Use !uwuprison <target>')
+    
         else:
             database = read_db()
             
             target = str(str_split[1])
             if 1 <= database[message.author.name]['coins']:
-                database[message.author.name]['coins'] -= 1
+                database[message.author.name]['coins'] -= 200
 
                 await message.channel.send(f'{message.author.name} sent {target} to UwU prison <:aegao:849030455189438485> !')
                 write_db(database)
+                rpgmusicpath = r"uw.mp3"
+                # grab the user who sent the command
+                user = message.author
+                channel = None
+                voice_channel = user.voice.channel
+                if voice_channel != None:
+                    channel = voice_channel.name
+                    vc = await voice_channel.connect()
+                    # player = vc.create_ffmpeg_player(rpgmusicpath, after=lambda: print('done'))
+                    # player.start()
+                    vc.play(discord.FFmpegPCMAudio(rpgmusicpath))
+                    await asyncio.sleep(15)
+                    vc.stop()
+                    await vc.disconnect()
+                else:
+                    await message.channel.send('User is not in a channel.')
             else:
                 await message.channel.send(f'{message.author.name} does not have enough <:CBCcoin:831506214659293214> (CBC) to send {target} to UwU prison!')
+        
 
     
     if message.content.startswith('!coinswap'):
@@ -608,6 +629,7 @@ async def on_message(message):
                 write_db(database)
             else:
                 await message.channel.send(f'{message.author.name} does not have enough ₪ to swap to (CBC)!')
+
 
 
 
