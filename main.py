@@ -600,10 +600,8 @@ async def on_message(message):
                 if voice_channel != None:
                     channel = voice_channel.name
                     vc = await voice_channel.connect()
-                    # player = vc.create_ffmpeg_player(rpgmusicpath, after=lambda: print('done'))
-                    # player.start()
                     vc.play(discord.FFmpegPCMAudio(rpgmusicpath))
-                    await asyncio.sleep(2)
+                    await asyncio.sleep(5)
                     vc.stop()
                     await vc.disconnect()
                 else:
