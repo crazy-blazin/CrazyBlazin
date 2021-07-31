@@ -137,19 +137,39 @@ def create_gif(username, price):
     # add text to each frame
     # frames = []
     for N, frame in enumerate(ImageSequence.Iterator(gif_image)):
-        frame = frame.copy().convert('RGBA').resize((400, 300), resample=(1))
-        draw = ImageDraw.Draw(frame)
-        draw.text((x+110, y), text_name, pink, font=font)
-        draw.text((x+50, y+200), text_price, pink, font=font)
+        frame2 = frame.copy().convert('RGBA').resize((400, 300), resample=(1))
+        draw = ImageDraw.Draw(frame2)
+        draw.text((x+90, y+230), text_name, pink, font=font)
         # draw.text((x, y), text_name, silver, font=font)
         # draw.text((x, y), text_name, white, font=font)
 
         if N%10 == 0:
-            draw.text((x+110, y), text_name, white, font=font)
-            draw.text((x+50, y+200), text_price, white, font=font)
+            # draw.text((x+50, y+200), text_name, white, font=font)
+            if N > 35:
+                draw.text((x+60, y+70), text_price, white, font=font)
+        else:
+            if N > 35:
+                draw.text((x+60, y+70), text_price, pink, font=font)
+
         # draw.text((x+10, y+10), text_price, silver, font=font)
         # draw.text((x+10, y+10), text_price, white, font=font)
-        frame.save("./frames/{}.png".format(str(N).zfill(3)))
+        frame2.save("./frames/{}.png".format(str(N).zfill(3)))
+        # frames.append(frame)
+
+    for N2 in range(1, 50):
+        frame = frame.copy().convert('RGBA').resize((400, 300), resample=(1))
+        draw = ImageDraw.Draw(frame)
+        draw.text((x+90, y+230), text_name, pink, font=font)
+        # draw.text((x, y), text_name, silver, font=font)
+        # draw.text((x, y), text_name, white, font=font)
+
+        if N2%10 == 0:
+            draw.text((x+60, y+70), text_price, white, font=font)
+        else:
+            draw.text((x+60, y+70), text_price, pink, font=font)
+        # draw.text((x+10, y+10), text_price, silver, font=font)
+        # draw.text((x+10, y+10), text_price, white, font=font)
+        frame.save("./frames/{}.png".format(str(N+N2).zfill(3)))
         # frames.append(frame)
 
     # frames[0].save('out.gif', save_all=True, append_images=frames[1:])
@@ -161,7 +181,7 @@ def create_gif(username, price):
     # os.system('ffmpeg -i image%d.jpg video.flv')
     # os.system('ffmpeg -i video.flv -i palette.png -filter_complex "fps=1.2,scale=900:-1:flags=lanczos[x];[x][1:v]paletteuse" out.gif')
     os.system('ffmpeg -framerate 15 -i frames/%03d.png -c:v ffv1 -r 15 -y out.avi')
-    os.system('ffmpeg -i out.avi -i palette.png -filter_complex "fps=15,scale=500:-1:flags=lanczos[x];[x][1:v]paletteuse" -y out.gif')
+    os.system('ffmpeg -i out.avi -i palette.png -filter_complex "fps=15,scale=500:-1:flags=lanczos[x];[x][1:v]paletteuse" -y -loop -1 out.gif')
     # os.system('ffmpeg -y -i out.flv out.gif')
 
     # clean up
