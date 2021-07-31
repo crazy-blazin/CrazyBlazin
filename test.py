@@ -1,18 +1,3 @@
-# from riotwatcher import LolWatcher
-
-# key = "RGAPI-9e29ac1b-8163-4d0a-a119-b086692403d0"
-
-# watcher = LolWatcher(key)
-
-# def printstats(summonername):
-#     summoner = watcher.summoner.by_name('euw1', summonername)
-#     recentmatchlists = watcher.match.matchlist_by_account_recent ('euw1', "Foxxravin" ['accountId'])
-#     print(recentmatchlists)
-
-
-# printstats("Foxxravin")
-
-
 
 
 from riotwatcher import LolWatcher

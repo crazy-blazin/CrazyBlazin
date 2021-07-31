@@ -67,6 +67,14 @@ class MyClient(discord.Client):
         channel = client.get_channel(803982821923356773)
         await channel.send(f'Bot online, build version: {bot_version}')
 
+        # SEND TO PATCH LOG CHANNEL
+        with open('patchnotes.txt', 'r') as f:
+            patchnotes = f.read()
+        patchchannel = client.get_channel(831638592106921994)
+        embed = discord.Embed(title=f"Crazy Blazin bot patch notes", description=f"Build {ver} patch notes.") #,color=Hex code
+        embed.add_field(name=f"Patch notes:", value=f'{patchnotes}')
+        await patchchannel.send(embed=embed)
+
 
         # members = self.get_all_members()
         # for member in members:
@@ -294,6 +302,7 @@ async def ticksystem():
             if database[user]['bitten']:
                 database[user]['coins'] -= 1
                 database[cumww_user]['coins'] += 1
+                database[cumww_user]["totalcoinsbitten"] += 1
             
             write_db(database)
         # check_version()
@@ -321,13 +330,18 @@ async def timer():
                 for user in database:
                     if 'wascumww' in database[user]:
                         if database[user]['wascumww']:
-                            await channel.send(f'Last cum werewolf was: {user}!')
+                            if "totalcoinsbitten" not in database[user]:
+                                await channel.send(f'Last cum werewolf was: {user}!')
+                            else:
+                                await channel.send(f'Last cum werewolf was: {user}. This cum loving werewolf stole a total of {database[user]["totalcoinsbitten"]} CBC!')
                     database[user]['cumww'] = False
                     database[user]['guesswolf'] = True
                     database[user]['bitten'] = False
                     database[user]['active_wolf'] = False
                     database[user]['wascumww'] = False
                     database[user]['lootbox'] = True
+                    database[user]['lootkeysgiven'] = True
+                    database[user]['totalcoinsbitten'] = 0
                 for member in members:
                     if member.name == rand_cumwolf:
                         await member.send('You are now the cum werewolf, bite users to drain their coins! !bite <user>. New werewolf will be assigned in 24 hours! NB! You should send the command directly to this bot so no one sees it! If you do not want to be cum werewolf write !cumresign.')
@@ -365,7 +379,6 @@ async def on_voice_state_update(member, before, after):
     database = read_db()
     if member.name not in database:
         database[member.name] = {'coins': 100}
-        print(member.name)
         write_db(database)
     
 
@@ -427,6 +440,7 @@ async def on_message(message):
                 database[member.name]['coins'] = 100
                 database[member.name]['shekels'] = 100
                 database[member.name]['guesswolf'] = True
+                database[member.name]["totalcoinsbitten"] = 0
     write_db(database)
     # if str(message.channel.id) == str(795738540251545620):
     #     with open('musicdatabase.txt', 'r') as f:
@@ -451,10 +465,16 @@ async def on_message(message):
             database[message.author.name]['shekels'] = shekval
         embed = discord.Embed(title=f"Balance", description=f"{message.author.name} current balance") #,color=Hex code
 
+        if 'lootkeys' not in database[message.author.name]:
+            database[message.author.name]['lootkeys'] = 0
+            write_db(database)
+
         # if 'spankcoin' in database[message.author.name]:
         #     embed.add_field(name=f"Spank coins", value=f'{round(valuespank,2)} <:raised_hands_tone1:859521216115900457>')
         embed.add_field(name=f"Crazy Blazin Coins", value=f'{round(value,2)} <:CBCcoin:831506214659293214>')
         embed.add_field(name=f"Sheqalim", value=f'₪ {round(shekval,2)}')
+        embed.add_field(name=f"Daily loot chest keys", value=f' ({database[message.author.name]["lootkeys"]}/3) :key: ')
+        
         await message.channel.send(embed=embed)
 
 
@@ -614,18 +634,67 @@ async def on_message(message):
 
         database = read_db()
 
+
         if 'lootbox' not in database[message.author.name]:
             database[message.author.name]['lootbox'] = True
+        
+        if 'lootkeys' not in database[message.author.name]:
+            database[message.author.name]['lootkeys'] = 0
+            write_db(database)
 
-        if database[message.author.name]['lootbox']:
-            database[message.author.name]['lootbox'] = False
+        
+        if database[message.author.name]['lootkeys'] >= 3:
+            database[message.author.name]['lootkeys'] -= 3
+            await message.channel.send(f'You have used 3 keys to open daily chest, you have now ({database[message.author.name]["lootkeys"]}/3) :key: left!')
             price = np.random.randint(10, 10000)
             database[message.author.name]['coins'] += price
             write_db(database)
             create_gif(message.author.name, price)
             await message.channel.send(file=discord.File('out.gif'))
         else:
-            await message.channel.send(f'You have already looted today!')
+            if database[message.author.name]['lootbox']:
+                database[message.author.name]['lootbox'] = False
+                price = np.random.randint(10, 10000)
+                database[message.author.name]['coins'] += price
+                write_db(database)
+                create_gif(message.author.name, price)
+                await message.channel.send(file=discord.File('out.gif'))
+            else:
+                await message.channel.send(f'You have already looted today and not enough keys!')
+
+
+
+    if message.content.startswith('!givekey'):
+        str_split = message.content.split(' ')
+        if len(str_split) > 2 or len(str_split) < 2:
+            await message.channel.send(f'Too many or few arguments. Use !givekey <target>')
+        else:
+            database = read_db()
+            target = str_split[1]
+            if target in database:
+                if target == message.author.name:
+                    await message.channel.send(f'You cannot give key to yourself!')
+                else:
+                    if 'lootkeysgiven' in database[message.author.name]:
+                        if database[message.author.name]['lootkeysgiven']:
+                            if 'lootkeys' not in database[target]:
+                                database[target]['lootkeys'] = 0
+                            
+                            database[target]['lootkeys'] += 1
+                            await message.channel.send(f'{message.author.name} gave 1 key to {target}!')
+                            write_db(database)
+                        else:
+                            await message.channel.send(f'You have already given out key today!')
+
+                    else:
+                        database[message.author.name]['lootkeysgiven'] = False
+                        if 'lootkeys' not in database[target]:
+                            database[target]['lootkeys'] = 0
+                        database[target]['lootkeys'] += 1
+                        await message.channel.send(f'{message.author.name} gave 1 key to {target}!')
+                        write_db(database)
+            else:
+                await message.channel.send(f'Target does not exist!')
 
 
 
@@ -776,6 +845,7 @@ async def on_message(message):
                 database[user]['cumww'] = False
                 database[user]['guesswolf'] = True
                 database[user]['bitten'] = False
+                database[user]["totalcoinsbitten"] = 0
             for member in members:
                 if member.name == rand_cumwolf:
                     print(rand_cumwolf)
@@ -808,8 +878,9 @@ async def on_message(message):
                         if database[target]['cumww']:
                             await message.channel.send(f'{message.author.name} guessed correctly, cum werewolf ({target}) has been found, good job! 5000 <:CBCcoin:831506214659293214> has been credited to your account!')
                             database[message.author.name]['coins'] += 5000
-                            await channel.send(f'The werewolf ({target}) has been found!')
+                            await channel.send(f'The werewolf ({target}) has been found. This cum loving werewolf stole a total of {database[target]["totalcoinsbitten"]} CBC!')
                             database[target]['cumww'] = False
+                            database[target]["totalcoinsbitten"] = 0
                             for user in database:
                                 database[user]['bitten'] = False
                         else:
