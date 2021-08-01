@@ -41,12 +41,36 @@ with open('version.txt', 'r') as f:
 with open('../key.txt', 'r') as f:
     k = str(f.read())
 
+
+def check_version():
+    global version
+    with open('version.txt', 'r') as f:
+        ver = float(f.read())
+    if version != ver:
+        os._exit(0)
+
+def read_db():
+    try:
+        with open('../database.txt', 'r') as f:
+            database = eval(f.read())
+        return database
+    except:
+        print('read error')
+
+def write_db(database):
+    try:
+        with open('../database.txt', 'w', encoding='utf-8') as f:
+            f.write(str(database))
+    except:
+        print('write error')
+
+
 # logging.basicConfig(filename='main.log', level=logging.DEBUG)
 
 
 
 temp_status  = {}
-
+database = read_db()
 
         
 class MyClient(discord.Client):
@@ -57,15 +81,16 @@ class MyClient(discord.Client):
         print(f'Logged in as {self.user} (ID: {self.user.id})')
         print('------')
         global temp_status
+        global database
         members = client.get_all_members()
-        database = read_db()
+        # database = read_db()
         for member in members:
             if member.name in database:
                 temp_status[member.name] = member.voice
         with open('version.txt', 'r') as f:
             bot_version = float(f.read())
         # SEND TO PATCH LOG CHANNEL
-        with open('patchnotes.txt', 'r') as f:
+        with open('patchnotes.txt', 'r', encoding='utf-8') as f:
             patchnotes = f.read()
         patchchannel = client.get_channel(831638592106921994)
         embed = discord.Embed(title=f"Crazy Blazin bot patch notes", description=f"Build {bot_version} patch notes.") #,color=Hex code
@@ -200,27 +225,6 @@ def create_gif(username, price):
 hour_cumww = 10
 
 
-def check_version():
-    global version
-    with open('version.txt', 'r') as f:
-        ver = float(f.read())
-    if version != ver:
-        os._exit(0)
-
-def read_db():
-    try:
-        with open('../database.txt', 'r') as f:
-            database = eval(f.read())
-        return database
-    except:
-        print('read error')
-
-def write_db(database):
-    try:
-        with open('../database.txt', 'w', encoding='utf-8') as f:
-            f.write(str(database))
-    except:
-        print('write error')
 
 
 
@@ -229,7 +233,8 @@ def write_db(database):
 
 
 def add_coins(stream_state, user, cointype):
-    database = read_db()
+    global database
+    # database = read_db()
     if stream_state:
         if cointype in database[user]:
             database[user][cointype] = round(database[user][cointype] + 1, 2)
@@ -247,7 +252,8 @@ def add_coins(stream_state, user, cointype):
 async def ticksystem():
     while True:
         global temp_status
-        database = read_db()
+        # database = read_db()
+        global database
         for user in database:
             if 'cumww' not in database[user]:
                 database[user]['cumww'] = False
@@ -260,7 +266,7 @@ async def ticksystem():
                 if database[user]['coins'] >= database[user]['topcoins']:
                     database[user]['topcoins'] = database[user]['coins']
             write_db(database)
-            database = read_db()
+            # database = read_db()
 
 
         for user in database:
@@ -278,7 +284,8 @@ async def ticksystem():
                     else:
                         channelid = str(0)
 
-            database = read_db()
+            # database = read_db()
+            
             
             if 'Timer' in database[user]:
                 if database[user]['Timer'] <= 0:
@@ -317,7 +324,8 @@ async def timer():
     while True:
         print('timer running')
         global hour_cumww
-        database = read_db()
+        # database = read_db()
+        global database
         time = datetime.datetime.now
         print(hour_cumww)
         if time().hour == int(hour_cumww):# and time().minute == 9:
@@ -375,7 +383,8 @@ client.loop.create_task(timer())
 @client.event
 async def on_voice_state_update(member, before, after):
     global temp_status
-    database = read_db()
+    # database = read_db()
+    global database
     if member.name not in database:
         database[member.name] = {'coins': 100}
         write_db(database)
@@ -426,8 +435,9 @@ async def on_voice_state_update(member, before, after):
 async def on_message(message):
     if message.author == client.user:
         return
+    
+    global database
 
-    database = read_db()
     members = client.get_all_members()
     for member in members:
         if member.name not in database:
@@ -454,7 +464,7 @@ async def on_message(message):
     #         f.write(str(musicdatabase))
 
     if message.content.startswith('!bal'):
-        database = read_db()
+        # database = read_db()
         value = database[message.author.name]['coins']
 
         if 'shekels' in database[message.author.name]:
@@ -472,7 +482,7 @@ async def on_message(message):
         #     embed.add_field(name=f"Spank coins", value=f'{round(valuespank,2)} <:raised_hands_tone1:859521216115900457>')
         embed.add_field(name=f"Crazy Blazin Coins", value=f'{round(value,2)} <:CBCcoin:831506214659293214>')
         embed.add_field(name=f"Sheqalim", value=f'₪ {round(shekval,2)}')
-        embed.add_field(name=f"Daily loot chest keys", value=f' ({database[message.author.name]["lootkeys"]}/3) :key: ')
+        embed.add_field(name=f"Key shards", value=f' ({database[message.author.name]["lootkeys"]}/3) :key: ')
         
         await message.channel.send(embed=embed)
 
@@ -481,7 +491,7 @@ async def on_message(message):
         str_split = message.content.split(' ')
         amount = float(str_split[1])*np.sign(float(str_split[1]))
         if message.author.name == 'Foxxravin':
-            database = read_db()
+            # database = read_db()
             for user in database:
                 if 'coins' in database[user]:
                     database[user]['coins'] += int(amount)
@@ -500,7 +510,7 @@ async def on_message(message):
             await message.channel.send(f'Too many or few arguments. Use !transfer <target> <amount>')
         amount = round(float(str_split[2]),2)
         target = str_split[1]
-        database = read_db()
+        # database = read_db()
         if message.author.name == 'Foxxravin' and target in database:
             if 'coins' in database[target]:
                 database[target]['coins'] += amount
@@ -528,7 +538,7 @@ async def on_message(message):
         if len(str_split) > 2 or len(str_split) < 2:
             await message.channel.send(f'Too many or few arguments. Use !buy gold')
         else:
-            database = read_db()
+            # database = read_db()
             if 1000 <= database[message.author.name]['coins']:
                 database[message.author.name]['coins'] -= 1000
 
@@ -553,7 +563,7 @@ async def on_message(message):
         if len(str_split) > 2 or len(str_split) < 2:
             await message.channel.send(f'Too many or few arguments. Use !gamble <amount>')
         else:
-            database = read_db()
+            # database = read_db()
             try:
                 amount = float(str_split[1])*np.sign(float(str_split[1]))
                 if amount <= database[message.author.name]['coins']:
@@ -564,12 +574,14 @@ async def on_message(message):
                         database[message.author.name]['coins'] += 2*amount
                         database[message.author.name]['coins'] = round(database[message.author.name]['coins'], 2)
                         await message.channel.send(f'{message.author.name} Rolled {roll} and won {round(2*amount,2)}<:CBCcoin:831506214659293214>  :partying_face:')
+                        write_db(database)
                     else:
                         await message.channel.send(f'{message.author.name} Rolled {roll} and lost {amount} <:CBCcoin:831506214659293214>! :frowning2:')
+                        write_db(database)
                     
                     if database[message.author.name]['coins'] >= database[message.author.name]['topcoins']:
                         database[message.author.name]['topcoins'] = database[message.author.name]['coins']
-                    write_db(database)
+                        write_db(database)
 
 
                 else:
@@ -616,7 +628,7 @@ async def on_message(message):
         if len(str_split) > 2 or len(str_split) < 2:
             await message.channel.send(f'Too many or few arguments. Use !coinswap <amount>')
         else:
-            database = read_db()
+            # database = read_db()
             
             amount = round(float(str_split[1])*np.sign(float(str_split[1])),2)
             if amount <= database[message.author.name]['shekels']:
@@ -643,13 +655,12 @@ async def on_message(message):
         embed.add_field(name=f"Show users with historically most coins.", value=f'!top')
         embed.add_field(name=f"Swap ₪ shekels for crazy blazin coins <:CBCcoin:831506214659293214>", value=f'!coinswap <amount>')
         embed.add_field(name=f"Grab your daily loot! Can only be used once per day.", value=f'!daily')
-        embed.add_field(name=f"Give a key to someone you appreciate. Can only be used once per day.", value=f'!givekey <target>')
+        embed.add_field(name=f"Give a key shart to someone you appreciate. Can only be used once per day.", value=f'!givekey <target>')
         await message.channel.send(embed=embed)
 
     
     if message.content.startswith('!daily'):
-
-        database = read_db()
+        # database = read_db()
 
 
         if 'lootbox' not in database[message.author.name]:
@@ -662,7 +673,7 @@ async def on_message(message):
         
         if database[message.author.name]['lootkeys'] >= 3:
             database[message.author.name]['lootkeys'] -= 3
-            await message.channel.send(f'You have used 3 keys to open daily chest, you have now ({database[message.author.name]["lootkeys"]}/3) :key: left!')
+            await message.channel.send(f'You have used 3 key shards to open daily chest, you have now ({database[message.author.name]["lootkeys"]}/3) :key: shards left!')
             price = np.random.randint(10, 10000)
             database[message.author.name]['coins'] += price
             write_db(database)
@@ -677,7 +688,7 @@ async def on_message(message):
                 create_gif(message.author.name, price)
                 await message.channel.send(file=discord.File('out.gif'))
             else:
-                await message.channel.send(f'You have already looted today and not enough keys!')
+                await message.channel.send(f'You have already looted today and not enough key shards!')
 
 
 
@@ -686,11 +697,11 @@ async def on_message(message):
         if len(str_split) > 2 or len(str_split) < 2:
             await message.channel.send(f'Too many or few arguments. Use !givekey <target>')
         else:
-            database = read_db()
+            # database = read_db()
             target = str_split[1]
             if target in database:
                 if target == message.author.name:
-                    await message.channel.send(f'You cannot give key to yourself!')
+                    await message.channel.send(f'You cannot give key shard to yourself!')
                 else:
                     if 'lootkeysgiven' in database[message.author.name]:
                         if database[message.author.name]['lootkeysgiven']:
@@ -698,17 +709,17 @@ async def on_message(message):
                                 database[target]['lootkeys'] = 0
                             
                             database[target]['lootkeys'] += 1
-                            await message.channel.send(f'{message.author.name} gave 1 key to {target}!')
+                            await message.channel.send(f'{message.author.name} gave 1 key shart to {target}!')
                             write_db(database)
                         else:
-                            await message.channel.send(f'You have already given out key today!')
+                            await message.channel.send(f'You have already given out key shard today!')
 
                     else:
                         database[message.author.name]['lootkeysgiven'] = False
                         if 'lootkeys' not in database[target]:
                             database[target]['lootkeys'] = 0
                         database[target]['lootkeys'] += 1
-                        await message.channel.send(f'{message.author.name} gave 1 key to {target}!')
+                        await message.channel.send(f'{message.author.name} gave 1 key shard to {target}!')
                         write_db(database)
             else:
                 await message.channel.send(f'Target does not exist!')
@@ -725,7 +736,7 @@ async def on_message(message):
 
     if message.content.startswith('!getuserinfos'):
         if message.author.name == 'Foxxravin':
-            database = read_db()
+            # database = read_db()
             message.channel.send(str(database))
         else:
             message.channel.send(f'You are not Foxxravin!')
@@ -792,7 +803,7 @@ async def on_message(message):
     
 
     if message.content.startswith('!top'):
-        database = read_db()
+        # database = read_db()
         temp_stats  = {}
         for user in database:
             coins = database[user]['topcoins']
@@ -800,7 +811,7 @@ async def on_message(message):
 
         index = 1
         embed = discord.Embed(title="Top coins history", description="Users that have had the most coins ever") #,color=Hex code
-        medaljonger = [':first_place:', ':second_place:', ':third_place:']
+        medaljonger = [':crown:', ':second_place:', ':third_place:']
         for key in sorted(temp_stats, key=temp_stats.get, reverse=True):
             if (index < 11):
                 if index < 4:
@@ -819,7 +830,7 @@ async def on_message(message):
             await message.channel.send(f'Too many or few arguments. Use !bite <target>')
 
         else:
-            database = read_db()
+            # database = read_db()
             target = str_split[1]
             channel = client.get_channel(867753681301929994)
 
@@ -855,7 +866,7 @@ async def on_message(message):
         if database[message.author.name]['cumww']:
 
             await channel.send(f'The cum werewolf "{message.author.name}" resigned, a new cum werewolf is chosen!')
-            database = read_db()
+            # database = read_db()
             rand_cumwolf = np.random.choice(list(database.keys()))
             members = client.get_all_members()
             for user in database:
@@ -879,7 +890,7 @@ async def on_message(message):
             await message.channel.send(f'Too many or few arguments. Use !guess <target>')        
         
         else:
-            database = read_db()
+            # database = read_db()
             target = str_split[1]
             if target in database:
                 channel = client.get_channel(867753681301929994)
@@ -909,6 +920,8 @@ async def on_message(message):
             else:
                 await message.channel.send(f'{target} does not exist!')
             write_db(database)
+    
+    write_db(database)
 
 
 client.run(k)
