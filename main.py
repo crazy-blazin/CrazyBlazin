@@ -227,11 +227,6 @@ hour_cumww = 10
 
 
 
-
-
-
-
-
 def add_coins(stream_state, user, cointype):
     global database
     # database = read_db()
