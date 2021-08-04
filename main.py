@@ -142,7 +142,8 @@ client = MyClient(intents = intents)
 
 
 
-def create_gif(username, price):
+def create_gif(username, price, jellys):
+
     # create/delete our temp files folder
     if os.path.exists('frames'):
         shutil.rmtree('frames')
@@ -161,6 +162,7 @@ def create_gif(username, price):
 
     text_name = f"{username}"
     text_price = f"Looted {price} CBC!!!!"
+    text_price_jell = f"Looted {jellys} luck jells!!"
 
     # load the font
     font = ImageFont.truetype("ShortBaby-Mg2w.ttf", 30)
@@ -179,9 +181,14 @@ def create_gif(username, price):
             # draw.text((x+50, y+200), text_name, white, font=font)
             if N > 35:
                 draw.text((x+60, y+70), text_price, white, font=font)
+                if jellys > 0:
+                    draw.text((x+40, y+110), text_price_jell, white, font=font)
         else:
             if N > 35:
                 draw.text((x+60, y+70), text_price, pink, font=font)
+                if jellys > 0:
+                    draw.text((x+40, y+110), text_price_jell, pink, font=font)
+                    
 
         # draw.text((x+10, y+10), text_price, silver, font=font)
         # draw.text((x+10, y+10), text_price, white, font=font)
@@ -197,8 +204,12 @@ def create_gif(username, price):
 
         if N2%10 == 0:
             draw.text((x+60, y+70), text_price, white, font=font)
+            if jellys > 0:
+                    draw.text((x+40, y+110), text_price_jell, white, font=font)
         else:
             draw.text((x+60, y+70), text_price, pink, font=font)
+            if jellys > 0:
+                    draw.text((x+40, y+110), text_price_jell, pink, font=font)
         # draw.text((x+10, y+10), text_price, silver, font=font)
         # draw.text((x+10, y+10), text_price, white, font=font)
         frame.save("./frames/{}.png".format(str(N+N2).zfill(3)))
@@ -469,6 +480,11 @@ async def on_message(message):
             database[message.author.name]['shekels'] = shekval
         embed = discord.Embed(title=f"Balance", description=f"{message.author.name} current balance") #,color=Hex code
 
+
+        if 'jellys' not in database[message.author.name]:
+            database[message.author.name]['jellys'] = 0
+            write_db(database)
+
         if 'lootkeys' not in database[message.author.name]:
             database[message.author.name]['lootkeys'] = 0
             write_db(database)
@@ -478,7 +494,7 @@ async def on_message(message):
         embed.add_field(name=f"Crazy Blazin Coins", value=f'{round(value,2)} <:CBCcoin:831506214659293214>')
         embed.add_field(name=f"Sheqalim", value=f'₪ {round(shekval,2)}')
         embed.add_field(name=f"Key shards", value=f' ({database[message.author.name]["lootkeys"]}/3) :key: ')
-        
+        embed.add_field(name=f"Luck jells", value=f' {database[message.author.name]["jellys"]} :kiwi: ')
         await message.channel.send(embed=embed)
 
 
@@ -564,19 +580,41 @@ async def on_message(message):
                 if amount <= database[message.author.name]['coins']:
                     database[message.author.name]['coins'] -= amount
 
-                    roll = np.random.randint(0, 101)
-                    if roll > 49:
-                        database[message.author.name]['coins'] += 2*amount
-                        database[message.author.name]['coins'] = round(database[message.author.name]['coins'], 2)
-                        await message.channel.send(f'{message.author.name} Rolled {roll} and won {round(2*amount,2)}<:CBCcoin:831506214659293214>  :partying_face:')
-                        write_db(database)
-                    else:
-                        await message.channel.send(f'{message.author.name} Rolled {roll} and lost {amount} <:CBCcoin:831506214659293214>! :frowning2:')
+                    if 'jellys' not in database[message.author.name]:
+                        database[message.author.name]['jellys'] = 0
                         write_db(database)
                     
-                    if database[message.author.name]['coins'] >= database[message.author.name]['topcoins']:
-                        database[message.author.name]['topcoins'] = database[message.author.name]['coins']
-                        write_db(database)
+                    if database[message.author.name]["jellys"] > 0:
+                        roll = np.random.randint(0, 101)
+                        await message.channel.send(f'{message.author.name} is gambling with luck jelly :kiwi:, this increases the chance by 30 percentage points!')
+                        database[message.author.name]["jellys"] -= 1
+                        if roll > 19:
+                            database[message.author.name]['coins'] += 2*amount
+                            database[message.author.name]['coins'] = round(database[message.author.name]['coins'], 2)
+                            await message.channel.send(f'{message.author.name} Rolled {roll} and won {round(2*amount,2)}<:CBCcoin:831506214659293214>  :partying_face:')
+                            write_db(database)
+                        else:
+                            await message.channel.send(f'{message.author.name} Rolled {roll} and lost {amount} <:CBCcoin:831506214659293214>! :frowning2:')
+                            write_db(database)
+                        
+                        if database[message.author.name]['coins'] >= database[message.author.name]['topcoins']:
+                            database[message.author.name]['topcoins'] = database[message.author.name]['coins']
+                            write_db(database)
+
+                    else:
+                        roll = np.random.randint(0, 101)
+                        if roll > 49:
+                            database[message.author.name]['coins'] += 2*amount
+                            database[message.author.name]['coins'] = round(database[message.author.name]['coins'], 2)
+                            await message.channel.send(f'{message.author.name} Rolled {roll} and won {round(2*amount,2)}<:CBCcoin:831506214659293214>  :partying_face:')
+                            write_db(database)
+                        else:
+                            await message.channel.send(f'{message.author.name} Rolled {roll} and lost {amount} <:CBCcoin:831506214659293214>! :frowning2:')
+                            write_db(database)
+                        
+                        if database[message.author.name]['coins'] >= database[message.author.name]['topcoins']:
+                            database[message.author.name]['topcoins'] = database[message.author.name]['coins']
+                            write_db(database)
 
 
                 else:
@@ -650,7 +688,7 @@ async def on_message(message):
         embed.add_field(name=f"Show users with historically most coins.", value=f'!top')
         embed.add_field(name=f"Swap ₪ shekels for crazy blazin coins <:CBCcoin:831506214659293214>", value=f'!coinswap <amount>')
         embed.add_field(name=f"Grab your daily loot! Can only be used once per day.", value=f'!daily')
-        embed.add_field(name=f"Give a key shart to someone you appreciate. Can only be used once per day.", value=f'!givekey <target>')
+        embed.add_field(name=f"Give a key shard to someone you appreciate. Can only be used once per day.", value=f'!givekey <target>')
         await message.channel.send(embed=embed)
 
     
@@ -678,9 +716,18 @@ async def on_message(message):
             if database[message.author.name]['lootbox']:
                 database[message.author.name]['lootbox'] = False
                 price = np.random.randint(10, 10000)
+                jellylickpercentage = np.random.randint(0, 101)
+                if jellylickpercentage < 10:
+                    jellys = np.random.randint(1, 10)
+                    if 'jellys' in database[message.author.name]:
+                        database[message.author.name]['jellys'] += jellys
+                    else:
+                        database[message.author.name]['jellys'] = jellys
+                else:
+                    jellys = 0
                 database[message.author.name]['coins'] += price
                 write_db(database)
-                create_gif(message.author.name, price)
+                create_gif(message.author.name, price, jellys)
                 await message.channel.send(file=discord.File('out.gif'))
             else:
                 await message.channel.send(f'You have already looted today and not enough key shards!')
@@ -704,7 +751,7 @@ async def on_message(message):
                                 database[target]['lootkeys'] = 0
                             
                             database[target]['lootkeys'] += 1
-                            await message.channel.send(f'{message.author.name} gave 1 key shart to {target}!')
+                            await message.channel.send(f'{message.author.name} gave 1 key shard to {target}!')
                             write_db(database)
                         else:
                             await message.channel.send(f'You have already given out key shard today!')
