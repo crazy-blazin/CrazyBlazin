@@ -515,6 +515,19 @@ async def on_message(message):
 
 
 
+    if message.content.startswith('!restartdaily'):
+        str_split = message.content.split(' ')
+        if message.author.name == 'Foxxravin':
+            # database = read_db()
+            for user in database:
+                database[user]['lootbox'] = True
+            write_db(database)
+            await message.channel.send(f'All users have reset daily chest!')
+        else:
+            await message.channel.send(f'You are not Foxxravin!')
+    
+
+
     if message.content.startswith('!transfer'):
         str_split = message.content.split(' ')
         if len(str_split) > 3 or len(str_split) < 3:
@@ -530,6 +543,7 @@ async def on_message(message):
         else:
             await message.channel.send(f'You are not Foxxravin!')
     
+
     if message.content.startswith('!changetime'):
         str_split = message.content.split(' ')
         if message.author.name == 'Foxxravin':
