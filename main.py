@@ -236,7 +236,7 @@ def create_gif(username, price, jellys, special = False):
     os.remove('palette.png')
 
 
-hour_cumww = 9
+hour_cumww = 10
 
 
 
@@ -601,37 +601,22 @@ async def on_message(message):
                         database[message.author.name]['jellys'] = 0
                         write_db(database)
                     
-                    if database[message.author.name]["jellys"] > 0:
-                        roll = np.random.randint(0, 101)
-                        await message.channel.send(f'{message.author.name} is gambling with luck jelly :kiwi:, this increases the chance by 30 percentage points!')
-                        database[message.author.name]["jellys"] -= 1
-                        if roll > 19:
-                            database[message.author.name]['coins'] += 2*amount
-                            database[message.author.name]['coins'] = round(database[message.author.name]['coins'], 2)
-                            await message.channel.send(f'{message.author.name} Rolled {roll} and won {round(2*amount,2)}<:CBCcoin:831506214659293214>  :partying_face:')
-                            write_db(database)
-                        else:
-                            await message.channel.send(f'{message.author.name} Rolled {roll} and lost {amount} <:CBCcoin:831506214659293214>! :frowning2:')
-                            write_db(database)
-                        
-                        if database[message.author.name]['coins'] >= database[message.author.name]['topcoins']:
-                            database[message.author.name]['topcoins'] = database[message.author.name]['coins']
-                            write_db(database)
-
+                    jellpoints = database[message.author.name]['jellys']
+                    if jellpoints > 50:
+                        jellpoints = 50
+                    roll = np.random.randint(1, 101)
+                    if roll > (50-jellpoints):
+                        database[message.author.name]['coins'] += 2*amount
+                        database[message.author.name]['coins'] = round(database[message.author.name]['coins'], 2)
+                        await message.channel.send(f'{message.author.name} Rolled {roll} and won {round(2*amount,2)}<:CBCcoin:831506214659293214>  :partying_face:. Win chance({round(((50+jellpoints)/100)*100, 2)}%)')
+                        write_db(database)
                     else:
-                        roll = np.random.randint(0, 101)
-                        if roll > 49:
-                            database[message.author.name]['coins'] += 2*amount
-                            database[message.author.name]['coins'] = round(database[message.author.name]['coins'], 2)
-                            await message.channel.send(f'{message.author.name} Rolled {roll} and won {round(2*amount,2)}<:CBCcoin:831506214659293214>  :partying_face:')
-                            write_db(database)
-                        else:
-                            await message.channel.send(f'{message.author.name} Rolled {roll} and lost {amount} <:CBCcoin:831506214659293214>! :frowning2:')
-                            write_db(database)
-                        
-                        if database[message.author.name]['coins'] >= database[message.author.name]['topcoins']:
-                            database[message.author.name]['topcoins'] = database[message.author.name]['coins']
-                            write_db(database)
+                        await message.channel.send(f'{message.author.name} Rolled {roll} and lost {amount} <:CBCcoin:831506214659293214> :frowning2: Win chance({round(((50+jellpoints)/100)*100, 2)}%)')
+                        write_db(database)
+                    
+                    if database[message.author.name]['coins'] >= database[message.author.name]['topcoins']:
+                        database[message.author.name]['topcoins'] = database[message.author.name]['coins']
+                        write_db(database)
 
 
                 else:
@@ -735,8 +720,8 @@ async def on_message(message):
                 database[message.author.name]['lootbox'] = False
                 price = np.random.randint(10, 10000)
                 jellylickpercentage = np.random.randint(0, 101)
-                if jellylickpercentage < 10:
-                    jellys = np.random.randint(1, 10)
+                if jellylickpercentage <= 10:
+                    jellys = np.random.randint(1, 4)
                     if 'jellys' in database[message.author.name]:
                         database[message.author.name]['jellys'] += jellys
                     else:
