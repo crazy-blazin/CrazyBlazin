@@ -142,7 +142,7 @@ client = MyClient(intents = intents)
 
 
 
-def create_gif(username, price, jellys):
+def create_gif(username, price, jellys, special = False):
 
     # create/delete our temp files folder
     if os.path.exists('frames'):
@@ -150,7 +150,10 @@ def create_gif(username, price, jellys):
     os.mkdir('frames')
 
     # load in the background image
-    gif_image = Image.open('background.gif')
+    if special:
+        gif_image = Image.open('background2.gif')
+    else:
+        gif_image = Image.open('background.gif')
 
     # set up colours and vars
     x = 10
@@ -220,11 +223,11 @@ def create_gif(username, price, jellys):
 
     # # output the result
 
-    os.system('ffmpeg -i frames/%03d.png -vf scale=900:-1:sws_dither=ed,palettegen -y palette.png')
+    os.system('ffmpeg -i frames/%03d.png -vf scale=500:-1:sws_dither=ed,palettegen -y palette.png')
     # os.system('ffmpeg -i image%d.jpg video.flv')
     # os.system('ffmpeg -i video.flv -i palette.png -filter_complex "fps=1.2,scale=900:-1:flags=lanczos[x];[x][1:v]paletteuse" out.gif')
     os.system('ffmpeg -framerate 15 -i frames/%03d.png -c:v ffv1 -r 15 -y out.avi')
-    os.system('ffmpeg -i out.avi -i palette.png -filter_complex "fps=15,scale=500:-1:flags=lanczos[x];[x][1:v]paletteuse" -y -loop -1 out.gif')
+    os.system('ffmpeg -i out.avi -i palette.png -filter_complex "fps=15,scale=300:-1:flags=lanczos[x];[x][1:v]paletteuse" -y -loop -1 out.gif')
     # os.system('ffmpeg -y -i out.flv out.gif')
 
     # clean up
@@ -712,12 +715,12 @@ async def on_message(message):
 
         if 'lootbox' not in database[message.author.name]:
             database[message.author.name]['lootbox'] = True
+            write_db(database)
         
         if 'lootkeys' not in database[message.author.name]:
             database[message.author.name]['lootkeys'] = 0
             write_db(database)
 
-        
         if database[message.author.name]['lootkeys'] >= 3:
             database[message.author.name]['lootkeys'] -= 3
             await message.channel.send(f'You have used 3 key shards to open daily chest, you have now ({database[message.author.name]["lootkeys"]}/3) :key: shards left!')
@@ -727,7 +730,8 @@ async def on_message(message):
             create_gif(message.author.name, price)
             await message.channel.send(file=discord.File('out.gif'))
         else:
-            if database[message.author.name]['lootbox']:
+            # if database[message.author.name]['lootbox']:
+            if True:
                 database[message.author.name]['lootbox'] = False
                 price = np.random.randint(10, 10000)
                 jellylickpercentage = np.random.randint(0, 101)
@@ -741,7 +745,7 @@ async def on_message(message):
                     jellys = 0
                 database[message.author.name]['coins'] += price
                 write_db(database)
-                create_gif(message.author.name, price, jellys)
+                create_gif(message.author.name, price, jellys, special=True)
                 await message.channel.send(file=discord.File('out.gif'))
             else:
                 await message.channel.send(f'You have already looted today and not enough key shards!')
