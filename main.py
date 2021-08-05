@@ -236,7 +236,7 @@ def create_gif(username, price, jellys, special = False):
     os.remove('palette.png')
 
 
-hour_cumww = 10
+hour_cumww = 9
 
 
 
@@ -730,8 +730,8 @@ async def on_message(message):
             create_gif(message.author.name, price)
             await message.channel.send(file=discord.File('out.gif'))
         else:
-            # if database[message.author.name]['lootbox']:
-            if True:
+            if database[message.author.name]['lootbox']:
+            # if True:
                 database[message.author.name]['lootbox'] = False
                 price = np.random.randint(10, 10000)
                 jellylickpercentage = np.random.randint(0, 101)
@@ -745,7 +745,7 @@ async def on_message(message):
                     jellys = 0
                 database[message.author.name]['coins'] += price
                 write_db(database)
-                create_gif(message.author.name, price, jellys, special=True)
+                create_gif(message.author.name, price, jellys, special=False)
                 await message.channel.send(file=discord.File('out.gif'))
             else:
                 await message.channel.send(f'You have already looted today and not enough key shards!')
