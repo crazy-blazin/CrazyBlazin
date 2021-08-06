@@ -926,7 +926,7 @@ async def on_message(message):
             else:
                 await message.channel.send(f'{message.author.name} needs to be in a voice channel to start event!')
         else:
-                await message.channel.send(f'{message.author.name} needs to be in a voice channel to start event!')
+                await message.channel.send(f'{message.author.name} You need to be admin or mod to start this event!')
 
 
 
