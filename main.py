@@ -173,50 +173,79 @@ def create_gif(username, price, jellys, special = False):
 
     # add text to each frame
     # frames = []
-    for N, frame in enumerate(ImageSequence.Iterator(gif_image)):
-        frame2 = frame.copy().convert('RGBA').resize((400, 300), resample=(1))
-        draw = ImageDraw.Draw(frame2)
-        draw.text((x+90, y+230), text_name, pink, font=font)
-        # draw.text((x, y), text_name, silver, font=font)
-        # draw.text((x, y), text_name, white, font=font)
+    if special:
+        for N, frame in enumerate(ImageSequence.Iterator(gif_image)):
+            frame2 = frame.copy().convert('RGBA').resize((400, 300), resample=(1))
+            draw = ImageDraw.Draw(frame2)
+            # draw.text((x, y), text_name, silver, font=font)
+            # draw.text((x, y), text_name, white, font=font)
 
-        if N%10 == 0:
-            # draw.text((x+50, y+200), text_name, white, font=font)
-            if N > 35:
+            if N%10 == 0:
+                # draw.text((x+50, y+200), text_name, white, font=font)
+                if N > 187:
+                    draw.text((x+90, y+230), text_name, white, font=font)
+                    draw.text((x+60, y+70), text_price, white, font=font)
+                    if jellys > 0:
+                        draw.text((x+40, y+110), text_price_jell, white, font=font)
+            else:
+                if N > 170:
+                    draw.text((x+90, y+230), text_name, pink, font=font)
+                    if N > 187:
+                        draw.text((x+60, y+70), text_price, pink, font=font)
+                        if jellys > 0:
+                            draw.text((x+40, y+110), text_price_jell, pink, font=font)
+                        
+
+            # draw.text((x+10, y+10), text_price, silver, font=font)
+            # draw.text((x+10, y+10), text_price, white, font=font)
+            frame2.save("./frames/{}.png".format(str(N).zfill(3)))
+            # frames.append(frame)
+
+    else:
+        for N, frame in enumerate(ImageSequence.Iterator(gif_image)):
+            frame2 = frame.copy().convert('RGBA').resize((400, 300), resample=(1))
+            draw = ImageDraw.Draw(frame2)
+            draw.text((x+90, y+230), text_name, pink, font=font)
+            # draw.text((x, y), text_name, silver, font=font)
+            # draw.text((x, y), text_name, white, font=font)
+
+            if N%10 == 0:
+                # draw.text((x+50, y+200), text_name, white, font=font)
+                if N > 35:
+                    draw.text((x+60, y+70), text_price, white, font=font)
+                    if jellys > 0:
+                        draw.text((x+40, y+110), text_price_jell, white, font=font)
+            else:
+                if N > 35:
+                    draw.text((x+60, y+70), text_price, pink, font=font)
+                    if jellys > 0:
+                        draw.text((x+40, y+110), text_price_jell, pink, font=font)
+                        
+
+            # draw.text((x+10, y+10), text_price, silver, font=font)
+            # draw.text((x+10, y+10), text_price, white, font=font)
+            frame2.save("./frames/{}.png".format(str(N).zfill(3)))
+            # frames.append(frame)
+
+        for N2 in range(1, 50):
+            frame = frame.copy().convert('RGBA').resize((400, 300), resample=(1))
+            draw = ImageDraw.Draw(frame)
+            draw.text((x+90, y+230), text_name, pink, font=font)
+            # draw.text((x, y), text_name, silver, font=font)
+            # draw.text((x, y), text_name, white, font=font)
+
+            if N2%10 == 0:
                 draw.text((x+60, y+70), text_price, white, font=font)
                 if jellys > 0:
-                    draw.text((x+40, y+110), text_price_jell, white, font=font)
-        else:
-            if N > 35:
+                        draw.text((x+40, y+110), text_price_jell, white, font=font)
+            else:
                 draw.text((x+60, y+70), text_price, pink, font=font)
                 if jellys > 0:
-                    draw.text((x+40, y+110), text_price_jell, pink, font=font)
-                    
-
-        # draw.text((x+10, y+10), text_price, silver, font=font)
-        # draw.text((x+10, y+10), text_price, white, font=font)
-        frame2.save("./frames/{}.png".format(str(N).zfill(3)))
-        # frames.append(frame)
-
-    for N2 in range(1, 50):
-        frame = frame.copy().convert('RGBA').resize((400, 300), resample=(1))
-        draw = ImageDraw.Draw(frame)
-        draw.text((x+90, y+230), text_name, pink, font=font)
-        # draw.text((x, y), text_name, silver, font=font)
-        # draw.text((x, y), text_name, white, font=font)
-
-        if N2%10 == 0:
-            draw.text((x+60, y+70), text_price, white, font=font)
-            if jellys > 0:
-                    draw.text((x+40, y+110), text_price_jell, white, font=font)
-        else:
-            draw.text((x+60, y+70), text_price, pink, font=font)
-            if jellys > 0:
-                    draw.text((x+40, y+110), text_price_jell, pink, font=font)
-        # draw.text((x+10, y+10), text_price, silver, font=font)
-        # draw.text((x+10, y+10), text_price, white, font=font)
-        frame.save("./frames/{}.png".format(str(N+N2).zfill(3)))
-        # frames.append(frame)
+                        draw.text((x+40, y+110), text_price_jell, pink, font=font)
+            # draw.text((x+10, y+10), text_price, silver, font=font)
+            # draw.text((x+10, y+10), text_price, white, font=font)
+            frame.save("./frames/{}.png".format(str(N+N2).zfill(3)))
+            # frames.append(frame)
 
     # frames[0].save('out.gif', save_all=True, append_images=frames[1:])
     # del frames
@@ -867,6 +896,37 @@ async def on_message(message):
                 await message.channel.send(embed=embed)
                 return
             index += 1
+
+
+    if message.content.startswith('!startevent'):
+        role_names = [role.name for role in message.author.roles]
+        if 'Admin' not in role_names or 'Server: Mod':
+            if message.author.voice != None:
+                channel = message.author.voice.channel
+                members = len(channel.members)
+                if members > 3:
+                    await message.channel.send(f'{message.author.name} started a chest event!')
+                    await asyncio.sleep(3)
+                    await message.channel.send(f'ARE EVERYBODY READY??????? Are you ready!???? YOU MUST JOIN THE STARTERS VOICE CHAT ({message.author.name}) WITHIN 1 MINUTE TO GET PRICE!!!!')
+                    await asyncio.sleep(60)
+                    members_user = [x.name for x in channel.members]
+                    jell = np.random.randint(0,2)
+                    price = np.random.randint(0,20000)
+                    winner = np.random.choice(members_user, 1)[0]
+                    if 'jellys' not in database[winner]:
+                        database[winner]['jellys'] = 0
+                    database[winner]['jellys'] += jell
+                    database[winner]['coins'] += price
+                    write_db(database)
+                    await message.channel.send(f'Generating winner......')
+                    create_gif(winner, price, jellys = jell, special = True)
+                    await message.channel.send(file=discord.File('out.gif'))
+                else:
+                    await message.channel.send(f'There must be more than three users in the voice chat to start event!')
+            else:
+                await message.channel.send(f'{message.author.name} needs to be in a voice channel to start event!')
+
+
 
 
     if message.content.startswith('!bite'):
