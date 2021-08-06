@@ -740,8 +740,17 @@ async def on_message(message):
             await message.channel.send(f'You have used 3 key shards to open daily chest, you have now ({database[message.author.name]["lootkeys"]}/3) :key: shards left!')
             price = np.random.randint(10, 10000)
             database[message.author.name]['coins'] += price
+            jellylickpercentage = np.random.randint(0, 101)
+            if jellylickpercentage <= 10:
+                jellys = np.random.randint(1, 4)
+                if 'jellys' in database[message.author.name]:
+                    database[message.author.name]['jellys'] += jellys
+                else:
+                    database[message.author.name]['jellys'] = jellys
+            else:
+                jellys = 0
             write_db(database)
-            create_gif(message.author.name, price)
+            create_gif(message.author.name, price, jellys, special=False)
             await message.channel.send(file=discord.File('out.gif'))
         else:
             if database[message.author.name]['lootbox']:
