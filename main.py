@@ -266,7 +266,7 @@ def create_gif(username, price, jellys, special = False):
 
 
 hour_cumww = 10
-
+EVENT_IN_PROGRESS = False
 
 
 
@@ -908,34 +908,41 @@ async def on_message(message):
 
 
     if message.content.startswith('!startevent'):
-        role_names = [role.name for role in message.author.roles]
-        if 'Admin' in role_names or 'Server: Mod' in role_names:
-            if message.author.voice != None:
-                channel = message.author.voice.channel
-                members = len(channel.members)
-                if members > 3:
-                    await message.channel.send(f'{message.author.name} started a chest event!')
-                    await asyncio.sleep(3)
-                    await message.channel.send(f'ARE EVERYBODY READY??????? Are you ready!???? YOU MUST JOIN THE STARTERS VOICE CHAT ({message.author.name}) WITHIN 1 MINUTE TO GET PRICE!!!!')
-                    await asyncio.sleep(60)
-                    members_user = [x.name for x in channel.members]
-                    jell = np.random.randint(0,2)
-                    price = np.random.randint(0,20000)
-                    winner = np.random.choice(members_user, 1)[0]
-                    if 'jellys' not in database[winner]:
-                        database[winner]['jellys'] = 0
-                    database[winner]['jellys'] += jell
-                    database[winner]['coins'] += price
-                    write_db(database)
-                    await message.channel.send(f'Generating winner......')
-                    create_gif(winner, price, jellys = jell, special = True)
-                    await message.channel.send(file=discord.File('out.gif'))
+        global EVENT_IN_PROGRESS
+        if not EVENT_IN_PROGRESS:
+            EVENT_IN_PROGRESS = True
+            role_names = [role.name for role in message.author.roles]
+            if 'Admin' in role_names or 'Server: Mod' in role_names:
+                if message.author.voice != None:
+                    channel = message.author.voice.channel
+                    members = len(channel.members)
+                    if members > 3:
+                        await message.channel.send(f'{message.author.name} started a chest event!')
+                        await asyncio.sleep(3)
+                        await message.channel.send(f'ARE EVERYBODY READY??????? Are you ready!???? YOU MUST JOIN THE STARTERS VOICE CHAT ({message.author.name}) WITHIN 1 MINUTE TO GET PRICE!!!!')
+                        await asyncio.sleep(60)
+                        members_user = [x.name for x in channel.members]
+                        jell = np.random.randint(0,2)
+                        price = np.random.randint(0,20000)
+                        winner = np.random.choice(members_user, 1)[0]
+                        if 'jellys' not in database[winner]:
+                            database[winner]['jellys'] = 0
+                        database[winner]['jellys'] += jell
+                        database[winner]['coins'] += price
+                        write_db(database)
+                        await message.channel.send(f'Generating winner......')
+                        create_gif(winner, price, jellys = jell, special = True)
+                        await message.channel.send(file=discord.File('out.gif'))
+                    else:
+                        await message.channel.send(f'There must be more than three users in the voice chat to start event!')
                 else:
-                    await message.channel.send(f'There must be more than three users in the voice chat to start event!')
+                    await message.channel.send(f'{message.author.name} needs to be in a voice channel to start event!')
             else:
-                await message.channel.send(f'{message.author.name} needs to be in a voice channel to start event!')
+                    await message.channel.send(f'{message.author.name} You need to be admin or mod to start this event!')
+            
+            EVENT_IN_PROGRESS = False
         else:
-                await message.channel.send(f'{message.author.name} You need to be admin or mod to start this event!')
+            await message.channel.send(f'An event is already in progress!')
 
 
 
