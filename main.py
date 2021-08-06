@@ -900,7 +900,7 @@ async def on_message(message):
 
     if message.content.startswith('!startevent'):
         role_names = [role.name for role in message.author.roles]
-        if 'Admin' not in role_names or 'Server: Mod':
+        if 'Admin' in role_names or 'Server: Mod':
             if message.author.voice != None:
                 channel = message.author.voice.channel
                 members = len(channel.members)
@@ -924,6 +924,8 @@ async def on_message(message):
                 else:
                     await message.channel.send(f'There must be more than three users in the voice chat to start event!')
             else:
+                await message.channel.send(f'{message.author.name} needs to be in a voice channel to start event!')
+        else:
                 await message.channel.send(f'{message.author.name} needs to be in a voice channel to start event!')
 
 
