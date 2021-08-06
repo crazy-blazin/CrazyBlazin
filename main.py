@@ -900,7 +900,7 @@ async def on_message(message):
 
     if message.content.startswith('!startevent'):
         role_names = [role.name for role in message.author.roles]
-        if 'Admin' in role_names or 'Server: Mod':
+        if 'Admin' in role_names or 'Server: Mod' in role_names:
             if message.author.voice != None:
                 channel = message.author.voice.channel
                 members = len(channel.members)
