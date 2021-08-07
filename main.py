@@ -619,10 +619,14 @@ async def on_message(message):
         str_split = message.content.split(' ')
         if len(str_split) > 2 or len(str_split) < 2:
             await message.channel.send(f'Too many or few arguments. Use !gamble <amount>')
+
         else:
             # database = read_db()
             try:
-                amount = float(str_split[1])*np.sign(float(str_split[1]))
+                if str_split[0] == '!gambleall':
+                    amount = database[message.author.name]['coins']
+                else:
+                    amount = float(str_split[1])*np.sign(float(str_split[1]))
                 if amount <= database[message.author.name]['coins']:
                     database[message.author.name]['coins'] -= amount
 
@@ -646,8 +650,6 @@ async def on_message(message):
                     if database[message.author.name]['coins'] >= database[message.author.name]['topcoins']:
                         database[message.author.name]['topcoins'] = database[message.author.name]['coins']
                         write_db(database)
-
-
                 else:
                     await message.channel.send(f'{message.author.name} does not have enough <:CBCcoin:831506214659293214> (CBC) to gamble!')
             except Exception as e:
@@ -720,6 +722,8 @@ async def on_message(message):
         embed.add_field(name=f"Swap ₪ shekels for crazy blazin coins <:CBCcoin:831506214659293214>", value=f'!coinswap <amount>')
         embed.add_field(name=f"Grab your daily loot! Can only be used once per day.", value=f'!daily')
         embed.add_field(name=f"Give a key shard to someone you appreciate. Can only be used once per day.", value=f'!givekey <target>')
+        embed.add_field(name=f"Gamble everything.", value=f'!gambleall')
+        embed.add_field(name=f"Start loot crate event in a voice channel (ADMINS/MODS) only!.", value=f'!startevent')
         await message.channel.send(embed=embed)
 
     
@@ -817,12 +821,41 @@ async def on_message(message):
             await message.channel.send(f'You are not Foxxravin!')
 
 
-    if message.content.startswith('!getuserinfos'):
+    if message.content.startswith('!getuserinfo'):
         if message.author.name == 'Foxxravin':
-            # database = read_db()
-            message.channel.send(str(database))
+            str_split = message.content.split(' ')
+            if len(str_split) > 2 or len(str_split) < 2:
+                await message.channel.send(f'Too many or few arguments. Use !getuserinfo <target>')
+            else:
+                target = str_split[1]
+                if target in database:
+                    await message.channel.send(str(database[target]))
+                else:
+                    await message.channel.send('Target not in database!')
         else:
-            message.channel.send(f'You are not Foxxravin!')
+            await message.channel.send(f'You are not Foxxravin!')
+
+    
+    if message.content.startswith('!changeuserinfo '):
+        if message.author.name == 'Foxxravin':
+            str_split = message.content.split(' ')
+            if len(str_split) > 4 or len(str_split) < 4:
+                await message.channel.send(f'Too many or few arguments. Use !changeuserinfo <target> <statname> <value>')
+            else:
+                target = str_split[1]
+                statname = str_split[2]
+                value = eval(str_split[3])
+
+                if target in database:
+                    if statname in database[target]:
+                        database[target][statname] = value
+                        await message.channel.send('Target stat value changed by admin')
+                    else:
+                        await message.channel.send(f'{statname} does not exist in the database!')
+                else:
+                    await message.channel.send('Target not in database!')
+        else:
+            await message.channel.send(f'You are not Foxxravin!')
 
 
                 
