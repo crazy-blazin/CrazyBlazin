@@ -617,9 +617,8 @@ async def on_message(message):
 
     if message.content.startswith('!gamble'):
         str_split = message.content.split(' ')
-        if len(str_split) > 2 or len(str_split) < 2:
+        if len(str_split) > 2 or len(str_split) < 2 and str_split[0] != '!gambleall':
             await message.channel.send(f'Too many or few arguments. Use !gamble <amount>')
-
         else:
             # database = read_db()
             try:
