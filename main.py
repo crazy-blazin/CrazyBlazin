@@ -293,10 +293,10 @@ async def ticksystem():
         # database = read_db()
         global database
         for user in database:
-            if 'cumww' not in database[user]:
-                database[user]['cumww'] = False
-            if database[user]['cumww']:
-                cumww_user = user
+            # if 'cumww' not in database[user]:
+            #     database[user]['cumww'] = False
+            # if database[user]['cumww']:
+            #     cumww_user = user
             
             if 'topcoins' not in database[user]:
                 database[user]['topcoins'] = database[user]['coins']
@@ -341,12 +341,12 @@ async def ticksystem():
                 else:
                     database[user]['coins'] =  100
             
-            if 'bitten' not in database[user]:
-                database[user]['bitten'] = False
-            if database[user]['bitten']:
-                database[user]['coins'] -= 1
-                database[cumww_user]['coins'] += 1
-                database[cumww_user]["totalcoinsbitten"] += 1
+            # if 'bitten' not in database[user]:
+            #     database[user]['bitten'] = False
+            # if database[user]['bitten']:
+            #     database[user]['coins'] -= 1
+            #     database[cumww_user]['coins'] += 1
+            #     database[cumww_user]["totalcoinsbitten"] += 1
             
             write_db(database)
         # check_version()
@@ -355,9 +355,9 @@ async def ticksystem():
 
 async def timer():
     await client.wait_until_ready()
-    channel = client.get_channel(867753681301929994)
-    msg_sent = False
-    msg_sent_reveal = False
+    # channel = client.get_channel(867753681301929994)
+    # msg_sent = False
+    # msg_sent_reveal = False
 
     while True:
         print('timer running')
@@ -367,18 +367,18 @@ async def timer():
         time = datetime.datetime.now
         print(hour_cumww)
         if time().hour == int(hour_cumww):# and time().minute == 9:
-            print('TIME IS ON ', hour_cumww)
+            # print('TIME IS ON ', hour_cumww)
             if not msg_sent:
-                print('ww is chosen!')
-                rand_cumwolf = np.random.choice(list(database.keys()))
-                members = client.get_all_members()
+                # print('ww is chosen!')
+                # rand_cumwolf = np.random.choice(list(database.keys()))
+                # members = client.get_all_members()
                 for user in database:
-                    if 'wascumww' in database[user]:
-                        if database[user]['wascumww']:
-                            if "totalcoinsbitten" not in database[user]:
-                                await channel.send(f'Last cum werewolf was: {user}!')
-                            else:
-                                await channel.send(f'Last cum werewolf was: {user}. This cum loving werewolf stole a total of {database[user]["totalcoinsbitten"]} CBC!')
+                    # if 'wascumww' in database[user]:
+                    #     if database[user]['wascumww']:
+                    #         if "totalcoinsbitten" not in database[user]:
+                    #             await channel.send(f'Last cum werewolf was: {user}!')
+                    #         else:
+                    #             await channel.send(f'Last cum werewolf was: {user}. This cum loving werewolf stole a total of {database[user]["totalcoinsbitten"]} CBC!')
                     database[user]['cumww'] = False
                     database[user]['guesswolf'] = True
                     database[user]['bitten'] = False
@@ -387,28 +387,28 @@ async def timer():
                     database[user]['lootbox'] = True
                     database[user]['lootkeysgiven'] = True
                     database[user]['totalcoinsbitten'] = 0
-                for member in members:
-                    if member.name == rand_cumwolf:
-                        await member.send('You are now the cum werewolf, bite users to drain their coins! !bite <user>. New werewolf will be assigned in 24 hours! NB! You should send the command directly to this bot so no one sees it! If you do not want to be cum werewolf write !cumresign.')
-                        await channel.send(f'A new cum werewolf has been chosen! Try to guess who before he/she steals all your coins!')
-                        database[rand_cumwolf]['cumww'] = True
-                        database[rand_cumwolf]['wascumww'] = True
-                msg_sent = True
+                # for member in members:
+                #     if member.name == rand_cumwolf:
+                #         await member.send('You are now the cum werewolf, bite users to drain their coins! !bite <user>. New werewolf will be assigned in 24 hours! NB! You should send the command directly to this bot so no one sees it! If you do not want to be cum werewolf write !cumresign.')
+                #         await channel.send(f'A new cum werewolf has been chosen! Try to guess who before he/she steals all your coins!')
+                #         database[rand_cumwolf]['cumww'] = True
+                #         database[rand_cumwolf]['wascumww'] = True
+                # msg_sent = True
                 write_db(database)
         else:
             msg_sent = False
         
-        time = datetime.datetime.now
-        if time().hour%4 == 0:# and time().minute == 9:
-            if not msg_sent_reveal:
-                for user in database:
-                    if database[user]['cumww']:
-                        rand_cumwolf_split = [char for char in user]
-                        random_letter = np.random.choice(rand_cumwolf_split)
-                        await channel.send(f'Hint: Random letter/number from username is: {random_letter.lower()}')
-                msg_sent_reveal = True
-        else:
-            msg_sent_reveal = False
+        # time = datetime.datetime.now
+        # if time().hour%4 == 0:# and time().minute == 9:
+        #     if not msg_sent_reveal:
+        #         for user in database:
+        #             if database[user]['cumww']:
+        #                 rand_cumwolf_split = [char for char in user]
+        #                 random_letter = np.random.choice(rand_cumwolf_split)
+        #                 await channel.send(f'Hint: Random letter/number from username is: {random_letter.lower()}')
+        #         msg_sent_reveal = True
+        # else:
+        #     msg_sent_reveal = False
 
         # check_version()
         await asyncio.sleep(10)
@@ -979,63 +979,63 @@ async def on_message(message):
 
 
 
-    if message.content.startswith('!bite'):
-        str_split = message.content.split(' ')
-        if len(str_split) > 2 or len(str_split) < 2:
-            await message.channel.send(f'Too many or few arguments. Use !bite <target>')
+    # if message.content.startswith('!bite'):
+    #     str_split = message.content.split(' ')
+    #     if len(str_split) > 2 or len(str_split) < 2:
+    #         await message.channel.send(f'Too many or few arguments. Use !bite <target>')
 
-        else:
-            # database = read_db()
-            target = str_split[1]
-            channel = client.get_channel(867753681301929994)
+    #     else:
+    #         # database = read_db()
+    #         target = str_split[1]
+    #         channel = client.get_channel(867753681301929994)
 
-            if target in database:
-                if database[message.author.name]['cumww']:
+    #         if target in database:
+    #             if database[message.author.name]['cumww']:
 
-                    if 'cumww' not in database[target]:
-                        database[target]['cumww'] = False
-                    if 'bitten' not in database[target]:
-                        database[user]['bitten'] = False
+    #                 if 'cumww' not in database[target]:
+    #                     database[target]['cumww'] = False
+    #                 if 'bitten' not in database[target]:
+    #                     database[user]['bitten'] = False
 
-                    if database[target]['bitten'] != True and message.author.name != target:
-                        await message.channel.send(f'You have bitten {target}, he now bleed coins to you!')
-                        database[target]['bitten'] = True
-                        write_db(database)
-                        await channel.send(f'{target} got bit by the cum werewolf and is now bleeding coins!')
-                    else:
-                        await message.channel.send(f'User is already bitten or you are trying to bite yourself! Try again!')
-                else:
-                    pass
-            else:
-                await message.channel.send(f'{target} does not exist!')
-        try:
-            pass
-            # await client.delete_message(message)
-        except:
-            print('msg sent private')
+    #                 if database[target]['bitten'] != True and message.author.name != target:
+    #                     await message.channel.send(f'You have bitten {target}, he now bleed coins to you!')
+    #                     database[target]['bitten'] = True
+    #                     write_db(database)
+    #                     await channel.send(f'{target} got bit by the cum werewolf and is now bleeding coins!')
+    #                 else:
+    #                     await message.channel.send(f'User is already bitten or you are trying to bite yourself! Try again!')
+    #             else:
+    #                 pass
+    #         else:
+    #             await message.channel.send(f'{target} does not exist!')
+    #     try:
+    #         pass
+    #         # await client.delete_message(message)
+    #     except:
+    #         print('msg sent private')
 
 
 
-    if message.content.startswith('!cumresign'):
-        channel = client.get_channel(867753681301929994)
-        if database[message.author.name]['cumww']:
+    # if message.content.startswith('!cumresign'):
+    #     channel = client.get_channel(867753681301929994)
+    #     if database[message.author.name]['cumww']:
 
-            await channel.send(f'The cum werewolf "{message.author.name}" resigned, a new cum werewolf is chosen!')
-            # database = read_db()
-            rand_cumwolf = np.random.choice(list(database.keys()))
-            members = client.get_all_members()
-            for user in database:
-                database[user]['cumww'] = False
-                database[user]['guesswolf'] = True
-                database[user]['bitten'] = False
-                database[user]["totalcoinsbitten"] = 0
-            for member in members:
-                if member.name == rand_cumwolf:
-                    print(rand_cumwolf)
-                    await member.send('You are now the cum werewolf, bite users to drain their coins! !bite <user>. New werewolf will be assigned in 24 hours! NB! You should send the command directly to this bot so no one sees it! If you do not want to be cum werewolf write !cumresign.')
-                    await channel.send(f'A new cum werewolf has been chosen! Try to guess who before he/she steals all your coins!')
-                    database[rand_cumwolf]['cumww'] = True
-            write_db(database)
+    #         await channel.send(f'The cum werewolf "{message.author.name}" resigned, a new cum werewolf is chosen!')
+    #         # database = read_db()
+    #         rand_cumwolf = np.random.choice(list(database.keys()))
+    #         members = client.get_all_members()
+    #         for user in database:
+    #             database[user]['cumww'] = False
+    #             database[user]['guesswolf'] = True
+    #             database[user]['bitten'] = False
+    #             database[user]["totalcoinsbitten"] = 0
+    #         for member in members:
+    #             if member.name == rand_cumwolf:
+    #                 print(rand_cumwolf)
+    #                 await member.send('You are now the cum werewolf, bite users to drain their coins! !bite <user>. New werewolf will be assigned in 24 hours! NB! You should send the command directly to this bot so no one sees it! If you do not want to be cum werewolf write !cumresign.')
+    #                 await channel.send(f'A new cum werewolf has been chosen! Try to guess who before he/she steals all your coins!')
+    #                 database[rand_cumwolf]['cumww'] = True
+    #         write_db(database)
     
 
 
