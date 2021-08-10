@@ -31,7 +31,7 @@ from PIL import Image
 from PIL import ImageDraw, ImageSequence
 import subprocess
 import audioread
-
+import tempfile
 
 
 with open('version.txt', 'r') as f:
@@ -142,7 +142,7 @@ client = MyClient(intents = intents)
 
 
 
-def create_gif(username, price, jellys, special = False):
+def create_gif(username, price, jellys, special = False, filename = ''):
 
     # create/delete our temp files folder
     if os.path.exists('frames'):
@@ -255,13 +255,13 @@ def create_gif(username, price, jellys, special = False):
     os.system('ffmpeg -i frames/%03d.png -vf scale=500:-1:sws_dither=ed,palettegen -y palette.png')
     # os.system('ffmpeg -i image%d.jpg video.flv')
     # os.system('ffmpeg -i video.flv -i palette.png -filter_complex "fps=1.2,scale=900:-1:flags=lanczos[x];[x][1:v]paletteuse" out.gif')
-    os.system('ffmpeg -framerate 15 -i frames/%03d.png -c:v ffv1 -r 15 -y out.avi')
-    os.system('ffmpeg -i out.avi -i palette.png -filter_complex "fps=15,scale=300:-1:flags=lanczos[x];[x][1:v]paletteuse" -y -loop -1 out.gif')
+    os.system(f'ffmpeg -framerate 15 -i frames/%03d.png -c:v ffv1 -r 15 -y {filename}.avi')
+    os.system(f'ffmpeg -i {filename}.avi -i palette.png -filter_complex "fps=15,scale=300:-1:flags=lanczos[x];[x][1:v]paletteuse" -y -loop -1 {filename}.gif')
     # os.system('ffmpeg -y -i out.flv out.gif')
 
     # clean up
     shutil.rmtree('frames')
-    os.remove('out.avi')
+    os.remove(f'{filename}.avi')
     os.remove('palette.png')
 
 
@@ -729,7 +729,8 @@ async def on_message(message):
     if message.content.startswith('!daily'):
         # database = read_db()
 
-
+        random_id = np.random.randint(0, 10000)
+        gif_name = f'out_{random_id}'
         if 'lootbox' not in database[message.author.name]:
             database[message.author.name]['lootbox'] = True
             write_db(database)
@@ -744,6 +745,7 @@ async def on_message(message):
             price = np.random.randint(10, 10000)
             database[message.author.name]['coins'] += price
             jellylickpercentage = np.random.randint(0, 101)
+
             if jellylickpercentage <= 10:
                 jellys = np.random.randint(1, 4)
                 if 'jellys' in database[message.author.name]:
@@ -753,8 +755,9 @@ async def on_message(message):
             else:
                 jellys = 0
             write_db(database)
-            create_gif(message.author.name, price, jellys, special=False)
-            await message.channel.send(file=discord.File('out.gif'))
+            create_gif(message.author.name, price, jellys, special=False, filename = gif_name)
+            await message.channel.send(file=discord.File(gif_name+'.gif'))
+            os.remove(gif_name+'.gif')
         else:
             if database[message.author.name]['lootbox']:
             # if True:
@@ -771,8 +774,9 @@ async def on_message(message):
                     jellys = 0
                 database[message.author.name]['coins'] += price
                 write_db(database)
-                create_gif(message.author.name, price, jellys, special=False)
-                await message.channel.send(file=discord.File('out.gif'))
+                create_gif(message.author.name, price, jellys, special=False, filename = gif_name)
+                await message.channel.send(file=discord.File(gif_name+'.gif'))
+                os.remove(gif_name+'.gif')
             else:
                 await message.channel.send(f'You have already looted today and not enough key shards!')
 
@@ -835,7 +839,7 @@ async def on_message(message):
             await message.channel.send(f'You are not Foxxravin!')
 
     
-    if message.content.startswith('!changeuserinfo '):
+    if message.content.startswith('!changeuserinfo'):
         if message.author.name == 'Foxxravin':
             str_split = message.content.split(' ')
             if len(str_split) > 4 or len(str_split) < 4:
@@ -942,6 +946,8 @@ async def on_message(message):
     if message.content.startswith('!startevent'):
         global EVENT_IN_PROGRESS
         if not EVENT_IN_PROGRESS:
+            random_id = np.random.randint(0, 10000)
+            gif_name = f'out_{random_id}'
             EVENT_IN_PROGRESS = True
             role_names = [role.name for role in message.author.roles]
             if 'Admin' in role_names or 'Server: Mod' in role_names:
@@ -964,7 +970,7 @@ async def on_message(message):
                         write_db(database)
                         await message.channel.send(f'Generating winner......')
                         create_gif(winner, price, jellys = jell, special = True)
-                        await message.channel.send(file=discord.File('out.gif'))
+                        await message.channel.send(file=discord.File(f'{gif_name}.gif'))
                     else:
                         await message.channel.send(f'There must be more than three users in the voice chat to start event!')
                 else:
@@ -1039,42 +1045,42 @@ async def on_message(message):
     
 
 
-    if message.content.startswith('!guess'):
-        str_split = message.content.split(' ')
-        if len(str_split) > 2 or len(str_split) < 2:
-            await message.channel.send(f'Too many or few arguments. Use !guess <target>')        
+    # if message.content.startswith('!guess'):
+    #     str_split = message.content.split(' ')
+    #     if len(str_split) > 2 or len(str_split) < 2:
+    #         await message.channel.send(f'Too many or few arguments. Use !guess <target>')        
         
-        else:
-            # database = read_db()
-            target = str_split[1]
-            if target in database:
-                channel = client.get_channel(867753681301929994)
-                target = str_split[1]
-                if 'guesswolf' not in database[message.author.name]:
-                    database[message.author.name]['guesswolf'] = True
+    #     else:
+    #         # database = read_db()
+    #         target = str_split[1]
+    #         if target in database:
+    #             channel = client.get_channel(867753681301929994)
+    #             target = str_split[1]
+    #             if 'guesswolf' not in database[message.author.name]:
+    #                 database[message.author.name]['guesswolf'] = True
 
-                if target != message.author.name:
-                    if database[message.author.name]['guesswolf']:
-                        database[message.author.name]['guesswolf'] = False
-                        if 'cumww' not in database[target]:
-                            database[user]['cumww'] = False
-                        if database[target]['cumww']:
-                            await message.channel.send(f'{message.author.name} guessed correctly, cum werewolf ({target}) has been found, good job! 5000 <:CBCcoin:831506214659293214> has been credited to your account!')
-                            database[message.author.name]['coins'] += 5000
-                            await channel.send(f'The werewolf ({target}) has been found. This cum loving werewolf stole a total of {database[target]["totalcoinsbitten"]} CBC!')
-                            database[target]['cumww'] = False
-                            database[target]["totalcoinsbitten"] = 0
-                            for user in database:
-                                database[user]['bitten'] = False
-                        else:
-                            await message.channel.send(f'{target} is not the cum werewolf!')
-                    else:
-                        await message.channel.send(f"{message.author.name} can't guess more than once per day.")
-                else:
-                    await message.channel.send(f"{message.author.name} can't guess him/herself.")
-            else:
-                await message.channel.send(f'{target} does not exist!')
-            write_db(database)
+    #             if target != message.author.name:
+    #                 if database[message.author.name]['guesswolf']:
+    #                     database[message.author.name]['guesswolf'] = False
+    #                     if 'cumww' not in database[target]:
+    #                         database[user]['cumww'] = False
+    #                     if database[target]['cumww']:
+    #                         await message.channel.send(f'{message.author.name} guessed correctly, cum werewolf ({target}) has been found, good job! 5000 <:CBCcoin:831506214659293214> has been credited to your account!')
+    #                         database[message.author.name]['coins'] += 5000
+    #                         await channel.send(f'The werewolf ({target}) has been found. This cum loving werewolf stole a total of {database[target]["totalcoinsbitten"]} CBC!')
+    #                         database[target]['cumww'] = False
+    #                         database[target]["totalcoinsbitten"] = 0
+    #                         for user in database:
+    #                             database[user]['bitten'] = False
+    #                     else:
+    #                         await message.channel.send(f'{target} is not the cum werewolf!')
+    #                 else:
+    #                     await message.channel.send(f"{message.author.name} can't guess more than once per day.")
+    #             else:
+    #                 await message.channel.send(f"{message.author.name} can't guess him/herself.")
+    #         else:
+    #             await message.channel.send(f'{target} does not exist!')
+    #         write_db(database)
     
     write_db(database)
 

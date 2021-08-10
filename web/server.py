@@ -165,8 +165,19 @@ def end():
     subprocess.run("start restart.bat", shell=True, check=True)
 
 
+
+@app.route("/<id>/shop")
+def shop(id):
+    return render_template('cards.html')
+
+
+@app.route("/cards")
+def cards():
+    return render_template('cards.html')
+
+
 print('Server running')
 
 if __name__ == "__main__":
     # socketio.run(app, debug=True)
-    app.run(debug=False)
+    app.run(debug=True)
