@@ -892,8 +892,9 @@ async def on_message(message):
                     id = str(uuid.uuid1())[-5:]
 
                     requests.get(f'http://27e64fe6cd6b.ngrok.io/admin/api/gift_creation/{id}/{username}/{amount}')
-                    img = qrcode.make(f'http://27e64fe6cd6b.ngrok/api/{id}')
+                    img = qrcode.make(f'http://f571b8f37f9d.ngrok.io//api/{id}')
                     im2 = Image.open('images/NEW_CB_LOGO_gift.png')
+                    print(f'http://f571b8f37f9d.ngrok.io/api/{id}')
 
                     dst = Image.new('RGB', (im2.width, im2.height + img.height))
                     dst.paste(im2, (0, 0))
