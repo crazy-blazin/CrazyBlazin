@@ -93,7 +93,7 @@ from werkzeug.utils import secure_filename
 from flask_socketio import SocketIO
 import asyncio
 import subprocess
-
+import pickle 
 
 app = Flask(__name__)
 api = Api(app)
@@ -137,6 +137,14 @@ api = Api(app)
 #     if version < ver:
 #         exit()
 
+all_gifts = []
+
+class Gift:
+    def __init__(self, id, username, amount):
+        self.amount = amount
+        self.username = username
+        self.id = id
+
 def read_db():
     try:
         with open('../../database.txt', 'r') as f:
@@ -144,6 +152,16 @@ def read_db():
         return database
     except:
         print('read error')
+
+
+def write_db(database):
+    try:
+        with open('../database.txt', 'w', encoding='utf-8') as f:
+            f.write(str(database))
+    except:
+        print('write error')
+
+
 
 @app.route("/")
 def frontpage():
@@ -169,11 +187,31 @@ def end():
 @app.route("/<id>/shop")
 def shop(id):
     return render_template('cards.html')
+    
+
+@app.route("/admin/api/gift_creation/<id>/<username>/<amount>")
+def create_gift(id, username, amount):
+    all_gifts.append(Gift(id, username, round(float(amount),2)))
+    return f'Gift created! -> {id}, {username}, {amount}'
 
 
-@app.route("/cards")
-def cards():
-    return render_template('cards.html')
+@app.route("/api/<id>")
+def redeem(id):
+    database = read_db()
+    lock = True
+    for gift in all_gifts:
+        if gift.id == id:
+            with open('giftcard.txt', 'a') as f:
+                out = [gift.username, gift.amount]
+                f.write(str(out)+'\n')
+            all_gifts.remove(gift)
+            lock = False
+    if lock:
+        return f'This gift code is no longer valid!'
+    else:
+        write_db(database)
+        return f'Gift redeemed! {gift.username} recieved {gift.amount} CBC!'
+    # return f'{gift.username} recieved {gift.amount}!'
 
 
 print('Server running')

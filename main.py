@@ -32,7 +32,11 @@ from PIL import ImageDraw, ImageSequence
 import subprocess
 import audioread
 import tempfile
-
+import qrcode
+from qrcode.image.styledpil import StyledPilImage
+from qrcode.image.styles.moduledrawers import RoundedModuleDrawer
+from qrcode.image.styles.colormasks import RadialGradiantColorMask
+import pickle
 
 with open('version.txt', 'r') as f:
     version = float(f.read())
@@ -67,6 +71,15 @@ def write_db(database):
 
 # logging.basicConfig(filename='main.log', level=logging.DEBUG)
 
+
+
+class Gift:
+    all_gifts = []
+    def __init__(self, id, username, amount):
+        self.amount = amount
+        self.username = username
+        self.id = id
+        self.all_gifts.append(self)
 
 
 temp_status  = {}
@@ -476,6 +489,15 @@ async def on_message(message):
     
     global database
 
+    file_checker = os.path.isfile('web/giftcard.txt')
+    if file_checker:
+        with open('web/giftcard.txt', 'r') as f:
+            giftcards = f.read().split('\n')[:-1]
+            for gift_users in giftcards:
+                gift_users = eval(gift_users)
+                database[gift_users[0]]['coins'] += gift_users[1]
+        os.remove('web/giftcard.txt')
+
     members = client.get_all_members()
     for member in members:
         if member.name not in database:
@@ -712,16 +734,12 @@ async def on_message(message):
         embed = discord.Embed(title=f"Commands", description=f"All commands for crazy blazin server")
         embed.add_field(name=f"Balance", value=f'!bal')
         embed.add_field(name=f"Gamble crazy blazin coins", value=f'!gamble <amount>')
-        embed.add_field(name=f"Send user to uwuprison", value=f'!uwuprison <name>')
+        embed.add_field(name=f"Gamble everything.", value=f'!gambleall')
         embed.add_field(name=f"Buy gold account price: 1000 CBC", value=f'!buy gold')
-        embed.add_field(name=f"Bite a user to make them bleed coins to you if you are the cum werewolf", value=f'!bite <user>')
-        embed.add_field(name=f"Guess who is the cum werewolf to get the price and to shut him down", value=f'!guess <user>')
-        embed.add_field(name=f"Resign as the cum werewolf. This function will select a new one.", value=f'!cumresign')
         embed.add_field(name=f"Show users with historically most coins.", value=f'!top')
         embed.add_field(name=f"Swap ₪ shekels for crazy blazin coins <:CBCcoin:831506214659293214>", value=f'!coinswap <amount>')
         embed.add_field(name=f"Grab your daily loot! Can only be used once per day.", value=f'!daily')
         embed.add_field(name=f"Give a key shard to someone you appreciate. Can only be used once per day.", value=f'!givekey <target>')
-        embed.add_field(name=f"Gamble everything.", value=f'!gambleall')
         embed.add_field(name=f"Start loot crate event in a voice channel (ADMINS/MODS) only!.", value=f'!startevent')
         await message.channel.send(embed=embed)
 
@@ -815,7 +833,6 @@ async def on_message(message):
                 await message.channel.send(f'Target does not exist!')
 
 
-
     if message.content.startswith('!restartserver'):
         if message.author.name == 'Foxxravin':
             await message.channel.send(f'Restarting server....')
@@ -855,6 +872,33 @@ async def on_message(message):
                         await message.channel.send('Target stat value changed by admin')
                     else:
                         await message.channel.send(f'{statname} does not exist in the database!')
+                else:
+                    await message.channel.send('Target not in database!')
+        else:
+            await message.channel.send(f'You are not Foxxravin!')
+
+
+
+    if message.content.startswith('!makegift'):
+        if message.author.name == 'Foxxravin':
+            str_split = message.content.split(' ')
+            if len(str_split) > 3 or len(str_split) < 3:
+                await message.channel.send(f'Too many or few arguments. Use !makegift <target> <amount>')
+            else:
+                username = str_split[1]
+                amount = int(str_split[2])
+                if username in database:
+                    id = str(uuid.uuid1())[-5:]
+
+                    requests.get(f'http://27e64fe6cd6b.ngrok.io/admin/api/gift_creation/{id}/{username}/{amount}')
+
+                    qr = qrcode.QRCode(error_correction=qrcode.constants.ERROR_CORRECT_H)
+                    qr.add_data('http://27e64fe6cd6b.ngrok.io/api/{id}')
+                    print(f'http://27e64fe6cd6b.ngrok.io/api/{id}')
+                    img_3 = qr.make_image(image_factory=StyledPilImage, embeded_image_path="images/NEW_CB_LOGO_gift.png")
+                    img_3.save("some_file.png")
+                    await message.channel.send(file=discord.File('some_file.png'))
+                    os.remove('some_file.png')
                 else:
                     await message.channel.send('Target not in database!')
         else:
@@ -941,7 +985,6 @@ async def on_message(message):
                 await message.channel.send(embed=embed)
                 return
             index += 1
-
 
 
 
