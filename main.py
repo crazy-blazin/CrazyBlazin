@@ -37,6 +37,7 @@ from qrcode.image.styledpil import StyledPilImage
 from qrcode.image.styles.moduledrawers import RoundedModuleDrawer
 from qrcode.image.styles.colormasks import RadialGradiantColorMask
 import pickle
+from PIL import Image
 
 with open('version.txt', 'r') as f:
     version = float(f.read())
@@ -891,12 +892,14 @@ async def on_message(message):
                     id = str(uuid.uuid1())[-5:]
 
                     requests.get(f'http://27e64fe6cd6b.ngrok.io/admin/api/gift_creation/{id}/{username}/{amount}')
+                    img = qrcode.make(f'http://27e64fe6cd6b.ngrok/api/{id}')
+                    im2 = Image.open('images/NEW_CB_LOGO_gift.png')
 
-                    qr = qrcode.QRCode(error_correction=qrcode.constants.ERROR_CORRECT_H)
-                    qr.add_data('http://27e64fe6cd6b.ngrok.io/api/{id}')
-                    print(f'http://27e64fe6cd6b.ngrok.io/api/{id}')
-                    img_3 = qr.make_image(image_factory=StyledPilImage, embeded_image_path="images/NEW_CB_LOGO_gift.png")
-                    img_3.save("some_file.png")
+                    dst = Image.new('RGB', (im2.width, im2.height + img.height))
+                    dst.paste(im2, (0, 0))
+                    dst.paste(img, (0, im2.height))
+                    dst.save("some_file.png")
+
                     await message.channel.send(file=discord.File('some_file.png'))
                     os.remove('some_file.png')
                 else:
