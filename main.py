@@ -476,7 +476,6 @@ async def on_voice_state_update(member, before, after):
                         write_read('2')
                         write_read('2')
                         lock = False
-                        break
     if lock:
         write_read('3')
         write_read('3')
