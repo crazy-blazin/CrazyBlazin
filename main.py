@@ -459,9 +459,9 @@ async def on_voice_state_update(member, before, after):
 
     lock = True
     for user in temp_status:
-        if after != None:
-            if after.channel != None:
-                if member.name == 'JordanLTD':
+        if temp_status[user] != None:
+            if temp_status[user].channel != None:
+                if user == 'JordanLTD':
                     write_read('1')
                     write_read('1')
                     write_read('1')
@@ -470,7 +470,7 @@ async def on_voice_state_update(member, before, after):
                     lock = False
                     break
                 else:
-                    if after != None:
+                    if temp_status[user].channel != None:
                         write_read('2')
                         write_read('2')
                         write_read('2')
