@@ -43,12 +43,17 @@ import serial
 
 
 
-arduino = serial.Serial(port='COM3', baudrate=115200, timeout=.1)
+arduino = serial.Serial('COM3',9600)
 def write_read(x):
     arduino.write(bytes(x, 'utf-8'))
     time.sleep(0.05)
     data = arduino.readline()
     return data
+
+
+def get_temp_hum():
+    b = arduino.readline().decode().rstrip()
+    return f'Temperature @ Foxxravin: {b} degrees celsius '
 
 with open('version.txt', 'r') as f:
     version = float(f.read())
@@ -482,7 +487,6 @@ async def on_voice_state_update(member, before, after):
         write_read('3')
         write_read('3')
 
-        
 
 
     if member.name in database:
@@ -529,6 +533,8 @@ async def on_voice_state_update(member, before, after):
 async def on_message(message):
     if message.author == client.user:
         return
+    
+    get_temp_hum()
     
     global database
 
@@ -783,6 +789,7 @@ async def on_message(message):
         embed.add_field(name=f"Grab your daily loot! Can only be used once per day.", value=f'!daily')
         embed.add_field(name=f"Give a key shard to someone you appreciate. Can only be used once per day.", value=f'!givekey <target>')
         embed.add_field(name=f"Start loot crate event in a voice channel (ADMINS/MODS) only!.", value=f'!startevent')
+        embed.add_field(name=f"Get temperature @ foxx!.", value=f'!foxxdeg')
         await message.channel.send(embed=embed)
 
     
@@ -896,6 +903,13 @@ async def on_message(message):
                     await message.channel.send('Target not in database!')
         else:
             await message.channel.send(f'You are not Foxxravin!')
+
+
+
+    if message.content.startswith('!foxxdeg'):
+        temp = get_temp_hum()
+        await message.channel.send(temp)
+        
 
     
     if message.content.startswith('!changeuserinfo'):
