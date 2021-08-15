@@ -457,10 +457,8 @@ async def on_voice_state_update(member, before, after):
     temp_status[member.name] = after
 
 
-
+    lock = True
     for user in temp_status:
-        lock = True
-        print(after)
         if after != None:
             if after.channel != None:
                 if member.name == 'JordanLTD':
