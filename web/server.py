@@ -195,6 +195,25 @@ def create_gift(id, username, amount):
     return f'Gift created! -> {id}, {username}, {amount}'
 
 
+
+# @app.route("/giftpage/<id>")
+# def giftpage(id):
+#     return render_template('get_gift.html')
+
+
+
+# @app.route("/<id>/shop")
+# def button_gift(id):
+#     return render_template('get_gift.html')
+
+    
+
+@app.route("/admin/api/gift_creation/<id>/<username>/<amount>")
+def create_gift(id, username, amount):
+    all_gifts.append(Gift(id, username, round(float(amount),2)))
+    return f'Gift created! -> {id}, {username}, {amount}'
+
+
 @app.route("/api/<id>")
 def redeem(id):
     database = read_db()
@@ -210,7 +229,7 @@ def redeem(id):
         return f'This gift code is no longer valid!'
     else:
         write_db(database)
-        return f'Gift redeemed! {gift.username} recieved {gift.amount} CBC!'
+        return f'<h1>Gift redeemed! {gift.username} recieved {gift.amount} CBC!</h1>'
     # return f'{gift.username} recieved {gift.amount}!'
 
 

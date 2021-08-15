@@ -37,36 +37,58 @@
 # print(recentmatchlists)
 
 
-import pickle
+# import pickle
 
 
-class Gift:
-    all_gifts = []
-    def __init__(self, id, username, amount):
-        self.amount = amount
-        self.username = username
-        self.id = id
-        self.all_gifts.append(self)
-
-
-
-
-filehandler = open('gifts.pkl', 'rb')
-a = pickle.load(filehandler)
-filehandler.close()
-
-
-test = [Gift(x, 'test', x*2) for x in range(0, 10)]
-
-filehandler = open('gifts.pkl', 'wb')
-pickle.dump(Gift, filehandler)
-filehandler.close()
-
-filehandler = open('gifts.pkl', 'rb')
-a = pickle.load(filehandler)
-filehandler.close()
+# class Gift:
+#     all_gifts = []
+#     def __init__(self, id, username, amount):
+#         self.amount = amount
+#         self.username = username
+#         self.id = id
+#         self.all_gifts.append(self)
 
 
 
-# for i in a:
-print(a.all_gifts)
+
+# filehandler = open('gifts.pkl', 'rb')
+# a = pickle.load(filehandler)
+# filehandler.close()
+
+
+# test = [Gift(x, 'test', x*2) for x in range(0, 10)]
+
+# filehandler = open('gifts.pkl', 'wb')
+# pickle.dump(Gift, filehandler)
+# filehandler.close()
+
+# filehandler = open('gifts.pkl', 'rb')
+# a = pickle.load(filehandler)
+# filehandler.close()
+
+
+
+# # for i in a:
+# print(a.all_gifts)
+
+import serial
+import time
+
+
+arduino = serial.Serial(port='COM3', baudrate=115200, timeout=.1)
+def write_read(x):
+    arduino.write(bytes(x, 'utf-8'))
+    time.sleep(0.05)
+    data = arduino.readline()
+    return data
+
+
+
+# while True:
+write_read('1')
+write_read('1')
+write_read('1')
+write_read('1')
+write_read('1')
+write_read('1')
+write_read('1')

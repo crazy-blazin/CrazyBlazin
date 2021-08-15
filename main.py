@@ -39,6 +39,17 @@ from qrcode.image.styles.colormasks import RadialGradiantColorMask
 import pickle
 from PIL import Image
 
+import serial
+
+
+
+arduino = serial.Serial(port='COM3', baudrate=115200, timeout=.1)
+def write_read(x):
+    arduino.write(bytes(x, 'utf-8'))
+    time.sleep(0.05)
+    data = arduino.readline()
+    return data
+
 with open('version.txt', 'r') as f:
     version = float(f.read())
     print(version)
@@ -325,6 +336,7 @@ async def ticksystem():
             if user in temp_status:
                 state = temp_status[user]
                 if state != None:
+
                     if state.channel != None:
                         channelid = str(state.channel.id)
                         stream_state = state.self_stream
@@ -345,15 +357,15 @@ async def ticksystem():
                 else:
                     database[user]['Timer'] -= 10
             
-            if 'Crowned' not in database[user]:
-                database[user]['Crowned'] = False
+            # if 'Crowned' not in database[user]:
+            #     database[user]['Crowned'] = False
                 
-            if database[user]['Crowned']:
-                if 'coins' in database[user]:
-                    database[user]['coins'] = round(database[user]['coins'] + 0.1, 2)
-                    print(f'Crowned Coins to : {user}')
-                else:
-                    database[user]['coins'] =  100
+            # if database[user]['Crowned']:
+            #     if 'coins' in database[user]:
+            #         database[user]['coins'] = round(database[user]['coins'] + 0.1, 2)
+            #         print(f'Crowned Coins to : {user}')
+            #     else:
+            #         database[user]['coins'] =  100
             
             # if 'bitten' not in database[user]:
             #     database[user]['bitten'] = False
@@ -443,6 +455,39 @@ async def on_voice_state_update(member, before, after):
     
 
     temp_status[member.name] = after
+
+
+
+    for user in temp_status:
+        lock = True
+        print(after)
+        if after != None:
+            if after.channel != None:
+                if member.name == 'JordanLTD':
+                    write_read('1')
+                    write_read('1')
+                    write_read('1')
+                    write_read('1')
+                    write_read('1')
+                    lock = False
+                    break
+                else:
+                    if after != None:
+                        write_read('2')
+                        write_read('2')
+                        write_read('2')
+                        write_read('2')
+                        lock = False
+                        break
+    if lock:
+        write_read('3')
+        write_read('3')
+        write_read('3')
+        write_read('3')
+
+        
+
+
     if member.name in database:
         if 'Timer' in database[member.name]:
             curr_timer = database[member.name]['Timer']
@@ -637,7 +682,6 @@ async def on_message(message):
 
 
                 
-
     if message.content.startswith('!gamble'):
         str_split = message.content.split(' ')
         if len(str_split) > 2 or len(str_split) < 2 and str_split[0] != '!gambleall':
@@ -657,10 +701,10 @@ async def on_message(message):
                         write_db(database)
                     
                     jellpoints = database[message.author.name]['jellys']
-                    if jellpoints > 50:
-                        jellpoints = 50
+                    if jellpoints > 15:
+                        jellpoints = 15
                     roll = np.random.randint(1, 101)
-                    if roll > (50-jellpoints):
+                    if roll > (51-jellpoints):
                         database[message.author.name]['coins'] += 2*amount
                         database[message.author.name]['coins'] = round(database[message.author.name]['coins'], 2)
                         await message.channel.send(f'{message.author.name} Rolled {roll} and won {round(2*amount,2)}<:CBCcoin:831506214659293214>  :partying_face:. Win chance({round(((50+jellpoints)/100)*100, 2)}%)')
@@ -881,7 +925,8 @@ async def on_message(message):
 
 
     if message.content.startswith('!makegift'):
-        if message.author.name == 'Foxxravin':
+        role_names = [role.name for role in message.author.roles]
+        if 'Admin' in role_names or 'Server: Influencer' in role_names:
             str_split = message.content.split(' ')
             if len(str_split) > 3 or len(str_split) < 3:
                 await message.channel.send(f'Too many or few arguments. Use !makegift <target> <amount>')
@@ -904,9 +949,9 @@ async def on_message(message):
                     await message.channel.send(file=discord.File('some_file.png'))
                     os.remove('some_file.png')
                 else:
-                    await message.channel.send('Target not in database!')
+                    await message.channel.send('Username not in database!')
         else:
-            await message.channel.send(f'You are not Foxxravin!')
+            await message.channel.send(f'You are not a mod or admin!')
 
 
                 
