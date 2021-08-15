@@ -92,3 +92,9 @@ write_read('1')
 write_read('1')
 write_read('1')
 write_read('1')
+
+
+
+# def get_temp_hum():
+#     b = arduino.readline().decode().rstrip()
+#     return f'Temperature @ Foxxravin: {b} degrees celsius '

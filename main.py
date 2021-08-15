@@ -42,11 +42,9 @@ from PIL import Image
 import serial
 
 
-
-arduino = serial.Serial('COM3',9600)
+arduino = serial.Serial(port='COM3', baudrate=115200, timeout=.2)
 def write_read(x):
     arduino.write(bytes(x, 'utf-8'))
-    time.sleep(0.05)
     data = arduino.readline()
     return data
 
@@ -461,7 +459,7 @@ async def on_voice_state_update(member, before, after):
 
     temp_status[member.name] = after
 
-
+    print('event')
     lock = True
     for user in temp_status:
         if temp_status[user] != None:
@@ -480,6 +478,7 @@ async def on_voice_state_update(member, before, after):
                         write_read('2')
                         write_read('2')
                         write_read('2')
+       
                         lock = False
     if lock:
         write_read('3')
