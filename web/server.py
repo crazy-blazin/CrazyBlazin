@@ -208,10 +208,10 @@ def create_gift(id, username, amount):
 
     
 
-@app.route("/admin/api/gift_creation/<id>/<username>/<amount>")
-def create_gift(id, username, amount):
-    all_gifts.append(Gift(id, username, round(float(amount),2)))
-    return f'Gift created! -> {id}, {username}, {amount}'
+# @app.route("/admin/api/gift_creation/<id>/<username>/<amount>")
+# def create_gift(id, username, amount):
+#     all_gifts.append(Gift(id, username, round(float(amount),2)))
+#     return f'Gift created! -> {id}, {username}, {amount}'
 
 
 @app.route("/api/<id>")
