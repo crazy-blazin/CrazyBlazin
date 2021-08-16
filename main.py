@@ -97,23 +97,23 @@ def run_ledlight():
     print('event')
     lock = True
     for user in temp_status:
-        if 'JordanLTD' in temp_status:
-            if temp_status['JordanLTD'] != None:
-                if temp_status['JordanLTD'].channel != None:
+        if temp_status[user] != None:
+            if temp_status[user].channel != None:
+                if user == 'JordanLTD':
                     write_read('1')
                     write_read('1')
                     write_read('1')
                     write_read('1')
                     write_read('1')
                     lock = False
-                    break    
-        if temp_status[user].channel != None:
-            write_read('2')
-            write_read('2')
-            write_read('2')
-            write_read('2')
-            lock = False
-            break
+                    break
+                else:
+                    if temp_status[user].channel != None:
+                        write_read('2')
+                        write_read('2')
+                        write_read('2')
+                        write_read('2')
+                        lock = False
     if lock:
         write_read('3')
         write_read('3')
