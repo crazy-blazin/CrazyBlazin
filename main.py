@@ -95,30 +95,34 @@ def write_db(database):
 def run_ledlight():
     global temp_status
     print('event')
-    lock = True
+    lock_mem = False
+    lock_jord = False
     for user in temp_status:
         if temp_status[user] != None:
             if temp_status[user].channel != None:
                 if user == 'JordanLTD':
-                    write_read('1')
-                    write_read('1')
-                    write_read('1')
-                    write_read('1')
-                    write_read('1')
-                    lock = False
-                    break
+                    lock_jord = True
                 else:
                     if temp_status[user].channel != None:
-                        write_read('2')
-                        write_read('2')
-                        write_read('2')
-                        write_read('2')
-                        lock = False
-    if lock:
-        write_read('3')
-        write_read('3')
-        write_read('3')
-        write_read('3')
+                        lock_mem = True
+    
+    if lock_jord:
+        write_read('1')
+        write_read('1')
+        write_read('1')
+        write_read('1')
+        write_read('1')
+    else:
+        if lock_mem:
+            write_read('2')
+            write_read('2')
+            write_read('2')
+            write_read('2')
+        else:
+            write_read('3')
+            write_read('3')
+            write_read('3')
+            write_read('3')
 
 class Gift:
     all_gifts = []
