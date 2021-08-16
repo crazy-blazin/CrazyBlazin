@@ -42,15 +42,14 @@ from PIL import Image
 import serial
 
 
-arduino = serial.Serial(port='COM3', baudrate=115200, timeout=.2)
+arduino = serial.Serial(port='COM3', baudrate=115200, timeout=.5)
 def write_read(x):
     arduino.write(bytes(x, 'utf-8'))
     data = arduino.readline()
     return data
 
-
 def get_temp_hum():
-    b = arduino.readline().decode().rstrip()
+    b = round(float(arduino.readline().decode().rstrip()),2)
     return f'Temperature @ Foxxravin: {b} degrees celsius '
 
 with open('version.txt', 'r') as f:
@@ -87,6 +86,35 @@ def write_db(database):
 # logging.basicConfig(filename='main.log', level=logging.DEBUG)
 
 
+
+def run_ledlight():
+    global temp_status
+    print('event')
+    lock = True
+    for user in temp_status:
+        if temp_status[user] != None:
+            if temp_status[user].channel != None:
+                if user == 'JordanLTD':
+                    write_read('1')
+                    write_read('1')
+                    write_read('1')
+                    write_read('1')
+                    write_read('1')
+                    lock = False
+                    break
+                else:
+                    if temp_status[user].channel != None:
+                        write_read('2')
+                        write_read('2')
+                        write_read('2')
+                        write_read('2')
+       
+                        lock = False
+    if lock:
+        write_read('3')
+        write_read('3')
+        write_read('3')
+        write_read('3')
 
 class Gift:
     all_gifts = []
@@ -389,6 +417,7 @@ async def timer():
     # msg_sent_reveal = False
 
     while True:
+        run_ledlight()
         print('timer running')
         global hour_cumww
         # database = read_db()
@@ -440,7 +469,7 @@ async def timer():
         #     msg_sent_reveal = False
 
         # check_version()
-        await asyncio.sleep(10)
+        await asyncio.sleep(4)
         
 
 client.loop.create_task(ticksystem())
@@ -459,32 +488,7 @@ async def on_voice_state_update(member, before, after):
 
     temp_status[member.name] = after
 
-    print('event')
-    lock = True
-    for user in temp_status:
-        if temp_status[user] != None:
-            if temp_status[user].channel != None:
-                if user == 'JordanLTD':
-                    write_read('1')
-                    write_read('1')
-                    write_read('1')
-                    write_read('1')
-                    write_read('1')
-                    lock = False
-                    break
-                else:
-                    if temp_status[user].channel != None:
-                        write_read('2')
-                        write_read('2')
-                        write_read('2')
-                        write_read('2')
-       
-                        lock = False
-    if lock:
-        write_read('3')
-        write_read('3')
-        write_read('3')
-        write_read('3')
+    run_ledlight()
 
 
 
@@ -907,6 +911,7 @@ async def on_message(message):
 
     if message.content.startswith('!foxxdeg'):
         temp = get_temp_hum()
+        print(temp)
         await message.channel.send(temp)
         
 
