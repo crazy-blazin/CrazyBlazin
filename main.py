@@ -99,7 +99,7 @@ def run_ledlight():
     for user in temp_status:
         if 'JordanLTD' in temp_status:
             if temp_status['JordanLTD'] != None:
-                if temp_status[user].channel != None:
+                if temp_status['JordanLTD'].channel != None:
                     write_read('1')
                     write_read('1')
                     write_read('1')
