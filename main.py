@@ -49,7 +49,12 @@ def write_read(x):
     return data
 
 def get_temp_hum():
-    b = round(float(arduino.readline().decode().rstrip()),2)
+    while True:
+        try:
+            b = round(float(arduino.readline().decode().rstrip()),2)
+            break
+        except:
+            pass
     return f'Temperature @ Foxxravin: {b} degrees celsius '
 
 with open('version.txt', 'r') as f:
