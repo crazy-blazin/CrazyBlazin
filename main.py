@@ -39,23 +39,23 @@ from qrcode.image.styles.colormasks import RadialGradiantColorMask
 import pickle
 from PIL import Image
 
-import serial
+# import serial
 
-#44
-arduino = serial.Serial(port='COM3', baudrate=115200, timeout=.5)
-def write_read(x):
-    arduino.write(bytes(x, 'utf-8'))
-    data = arduino.readline()
-    return data
+# #44
+# arduino = serial.Serial(port='COM3', baudrate=115200, timeout=.5)
+# def write_read(x):
+#     arduino.write(bytes(x, 'utf-8'))
+#     data = arduino.readline()
+#     return data
 
-def get_temp_hum():
-    while True:
-        try:
-            b = round(float(arduino.readline().decode().rstrip()),2)
-            break
-        except:
-            pass
-    return f'Temperature @ Foxxravin: {b} degrees celsius '
+# def get_temp_hum():
+#     while True:
+#         try:
+#             b = round(float(arduino.readline().decode().rstrip()),2)
+#             break
+#         except:
+#             pass
+#     return f'Temperature @ Foxxravin: {b} degrees celsius '
 
 with open('version.txt', 'r') as f:
     version = float(f.read())
@@ -92,38 +92,38 @@ def write_db(database):
 
 
 
-def run_ledlight():
-    # Run lighting system
-    global temp_status
-    print('event')
-    lock_mem = False
-    lock_jord = False
-    for user in temp_status:
-        if temp_status[user] != None:
-            if temp_status[user].channel != None:
-                if user == 'JordanLTD':
-                    lock_jord = True
-                else:
-                    if temp_status[user].channel != None:
-                        lock_mem = True
+# def run_ledlight():
+#     # Run lighting system
+#     global temp_status
+#     print('event')
+#     lock_mem = False
+#     lock_jord = False
+#     for user in temp_status:
+#         if temp_status[user] != None:
+#             if temp_status[user].channel != None:
+#                 if user == 'JordanLTD':
+#                     lock_jord = True
+#                 else:
+#                     if temp_status[user].channel != None:
+#                         lock_mem = True
     
-    if lock_jord:
-        write_read('1')
-        write_read('1')
-        write_read('1')
-        write_read('1')
-        write_read('1')
-    else:
-        if lock_mem:
-            write_read('2')
-            write_read('2')
-            write_read('2')
-            write_read('2')
-        else:
-            write_read('3')
-            write_read('3')
-            write_read('3')
-            write_read('3')
+#     if lock_jord:
+#         write_read('1')
+#         write_read('1')
+#         write_read('1')
+#         write_read('1')
+#         write_read('1')
+#     else:
+#         if lock_mem:
+#             write_read('2')
+#             write_read('2')
+#             write_read('2')
+#             write_read('2')
+#         else:
+#             write_read('3')
+#             write_read('3')
+#             write_read('3')
+#             write_read('3')
 
 class Gift:
     all_gifts = []
@@ -546,7 +546,7 @@ async def on_message(message):
     if message.author == client.user:
         return
     
-    get_temp_hum()
+    # get_temp_hum()
     
     global database
 
@@ -899,7 +899,7 @@ async def on_message(message):
     if message.content.startswith('!restartserver'):
         if message.author.name == 'Foxxravin':
             await message.channel.send(f'Restarting server....')
-            subprocess.run("start python restart.bat", shell=True, check=True)
+            subprocess.run("start python killall.bat", shell=True, check=True)
         else:
             await message.channel.send(f'You are not Foxxravin!')
 
@@ -920,10 +920,10 @@ async def on_message(message):
 
 
 
-    if message.content.startswith('!foxxdeg'):
-        temp = get_temp_hum()
-        print(temp)
-        await message.channel.send(temp)
+    # if message.content.startswith('!foxxdeg'):
+    #     temp = get_temp_hum()
+    #     print(temp)
+    #     await message.channel.send(temp)
         
 
     
