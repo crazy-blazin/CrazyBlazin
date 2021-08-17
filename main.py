@@ -41,7 +41,7 @@ from PIL import Image
 
 import serial
 
-
+#44
 arduino = serial.Serial(port='COM3', baudrate=115200, timeout=.5)
 def write_read(x):
     arduino.write(bytes(x, 'utf-8'))
