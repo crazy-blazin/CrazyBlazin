@@ -426,7 +426,7 @@ async def timer():
     # msg_sent_reveal = False
 
     while True:
-        run_ledlight()
+        #run_ledlight()
         print('timer running')
         global hour_cumww
         # database = read_db()
@@ -497,7 +497,7 @@ async def on_voice_state_update(member, before, after):
 
     temp_status[member.name] = after
 
-    run_ledlight()
+    #run_ledlight()
 
 
 
