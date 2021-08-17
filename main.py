@@ -93,6 +93,7 @@ def write_db(database):
 
 
 def run_ledlight():
+    # Run lighting system
     global temp_status
     print('event')
     lock_mem = False
