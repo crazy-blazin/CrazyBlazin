@@ -861,37 +861,37 @@ async def on_message(message):
 
 
 
-    if message.content.startswith('!givekey'):
-        str_split = message.content.split(' ')
-        if len(str_split) > 2 or len(str_split) < 2:
-            await message.channel.send(f'Too many or few arguments. Use !givekey <target>')
-        else:
-            # database = read_db()
-            target = str_split[1]
-            if target in database:
-                if target == message.author.name:
-                    await message.channel.send(f'You cannot give key shard to yourself!')
-                else:
-                    if 'lootkeysgiven' in database[message.author.name]:
-                        if database[message.author.name]['lootkeysgiven']:
-                            if 'lootkeys' not in database[target]:
-                                database[target]['lootkeys'] = 0
+    # if message.content.startswith('!givekey'):
+    #     str_split = message.content.split(' ')
+    #     if len(str_split) > 2 or len(str_split) < 2:
+    #         await message.channel.send(f'Too many or few arguments. Use !givekey <target>')
+    #     else:
+    #         # database = read_db()
+    #         target = str_split[1]
+    #         if target in database:
+    #             if target == message.author.name:
+    #                 await message.channel.send(f'You cannot give key shard to yourself!')
+    #             else:
+    #                 if 'lootkeysgiven' in database[message.author.name]:
+    #                     if database[message.author.name]['lootkeysgiven']:
+    #                         if 'lootkeys' not in database[target]:
+    #                             database[target]['lootkeys'] = 0
                             
-                            database[target]['lootkeys'] += 1
-                            await message.channel.send(f'{message.author.name} gave 1 key shard to {target}!')
-                            write_db(database)
-                        else:
-                            await message.channel.send(f'You have already given out key shard today!')
+    #                         database[target]['lootkeys'] += 1
+    #                         await message.channel.send(f'{message.author.name} gave 1 key shard to {target}!')
+    #                         write_db(database)
+    #                     else:
+    #                         await message.channel.send(f'You have already given out key shard today!')
 
-                    else:
-                        database[message.author.name]['lootkeysgiven'] = False
-                        if 'lootkeys' not in database[target]:
-                            database[target]['lootkeys'] = 0
-                        database[target]['lootkeys'] += 1
-                        await message.channel.send(f'{message.author.name} gave 1 key shard to {target}!')
-                        write_db(database)
-            else:
-                await message.channel.send(f'Target does not exist!')
+    #                 else:
+    #                     database[message.author.name]['lootkeysgiven'] = False
+    #                     if 'lootkeys' not in database[target]:
+    #                         database[target]['lootkeys'] = 0
+    #                     database[target]['lootkeys'] += 1
+    #                     await message.channel.send(f'{message.author.name} gave 1 key shard to {target}!')
+    #                     write_db(database)
+    #         else:
+    #             await message.channel.send(f'Target does not exist!')
 
 
     if message.content.startswith('!restartserver'):
