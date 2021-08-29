@@ -384,7 +384,8 @@ async def ticksystem():
                             if channelid != str(847583212926009374):
                                 add_coins(stream_state, user, 'coins')
                             else:
-                                add_coins(stream_state, user, 'shekels')
+                                # add_coins(stream_state, user, 'shekels')
+                                add_coins(stream_state, user, 'coins')
                     else:
                         channelid = str(0)
 
@@ -588,11 +589,11 @@ async def on_message(message):
         # database = read_db()
         value = database[message.author.name]['coins']
 
-        if 'shekels' in database[message.author.name]:
-            shekval = database[message.author.name]['shekels']
-        else:
-            shekval = 100
-            database[message.author.name]['shekels'] = shekval
+        # if 'shekels' in database[message.author.name]:
+        #     shekval = database[message.author.name]['shekels']
+        # else:
+        #     shekval = 100
+        #     database[message.author.name]['shekels'] = shekval
         embed = discord.Embed(title=f"Balance", description=f"{message.author.name} current balance") #,color=Hex code
 
 
@@ -607,7 +608,7 @@ async def on_message(message):
         # if 'spankcoin' in database[message.author.name]:
         #     embed.add_field(name=f"Spank coins", value=f'{round(valuespank,2)} <:raised_hands_tone1:859521216115900457>')
         embed.add_field(name=f"Crazy Blazin Coins", value=f'{round(value,2)} <:CBCcoin:831506214659293214>')
-        embed.add_field(name=f"Sheqalim", value=f'₪ {round(shekval,2)}')
+        # embed.add_field(name=f"Sheqalim", value=f'₪ {round(shekval,2)}')
         embed.add_field(name=f"Key shards", value=f' ({database[message.author.name]["lootkeys"]}/3) :key: ')
         embed.add_field(name=f"Luck jells", value=f' {database[message.author.name]["jellys"]} :kiwi: ')
         await message.channel.send(embed=embed)
@@ -917,6 +918,8 @@ async def on_message(message):
                     await message.channel.send('Target not in database!')
         else:
             await message.channel.send(f'You are not Foxxravin!')
+
+
 
 
 
