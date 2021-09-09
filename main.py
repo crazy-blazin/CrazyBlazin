@@ -1077,7 +1077,7 @@ async def on_message(message):
 
     if message.content.startswith('!addevent'):
         str_split = message.content.split(' ')
-        str_split = (str_split[1]).split('|')
+        str_split = (str_split[1:]).split('|')
         if len(str_split) > 1 and len(str_split) < 3:
             with open('eventlog.txt', 'r') as f:
                 eventss = eval(f.read())
