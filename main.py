@@ -1066,7 +1066,7 @@ async def on_message(message):
 
 
     if message.content.startswith('!events'):
-        with open('eventlog.txt', 'r') as f:
+        with open('../eventlog.txt', 'r') as f:
             eventss = eval(f.read())
         embed = discord.Embed(title='Events and happenings', description='Events and happenings around Norway PARTYY!') #,color=Hex code
         if len(eventss) > 0:
@@ -1082,20 +1082,20 @@ async def on_message(message):
             catstring += ' '+ stttt
         str_split = catstring.split('|')
         print(str_split)
-        with open('eventlog.txt', 'r') as f:
+        with open('../eventlog.txt', 'r') as f:
             eventss = eval(f.read())
         eventss.append([str_split[0], str_split[1]])
-        with open('eventlog.txt', 'w') as f:
+        with open('../eventlog.txt', 'w') as f:
             f.write(str(eventss))
         await message.channel.send(f'Event added')
 
     if message.content.startswith('!delevent'):
         str_split = message.content.split(' ')
         if len(str_split) > 1 and len(str_split) < 3:
-            with open('eventlog.txt', 'r') as f:
+            with open('../eventlog.txt', 'r') as f:
                 eventss = eval(f.read())
             eventss.pop(int(str_split[1]))
-            with open('eventlog.txt', 'w') as f:
+            with open('../eventlog.txt', 'w') as f:
                 f.write(str(eventss))
             await message.channel.send(f'Event deleted')
         else:
