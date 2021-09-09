@@ -1065,6 +1065,42 @@ async def on_message(message):
             index += 1
 
 
+    if message.content.startswith('!events'):
+        with open('eventlog.txt', 'r') as f:
+            eventss = eval(f.read())
+        embed = discord.Embed(title='Events and happenings', description='Events and happenings around Norway PARTYY!') #,color=Hex code
+        if len(eventss) > 0:
+            for i, event in enumerate(eventss):
+                embed.add_field(name=f"{i}.{event[0]}", value=f"{event[1]}")
+        await message.channel.send(embed=embed)
+
+
+    if message.content.startswith('!addevent'):
+        str_split = message.content.split(' ')
+        str_split = (str_split[1]).split('|')
+        if len(str_split) > 1 and len(str_split) < 3:
+            with open('eventlog.txt', 'r') as f:
+                eventss = eval(f.read())
+            eventss.append([str_split[0], str_split[1]])
+            with open('eventlog.txt', 'w') as f:
+                f.write(str(eventss))
+            await message.channel.send(f'Event added')
+        else:
+            await message.channel.send(f'Too many inputs!')
+    
+
+    if message.content.startswith('!delevent'):
+        str_split = message.content.split(' ')
+        if len(str_split) > 1 and len(str_split) < 3:
+            with open('eventlog.txt', 'r') as f:
+                eventss = eval(f.read())
+            eventss.pop(int(str_split[1]))
+            with open('eventlog.txt', 'w') as f:
+                f.write(str(eventss))
+            await message.channel.send(f'Event deleted')
+        else:
+            await message.channel.send(f'Too many inputs!')
+
 
     if message.content.startswith('!startevent'):
         global EVENT_IN_PROGRESS
