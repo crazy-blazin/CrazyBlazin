@@ -331,6 +331,7 @@ async def on_message(message):
 
 
     if message.content.startswith('!help'):
+        # helps commands
         embed = discord.Embed(title=f"Commands", description=f"All commands for crazy blazin server")
         embed.add_field(name=f"Balance", value=f'!bal')
         embed.add_field(name=f"Give rewards MUST BE ADMIN OR MOD", value=f'!givereward <username> <name of award>')
