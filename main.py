@@ -100,6 +100,13 @@ class MyClient(discord.Client):
         for member in members:
             if member.name in database:
                 temp_status[member.name] = member.voice
+                role_names = [role.name for role in member.roles]
+                if 'Bots' in role_names:
+                    print(member.name)
+                    database.pop(member.name, None)
+                    temp_status.pop(member.name, None)
+        
+
         with open('version.txt', 'r') as f:
             bot_version = float(f.read())
         # SEND TO PATCH LOG CHANNEL
@@ -109,6 +116,7 @@ class MyClient(discord.Client):
         embed = discord.Embed(title=f"Crazy Blazin bot patch notes", description=f"Build {bot_version} patch notes.") #,color=Hex code
         embed.add_field(name=f"Patch notes:", value=f'{patchnotes}')
         await patchchannel.send(embed=embed)
+        write_db(database)
 
 
         # members = self.get_all_members()
@@ -168,7 +176,6 @@ async def ticksystem():
                     else:
                         channelid = str(0)
 
-            
             write_db(database)
         await asyncio.sleep(10)
 
@@ -186,7 +193,8 @@ client.loop.create_task(ticksystem())
 async def on_voice_state_update(member, before, after):
     global temp_status
     global database
-    if member.name not in database:
+    role_names = [role.name for role in member.guild.roles]
+    if member.name not in database and 'Bots' not in role_names:
         database[member.name] = {'coins': 10}
         database[member.name]['rewards'] = {}
         write_db(database)
@@ -194,13 +202,12 @@ async def on_voice_state_update(member, before, after):
 
     temp_status[member.name] = after
 
-    if member.name in database:
-        if 'Timer' in database[member.name]:
-            curr_timer = database[member.name]['Timer']
-            role_names = [role.name for role in member.guild.roles]
-            if curr_timer <= 0 and 'Crazy Blazin Gold' in role_names:
-                role = get(member.guild.roles, name='Crazy Blazin Gold')
-                await member.remove_roles(role)
+        # if 'Timer' in database[member.name]:
+        #     curr_timer = database[member.name]['Timer']
+        #     role_names = [role.name for role in member.guild.roles]
+        #     if curr_timer <= 0 and 'Crazy Blazin Gold' in role_names:
+        #         role = get(member.guild.roles, name='Crazy Blazin Gold')
+        #         await member.remove_roles(role)
 
 
 @client.event
@@ -326,6 +333,10 @@ async def on_message(message):
     if message.content.startswith('!help'):
         embed = discord.Embed(title=f"Commands", description=f"All commands for crazy blazin server")
         embed.add_field(name=f"Balance", value=f'!bal')
+        embed.add_field(name=f"Give rewards MUST BE ADMIN OR MOD", value=f'!givereward <username> <name of award>')
+        embed.add_field(name=f"View all the rewards and their description", value=f'!rewardhelp')
+        embed.add_field(name=f"View toplist for the members with the most coins", value=f'!top')
+        embed.add_field(name=f"View all your current rewards", value=f'!myrewards')
         await message.channel.send(embed=embed)
 
     
