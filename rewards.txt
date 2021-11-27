@@ -1,0 +1,1 @@
+{'Pentakill': [':carpentry_saw:', 'People in the server witnessed pentakill in leauge for this user'], 'Dickhead': [':disguised_face:', 'People in the server witnessed this person being a dickhead'], 'Meeter': [':performing_arts:', 'This person has met other members of the server in real life']}
