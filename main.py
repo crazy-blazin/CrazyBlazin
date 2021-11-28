@@ -405,6 +405,22 @@ async def on_message(message):
                         write_db(database)
                     else:
                         await message.channel.send(f'You do not have enough coins!')
+    
+
+    if message.content.startswith('!vc'):
+        embed = discord.Embed(title=f"Voice chat assets", description=f"Asset information for voice chats") #,color=Hex code
+        for key in voice_channels_database:
+            name = voice_channels_database[key]['name']
+            value = voice_channels_database[key]['value']
+            stocks = voice_channels_database[key]['stocks']
+            users = voice_channels_database[key]['users']
+            output = ''
+            for user in users:
+                percent_owned = round(users[user]['amount']/stocks*100,2)
+                output += f'{user} | {percent_owned}%\n'
+
+            embed.add_field(name=f"{name}", value=f'Price/Share: {value} <:CBCcoin:831506214659293214> \n {output}')
+        await message.channel.send(embed=embed)
 
     
     # if message.content.startswith('!buy gold'):
@@ -441,8 +457,8 @@ async def on_message(message):
         embed.add_field(name=f"View all your current rewards", value=f'!myrewards')
         embed.add_field(name=f"View a members profile", value=f'!lookup <target>')
         embed.add_field(name=f"Buy shares in a voicechat", value=f'!buy <vc_name> <amount>')
+        embed.add_field(name=f"Check information about vc properties", value=f'!vc')
         await message.channel.send(embed=embed)
-
     
 
     write_db(database)
