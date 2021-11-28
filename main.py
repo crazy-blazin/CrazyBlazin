@@ -170,31 +170,32 @@ voice_channels_database = read_voice_channels()
 def add_coins(stream_state, user, cointype):
     # add coins to user
     global database
-    vc_channels = client.guilds[0].voice_channels
-    voice_channels = list(vc_channels)
-    extra_earned = 0
-    for vc in voice_channels:
-        all_members_in_vc = list(vc.members)
-        tot_members = len(all_members_in_vc)
-        if user in voice_channels_database[str(vc.id)]['users']:
-            total_owned = voice_channels_database[str(vc.id)]["users"][user]['amount']
-            percent_ownage = (total_owned / voice_channels_database[str(vc.id)]['stocks'])
-            if user in all_members_in_vc:
-                tot_members -= 1
-                # pass
-            extra_earned += percent_ownage * tot_members*20
+    # vc_channels = client.guilds[0].voice_channels
+    # voice_channels = list(vc_channels)
+    # extra_earned = 0
+    # for vc in voice_channels:
+    #     all_members_in_vc = list(vc.members)
+    #     tot_members = len(all_members_in_vc)
+    #     if user in voice_channels_database[str(vc.id)]['users']:
+    #         total_owned = voice_channels_database[str(vc.id)]["users"][user]['amount']
+    #         percent_ownage = (total_owned / voice_channels_database[str(vc.id)]['stocks'])
+    #         if user in all_members_in_vc:
+    #             tot_members -= 1
+    #             # pass
+    #         extra_earned += percent_ownage * tot_members*20
+    #         database[user][cointype] = round(database[user][cointype] + extra_earned, 5) 
 
     if stream_state:
         if cointype in database[user]:
-            database[user][cointype] = round(database[user][cointype] + 1, 5) + extra_earned
+            database[user][cointype] = round(database[user][cointype] + 1, 5)
         else:
             database[user][cointype] =  10
     else:
         if cointype in database[user]:
-            database[user][cointype] = round(database[user][cointype] + 0.33, 5) + extra_earned
+            database[user][cointype] = round(database[user][cointype] + 0.33, 5)
         else:
             database[user][cointype] =  10
-    print(f'Coins to : {user}, extra: {extra_earned}')
+    print(f'Coins to : {user}')
     write_db(database)
 
 
@@ -204,12 +205,30 @@ async def ticksystem():
         # database = read_db()
         global database
         write_db(database)
-
         for user in database:
+            try:
+                vc_channels = client.guilds[0].voice_channels
+                voice_channels = list(vc_channels)
+                extra_earned = 0
+                for vc in voice_channels:
+                    all_members_in_vc = list(vc.members)
+                    tot_members = len(all_members_in_vc)
+                    if user in voice_channels_database[str(vc.id)]['users']:
+                        total_owned = voice_channels_database[str(vc.id)]["users"][user]['amount']
+                        percent_ownage = (total_owned / voice_channels_database[str(vc.id)]['stocks'])
+                        if user in all_members_in_vc:
+                            tot_members -= 1
+                            # pass
+                        extra_earned += percent_ownage * tot_members*20
+                        database[user]['coins'] = round(database[user]['coins'] + extra_earned, 5)
+                        print(user, extra_earned)
+            except IndexError:
+                pass
+
             if user in temp_status:
                 state = temp_status[user]
                 if state != None:
-
+                    
                     if state.channel != None:
                         channelid = str(state.channel.id)
                         stream_state = state.self_stream
@@ -280,7 +299,7 @@ async def on_message(message):
                 total_owned = voice_channels_database[key]["users"][message.author.name]['amount']
                 percent_ownage = (total_owned / voice_channels_database[key]['stocks']) * 100
                 income_per_member = round((total_owned / voice_channels_database[key]['stocks']) * 1*20, 5)
-                embed.add_field(name=f"{voice_channels_database[key]['name']}", value=f'Stake: {percent_ownage}% | income/member: {income_per_member}')
+                embed.add_field(name=f"{voice_channels_database[key]['name']}", value=f'Stake: {percent_ownage}% | income/member: {income_per_member} :CBCcoin:')
         
         await message.channel.send(embed=embed)
 
