@@ -64,12 +64,28 @@ def read_db():
     except:
         print('read error')
 
+def write_read_voice_channels(database):
+    try:
+        with open('../voice_channels_database.txt', 'w', encoding='utf-8') as f:
+            f.write(str(database))
+        return database
+    except:
+        print('write error')
 
 def read_rewards():
     try:
         with open('rewards.txt', 'r') as f:
             rewards = eval(f.read())
         return rewards
+    except:
+        print('read error')
+
+
+def read_voice_channels():
+    try:
+        with open('../voice_channels_database.txt', 'r') as f:
+            voice_channels_database = eval(f.read())
+        return voice_channels_database
     except:
         print('read error')
 
@@ -97,6 +113,16 @@ class MyClient(discord.Client):
         global database
         members = client.get_all_members()
         # database = read_db()
+        vc_channels = client.guilds[0].voice_channels
+        voice_channels = list(vc_channels)
+        voice_channels_save = {}
+        if not os.path.exists('../voice_channels_database.txt'):
+            with open('../voice_channels_database.txt', 'w', encoding='utf-8') as f:
+                for i in voice_channels:
+                    voice_channels_save[str(i.id)] = {'name': f'{str(i.name)}' ,'stocks': 10000, 'users': {}, 'value': 100}
+                f.write(str(voice_channels_save))
+                voice_channels_database = read_voice_channels()
+
         for member in members:
             if member.name in database:
                 temp_status[member.name] = member.voice
@@ -133,25 +159,41 @@ class MyClient(discord.Client):
 # sio = socketio.Client()
 
 
+
+
 intents = discord.Intents.default()
 intents.members = True
 client = MyClient(intents = intents)
 
-
+voice_channels_database = read_voice_channels()
 
 def add_coins(stream_state, user, cointype):
     global database
+    vc_channels = client.guilds[0].voice_channels
+    voice_channels = list(vc_channels)
+    extra_earned = 0
+    for vc in voice_channels:
+        all_members_in_vc = list(vc.members)
+        tot_members = len(all_members_in_vc)
+        if user in voice_channels_database[str(vc.id)]['users']:
+            total_owned = voice_channels_database[str(vc.id)]["users"][user]['amount']
+            percent_ownage = (total_owned / voice_channels_database[str(vc.id)]['stocks'])
+            if user in all_members_in_vc:
+                tot_members -= 1
+                # pass
+            extra_earned += percent_ownage * tot_members*2
+
     if stream_state:
         if cointype in database[user]:
-            database[user][cointype] = round(database[user][cointype] + 1, 2)
+            database[user][cointype] = round(database[user][cointype] + 1, 5) + extra_earned
         else:
             database[user][cointype] =  10
     else:
         if cointype in database[user]:
-            database[user][cointype] = round(database[user][cointype] + 0.33, 2)
+            database[user][cointype] = round(database[user][cointype] + 0.33, 5) + extra_earned
         else:
             database[user][cointype] =  10
-    print(f'Coins to : {user}')
+    print(f'Coins to : {user}, extra: {extra_earned}')
     write_db(database)
 
 
@@ -215,6 +257,7 @@ async def on_message(message):
     
     global database
     global rewards
+    global voice_channels_database
 
     members = client.get_all_members()
     for member in members:
@@ -231,6 +274,12 @@ async def on_message(message):
         value = database[message.author.name]['coins']
         embed = discord.Embed(title=f"Balance", description=f"{message.author.name} current balance") #,color=Hex code
         embed.add_field(name=f"Crazy Blazin Coins", value=f'{round(value,2)} <:CBCcoin:831506214659293214>')
+        for key in voice_channels_database:
+            if message.author.name in voice_channels_database[key]['users']:
+                total_owned = voice_channels_database[key]["users"][message.author.name]['amount']
+                percent_ownage = (total_owned / voice_channels_database[key]['stocks']) * 100
+                embed.add_field(name=f"{voice_channels_database[key]['name']}", value=f'Hold: {percent_ownage}%')
+        
         await message.channel.send(embed=embed)
 
 
@@ -247,9 +296,14 @@ async def on_message(message):
                 for reward in rewards_user:
                     embed.add_field(name=f"{reward}", value=f'{rewards[reward][0]}')
                 embed.add_field(name=f"Crazy Blazin Coins", value=f'{round(value,2)} <:CBCcoin:831506214659293214>')
+                for key in voice_channels_database:
+                    if target in voice_channels_database[key]['users']:
+                        total_owned = voice_channels_database[key]["users"][target]['amount']
+                        percent_ownage = (total_owned / voice_channels_database[key]['stocks']) * 100
+                        embed.add_field(name=f"{voice_channels_database[key]['name']}", value=f'Hold: {percent_ownage}%')
                 await message.channel.send(embed=embed)
             else:
-                await message.channel.send(f'User does not exist!')
+                await message.channel.send(f'User does not exist!')    
                 
 
     if message.content.startswith('!myrewards'):
@@ -320,6 +374,36 @@ async def on_message(message):
         else:
             await message.channel.send(f'You are not Foxxravin!')
 
+
+  
+    if message.content.startswith('!buy'):
+        
+        str_split = message.content.split(' ')
+        if len(str_split) > 3 or len(str_split) < 3:
+            await message.channel.send(f'Too many or few arguments. Use !buy <vc_name> <amount>')
+        else:
+            vc_channels = client.guilds[0].voice_channels
+            voice_channels = list(vc_channels)
+            vc_name = str_split[1]
+            amount = float(str_split[2])
+            for key in voice_channels:
+                keyid = str(key.id)
+                if vc_name == str(key.name):
+                    voice_channels_database[keyid]['name'] = vc_name
+                    vc_value = float(voice_channels_database[keyid]['value'])
+                    if amount*vc_value <= database[message.author.name]['coins']:
+                        database[message.author.name]['coins'] -= amount*vc_value
+                        if message.author.name in voice_channels_database[keyid]['users']:
+                            voice_channels_database[keyid]['users'][message.author.name]['amount'] += amount
+                        else:
+                            voice_channels_database[keyid]['users'][message.author.name] = {'amount':amount}
+                        
+                        voice_channels_database[keyid]['value'] += amount*0.10
+                        write_read_voice_channels(voice_channels_database)
+                        await message.channel.send(f'{message.author.name} Bought {amount} shares in {vc_name} for {amount*vc_value} <:CBCcoin:831506214659293214>.')
+                        write_db(database)
+                    else:
+                        await message.channel.send(f'You do not have enough coins!')
 
     
     # if message.content.startswith('!buy gold'):
