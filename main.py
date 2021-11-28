@@ -412,9 +412,8 @@ async def on_message(message):
         vc_channels = client.guilds[0].voice_channels
         voice_channels = list(vc_channels)
         for key in voice_channels:
-            keyid = str(key.id)
-            if vc_name == str(key.name):
-                voice_channels_database[keyid]['name'] = vc_name
+            voice_channels_database[str(key.id)]['name'] = str(key.name)
+
         for key in voice_channels_database:
             name = voice_channels_database[key]['name']
             value = voice_channels_database[key]['value']
