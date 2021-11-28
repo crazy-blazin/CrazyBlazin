@@ -279,7 +279,8 @@ async def on_message(message):
             if message.author.name in voice_channels_database[key]['users']:
                 total_owned = voice_channels_database[key]["users"][message.author.name]['amount']
                 percent_ownage = (total_owned / voice_channels_database[key]['stocks']) * 100
-                embed.add_field(name=f"{voice_channels_database[key]['name']}", value=f'Hold: {percent_ownage}%')
+                income_per_member = round((total_owned / voice_channels_database[key]['stocks']) * 1*20, 5)
+                embed.add_field(name=f"{voice_channels_database[key]['name']}", value=f'Stake: {percent_ownage}% | income/member: {income_per_member}')
         
         await message.channel.send(embed=embed)
 
@@ -422,6 +423,7 @@ async def on_message(message):
             output = ''
             for user in users:
                 percent_owned = round(users[user]['amount']/stocks*100,2)
+                income_per_member = percent_ownage * 1*20
                 output += f'{user} | {percent_owned}%\n'
 
             embed.add_field(name=f"{name}", value=f'Price/Amount {value}/{stocks} <:CBCcoin:831506214659293214> \n {output}')
