@@ -182,7 +182,7 @@ def add_coins(stream_state, user, cointype):
             if user in all_members_in_vc:
                 tot_members -= 1
                 # pass
-            extra_earned += percent_ownage * tot_members*2
+            extra_earned += percent_ownage * tot_members*20
 
     if stream_state:
         if cointype in database[user]:
@@ -274,7 +274,7 @@ async def on_message(message):
     if message.content.startswith('!bal'):
         value = database[message.author.name]['coins']
         embed = discord.Embed(title=f"Balance", description=f"{message.author.name} current balance") #,color=Hex code
-        embed.add_field(name=f"Crazy Blazin Coins", value=f'{round(value,2)} <:CBCcoin:831506214659293214>')
+        embed.add_field(name=f"Crazy Blazin Coins", value=f'{round(value,5)} <:CBCcoin:831506214659293214>')
         for key in voice_channels_database:
             if message.author.name in voice_channels_database[key]['users']:
                 total_owned = voice_channels_database[key]["users"][message.author.name]['amount']
@@ -424,7 +424,7 @@ async def on_message(message):
                 percent_owned = round(users[user]['amount']/stocks*100,2)
                 output += f'{user} | {percent_owned}%\n'
 
-            embed.add_field(name=f"{name}", value=f'Price/Share: {value} <:CBCcoin:831506214659293214> \n {output}')
+            embed.add_field(name=f"{name}", value=f'Price/Amount {value}/{stocks} <:CBCcoin:831506214659293214> \n {output}')
         await message.channel.send(embed=embed)
 
     
