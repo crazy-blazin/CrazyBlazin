@@ -242,7 +242,7 @@ async def on_message(message):
             target = str(str_split[1])
             if target in database:
                 value = database[target]['coins']
-                rewards_user = database[message.author.name]['rewards']
+                rewards_user = database[target]['rewards']
                 embed = discord.Embed(title=f"User stats", description=f"{target} current balance") #,color=Hex code
                 for reward in rewards_user:
                     embed.add_field(name=f"{reward}", value=f'{rewards[reward][0]}')
