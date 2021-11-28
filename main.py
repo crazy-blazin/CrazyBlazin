@@ -198,8 +198,6 @@ async def on_voice_state_update(member, before, after):
         database[member.name] = {'coins': 10}
         database[member.name]['rewards'] = {}
         write_db(database)
-    
-
     temp_status[member.name] = after
 
         # if 'Timer' in database[member.name]:
@@ -235,6 +233,24 @@ async def on_message(message):
         embed.add_field(name=f"Crazy Blazin Coins", value=f'{round(value,2)} <:CBCcoin:831506214659293214>')
         await message.channel.send(embed=embed)
 
+
+    if message.content.startswith('!lookup'):
+        str_split = message.content.split(' ')
+        if len(str_split) > 2 or len(str_split) < 2:
+            await message.channel.send(f'Too many or few arguments. Use !lookup <target>')
+        else:
+            target = str(str_split[1])
+            if target in database:
+                value = database[target]['coins']
+                rewards_user = database[message.author.name]['rewards']
+                embed = discord.Embed(title=f"User stats", description=f"{target} current balance") #,color=Hex code
+                for reward in rewards_user:
+                    embed.add_field(name=f"{reward}", value=f'{rewards[reward][0]}')
+                embed.add_field(name=f"Crazy Blazin Coins", value=f'{round(value,2)} <:CBCcoin:831506214659293214>')
+                await message.channel.send(embed=embed)
+            else:
+                await message.channel.send(f'User does not exist!')
+                
 
     if message.content.startswith('!myrewards'):
         rewards_user = database[message.author.name]['rewards']
@@ -338,6 +354,7 @@ async def on_message(message):
         embed.add_field(name=f"View all the rewards and their description", value=f'!rewardhelp')
         embed.add_field(name=f"View toplist for the members with the most coins", value=f'!top')
         embed.add_field(name=f"View all your current rewards", value=f'!myrewards')
+        embed.add_field(name=f"View a members profile", value=f'!lookup <target>')
         await message.channel.send(embed=embed)
 
     
