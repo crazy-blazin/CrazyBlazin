@@ -404,14 +404,17 @@ async def on_message(message):
         else:
             vc_channels = client.guilds[0].voice_channels
             voice_channels = list(vc_channels)
-            vc_name = str_split[1]
+            vc_name = str(str_split[1])
             amount = float(str_split[2])
             for key in voice_channels:
                 keyid = str(key.id)
-                if vc_name == str(key.name):
-                    voice_channels_database[keyid]['name'] = vc_name
+                if vc_name.lower() == str(key.name).lower():
+                    voice_channels_database[keyid]['name'] = key.name
                     vc_value = float(voice_channels_database[keyid]['value'])
-                    if amount*vc_value <= database[message.author.name]['coins']:
+                    total_bought = [voice_channels_database[keyid]['users'][x]['amount'] for x in voice_channels_database[keyid]['users']]
+                    total_bought = np.array(total_bought).sum() + amount
+                    total_left =  (voice_channels_database[keyid]['stocks'] - total_bought) >= 0
+                    if (amount*vc_value <= database[message.author.name]['coins']) and total_left:
                         database[message.author.name]['coins'] -= amount*vc_value
                         if message.author.name in voice_channels_database[keyid]['users']:
                             voice_channels_database[keyid]['users'][message.author.name]['amount'] += amount
@@ -420,10 +423,12 @@ async def on_message(message):
                         
                         voice_channels_database[keyid]['value'] += amount*0.10
                         write_read_voice_channels(voice_channels_database)
-                        await message.channel.send(f'{message.author.name} Bought {amount} shares in {vc_name} for {amount*vc_value} <:CBCcoin:831506214659293214>.')
+                        await message.channel.send(f'{message.author.name} Bought {amount} shares in {key.name} for {amount*vc_value} <:CBCcoin:831506214659293214>.')
                         write_db(database)
                     else:
                         await message.channel.send(f'You do not have enough coins!')
+                    if not total_left:
+                        await message.channel.send(f'All stocks of this channel has been bought or you are trying to buy too many!')
     
 
     if message.content.startswith('!vc'):
