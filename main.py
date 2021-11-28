@@ -409,6 +409,12 @@ async def on_message(message):
 
     if message.content.startswith('!vc'):
         embed = discord.Embed(title=f"Voice chat assets", description=f"Asset information for voice chats") #,color=Hex code
+        vc_channels = client.guilds[0].voice_channels
+        voice_channels = list(vc_channels)
+        for key in voice_channels:
+            keyid = str(key.id)
+            if vc_name == str(key.name):
+                voice_channels_database[keyid]['name'] = vc_name
         for key in voice_channels_database:
             name = voice_channels_database[key]['name']
             value = voice_channels_database[key]['value']
