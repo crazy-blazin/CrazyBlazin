@@ -221,7 +221,6 @@ async def ticksystem():
                             # pass
                         extra_earned += percent_ownage * tot_members*20
                         database[user]['coins'] = round(database[user]['coins'] + extra_earned, 5)
-                        print(user, extra_earned)
             except IndexError:
                 pass
 
@@ -442,7 +441,7 @@ async def on_message(message):
             output = ''
             for user in users:
                 percent_owned = round(users[user]['amount']/stocks*100,2)
-                income_per_member = percent_ownage * 1*20
+                income_per_member = percent_owned * 1*20
                 output += f'{user} | {percent_owned}%\n'
 
             embed.add_field(name=f"{name}", value=f'Price/Amount {value}/{stocks} <:CBCcoin:831506214659293214> \n {output}')
