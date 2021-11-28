@@ -421,7 +421,7 @@ async def on_message(message):
                         else:
                             voice_channels_database[keyid]['users'][message.author.name] = {'amount':amount}
                         
-                        voice_channels_database[keyid]['value'] += amount*0.10*vc_value
+                        voice_channels_database[keyid]['value'] += amount*0.05*vc_value
                         write_read_voice_channels(voice_channels_database)
                         await message.channel.send(f'{message.author.name} Bought {amount} shares in {key.name} for {amount*vc_value} <:CBCcoin:831506214659293214>.')
                         write_db(database)
