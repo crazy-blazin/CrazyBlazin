@@ -168,6 +168,7 @@ client = MyClient(intents = intents)
 voice_channels_database = read_voice_channels()
 
 def add_coins(stream_state, user, cointype):
+    # add coins to user
     global database
     vc_channels = client.guilds[0].voice_channels
     voice_channels = list(vc_channels)
@@ -439,10 +440,10 @@ async def on_message(message):
         embed.add_field(name=f"View toplist for the members with the most coins", value=f'!top')
         embed.add_field(name=f"View all your current rewards", value=f'!myrewards')
         embed.add_field(name=f"View a members profile", value=f'!lookup <target>')
+        embed.add_field(name=f"Buy shares in a voicechat", value=f'!buy <vc_name> <amount>')
         await message.channel.send(embed=embed)
 
     
-
 
     write_db(database)
 
