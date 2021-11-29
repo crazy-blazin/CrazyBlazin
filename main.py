@@ -38,8 +38,7 @@ from qrcode.image.styles.moduledrawers import RoundedModuleDrawer
 from qrcode.image.styles.colormasks import RadialGradiantColorMask
 import pickle
 from PIL import Image
-
-
+import datetime
 
 with open('version.txt', 'r') as f:
     version = float(f.read())
@@ -204,6 +203,7 @@ async def ticksystem():
         global temp_status
         # database = read_db()
         global database
+        total_gained = 0
         write_db(database)
         for user in database:
             try:
@@ -220,6 +220,7 @@ async def ticksystem():
                             tot_members -= 1
                             # pass
                         extra_earned += percent_ownage * tot_members*20
+                        # total_gained += extra_earned
                         database[user]['coins'] = round(database[user]['coins'] + extra_earned, 5)
             except IndexError:
                 pass
@@ -237,6 +238,8 @@ async def ticksystem():
                     else:
                         channelid = str(0)
 
+
+            # total_gained
             write_db(database)
         await asyncio.sleep(10)
 
@@ -405,7 +408,7 @@ async def on_message(message):
             vc_channels = client.guilds[0].voice_channels
             voice_channels = list(vc_channels)
             vc_name = str(str_split[1])
-            amount = float(str_split[2])
+            amount = np.abs(float(str_split[2]))
             for key in voice_channels:
                 keyid = str(key.id)
                 if vc_name.lower() == str(key.name).lower():
