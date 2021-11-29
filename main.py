@@ -333,6 +333,7 @@ async def on_message(message):
         rewards_user = database[message.author.name]['rewards']
         embed = discord.Embed(title=f"Rewards", description=f"{message.author.name} current rewards") #,color=Hex code
         for reward in rewards_user:
+            print(reward, rewards[reward])
             embed.add_field(name=f"{reward}", value=f'{rewards[reward][0]}')
         await message.channel.send(embed=embed)
 
@@ -397,7 +398,6 @@ async def on_message(message):
         else:
             await message.channel.send(f'You are not Foxxravin!')
 
-
   
     if message.content.startswith('!buy'):
         
@@ -425,6 +425,7 @@ async def on_message(message):
                             voice_channels_database[keyid]['users'][message.author.name] = {'amount':amount}
                         
                         voice_channels_database[keyid]['value'] += amount*0.05*vc_value
+                        database[message.author.name]['rewards']['Investor'] = 1
                         write_read_voice_channels(voice_channels_database)
                         await message.channel.send(f'{message.author.name} Bought {amount} shares in {key.name} for {amount*vc_value} <:CBCcoin:831506214659293214>.')
                         write_db(database)
