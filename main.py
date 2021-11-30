@@ -192,12 +192,12 @@ def add_coins(stream_state, user, cointype):
 
     if stream_state:
         if cointype in database[user]:
-            database[user][cointype] = round(database[user][cointype] + 1, 5)
+            database[user][cointype] = round(database[user][cointype] + 3.5, 5)
         else:
             database[user][cointype] =  10
     else:
         if cointype in database[user]:
-            database[user][cointype] = round(database[user][cointype] + 0.33, 5)
+            database[user][cointype] = round(database[user][cointype] + 0.85, 5)
         else:
             database[user][cointype] =  10
     print(f'Coins to : {user}')
@@ -307,7 +307,7 @@ async def on_message(message):
                 total_owned = voice_channels_database[key]["users"][message.author.name]['amount']
                 percent_ownage = round((total_owned / voice_channels_database[key]['stocks']) * 100, 3)
                 income_per_member = round((total_owned / voice_channels_database[key]['stocks']) * 1*20, 5)
-                embed.add_field(name=f"{voice_channels_database[key]['name']}", value=f'Stake: {percent_ownage}% | income/member: {income_per_member}  <:CBCcoin:831506214659293214>')
+                embed.add_field(name=f"{voice_channels_database[key]['name']}", value=f'Stake: {percent_ownage}% | inc./mem.: {income_per_member}  <:CBCcoin:831506214659293214>')
         
         await message.channel.send(embed=embed)
 
