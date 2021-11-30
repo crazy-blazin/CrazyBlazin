@@ -64,12 +64,15 @@ def read_db():
         print('read error')
 
 def write_read_voice_channels(database):
-    try:
-        with open('../voice_channels_database.txt', 'w', encoding='utf-8') as f:
-            f.write(str(database))
-        return database
-    except:
-        print('write error')
+    if database != None:
+        try:
+            with open('../voice_channels_database.txt', 'w', encoding='utf-8') as f:
+                f.write(str(database))
+            return database
+        except:
+            print('write error')
+    else:
+        print('write error - voice database is none')
 
 def read_rewards():
     try:
@@ -89,11 +92,14 @@ def read_voice_channels():
         print('read error')
 
 def write_db(database):
-    try:
-        with open('../database.txt', 'w', encoding='utf-8') as f:
-            f.write(str(database))
-    except:
-        print('write error')
+    if database != None:
+        try:
+            with open('../database.txt', 'w', encoding='utf-8') as f:
+                f.write(str(database))
+        except:
+            print('write error')
+    else:
+        print('write error - database is none')
 
 
 
@@ -299,7 +305,7 @@ async def on_message(message):
         for key in voice_channels_database:
             if message.author.name in voice_channels_database[key]['users']:
                 total_owned = voice_channels_database[key]["users"][message.author.name]['amount']
-                percent_ownage = (total_owned / voice_channels_database[key]['stocks']) * 100
+                percent_ownage = round((total_owned / voice_channels_database[key]['stocks']) * 100, 3)
                 income_per_member = round((total_owned / voice_channels_database[key]['stocks']) * 1*20, 5)
                 embed.add_field(name=f"{voice_channels_database[key]['name']}", value=f'Stake: {percent_ownage}% | income/member: {income_per_member} :CBCcoin:')
         
@@ -322,8 +328,8 @@ async def on_message(message):
                 for key in voice_channels_database:
                     if target in voice_channels_database[key]['users']:
                         total_owned = voice_channels_database[key]["users"][target]['amount']
-                        percent_ownage = (total_owned / voice_channels_database[key]['stocks']) * 100
-                        embed.add_field(name=f"{voice_channels_database[key]['name']}", value=f'Hold: {percent_ownage}%')
+                        percent_ownage = round((total_owned / voice_channels_database[key]['stocks']) * 100, 2)
+                        embed.add_field(name=f"{voice_channels_database[key]['name']}", value=f'Stake: {percent_ownage}%')
                 await message.channel.send(embed=embed)
             else:
                 await message.channel.send(f'User does not exist!')    
@@ -425,7 +431,7 @@ async def on_message(message):
                             voice_channels_database[keyid]['users'][message.author.name] = {'amount':amount}
                         
                         voice_channels_database[keyid]['value'] += amount*0.05*vc_value
-                        database[message.author.name]['rewards']['Investor'] = 1
+                        # database[message.author.name]['rewards']['Investor'] = 1
                         write_read_voice_channels(voice_channels_database)
                         await message.channel.send(f'{message.author.name} Bought {amount} shares in {key.name} for {amount*vc_value} <:CBCcoin:831506214659293214>.')
                         write_db(database)
@@ -444,8 +450,8 @@ async def on_message(message):
 
         for key in voice_channels_database:
             name = voice_channels_database[key]['name']
-            value = voice_channels_database[key]['value']
-            stocks = voice_channels_database[key]['stocks']
+            value = round(voice_channels_database[key]['value'],3)
+            stocks = round(voice_channels_database[key]['stocks'],3)
             users = voice_channels_database[key]['users']
             output = ''
             for user in users:
@@ -453,7 +459,7 @@ async def on_message(message):
                 income_per_member = percent_owned * 1*20
                 output += f'{user} | {percent_owned}%\n'
 
-            embed.add_field(name=f"{name}", value=f'Price/Amount {value}/{stocks} <:CBCcoin:831506214659293214> \n {output}')
+            embed.add_field(name=f"{name}", value=f'Price/Amount {value} <:CBCcoin:831506214659293214> \n {output}')
         await message.channel.send(embed=embed)
 
     
