@@ -425,7 +425,7 @@ async def on_message(message):
                     total_bought = [voice_channels_database[keyid]['users'][x]['amount'] for x in voice_channels_database[keyid]['users']]
                     total_bought = np.array(total_bought).sum() + amount
                     total_left =  (voice_channels_database[keyid]['stocks'] - total_bought) >= 0
-                    target_has_to_pay = (amount*0.05*vc_value + vc_value)*amount
+                    target_has_to_pay = round((amount*0.05*vc_value + vc_value)*amount,2)
                     if (target_has_to_pay <= database[message.author.name]['coins']) and total_left:
                         database[message.author.name]['coins'] -= target_has_to_pay
                         if message.author.name in voice_channels_database[keyid]['users']:
@@ -443,6 +443,7 @@ async def on_message(message):
                     if not total_left:
                         await message.channel.send(f'All stocks of this channel has been bought or you are trying to buy too many!')
     
+
     if message.content.startswith('!sell'):
     
         str_split = message.content.split(' ')
@@ -459,11 +460,13 @@ async def on_message(message):
                     voice_channels_database[keyid]['name'] = key.name
                     vc_value = float(voice_channels_database[keyid]['value'])
                     if amount <= voice_channels_database[keyid]['users'][message.author.name]['amount']:
-                        target_earns = amount*vc_value
+                        target_earns = round(amount*vc_value, 2)
                         database[message.author.name]['coins'] += target_earns
                         voice_channels_database[keyid]['users'][message.author.name]['amount'] -= amount
                         
                         voice_channels_database[keyid]['value'] -= amount*0.05*vc_value
+                        if voice_channels_database[keyid]['value'] <= 0:
+                            voice_channels_database[keyid]['value'] = 0.5
                         # database[message.author.name]['rewards']['Investor'] = 1
                         write_read_voice_channels(voice_channels_database)
                         await message.channel.send(f'{message.author.name} Sold {amount} shares in {key.name} for {target_earns} <:CBCcoin:831506214659293214>.')
