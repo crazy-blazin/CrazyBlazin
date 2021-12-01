@@ -124,7 +124,7 @@ class MyClient(discord.Client):
         if not os.path.exists('../voice_channels_database.txt'):
             with open('../voice_channels_database.txt', 'w', encoding='utf-8') as f:
                 for i in voice_channels:
-                    voice_channels_save[str(i.id)] = {'name': f'{str(i.name)}' ,'stocks': 10000, 'users': {}, 'value': 100}
+                    voice_channels_save[str(i.id)] = {'name': f'{str(i.name)}' ,'stocks': 1000, 'users': {}, 'value': 100}
                 f.write(str(voice_channels_save))
                 voice_channels_database = read_voice_channels()
 
@@ -307,7 +307,9 @@ async def on_message(message):
                 total_owned = voice_channels_database[key]["users"][message.author.name]['amount']
                 percent_ownage = round((total_owned / voice_channels_database[key]['stocks']) * 100, 3)
                 income_per_member = round((total_owned / voice_channels_database[key]['stocks']) * 1*20, 5)
-                embed.add_field(name=f"{voice_channels_database[key]['name']}", value=f'Stake: {percent_ownage}% | inc./mem.: {income_per_member}  <:CBCcoin:831506214659293214>')
+                total_shares = int(voice_channels_database[key]['users'][message.author.name]['amount'])
+                if total_shares > 0:
+                    embed.add_field(name=f"{voice_channels_database[key]['name']} | Shares: {total_shares}", value=f'Stake: {percent_ownage}% | inc./mem.: {income_per_member}  <:CBCcoin:831506214659293214>')
         
         await message.channel.send(embed=embed)
 
@@ -423,8 +425,9 @@ async def on_message(message):
                     total_bought = [voice_channels_database[keyid]['users'][x]['amount'] for x in voice_channels_database[keyid]['users']]
                     total_bought = np.array(total_bought).sum() + amount
                     total_left =  (voice_channels_database[keyid]['stocks'] - total_bought) >= 0
-                    if (amount*vc_value <= database[message.author.name]['coins']) and total_left:
-                        database[message.author.name]['coins'] -= amount*vc_value
+                    target_has_to_pay = (amount*0.05*vc_value + vc_value)*amount
+                    if (target_has_to_pay <= database[message.author.name]['coins']) and total_left:
+                        database[message.author.name]['coins'] -= target_has_to_pay
                         if message.author.name in voice_channels_database[keyid]['users']:
                             voice_channels_database[keyid]['users'][message.author.name]['amount'] += amount
                         else:
@@ -433,12 +436,41 @@ async def on_message(message):
                         voice_channels_database[keyid]['value'] += amount*0.05*vc_value
                         # database[message.author.name]['rewards']['Investor'] = 1
                         write_read_voice_channels(voice_channels_database)
-                        await message.channel.send(f'{message.author.name} Bought {amount} shares in {key.name} for {amount*vc_value} <:CBCcoin:831506214659293214>.')
+                        await message.channel.send(f'{message.author.name} Bought {amount} shares in {key.name} for {target_has_to_pay} <:CBCcoin:831506214659293214>.')
                         write_db(database)
                     else:
-                        await message.channel.send(f'You do not have enough coins!')
+                        await message.channel.send(f'You do not have enough coins, you need {target_has_to_pay} <:CBCcoin:831506214659293214> for this purchase (amount^2 * 0.05*vc_value + vc_value*amount)).')
                     if not total_left:
                         await message.channel.send(f'All stocks of this channel has been bought or you are trying to buy too many!')
+    
+    if message.content.startswith('!sell'):
+    
+        str_split = message.content.split(' ')
+        if len(str_split) > 3 or len(str_split) < 3:
+            await message.channel.send(f'Too many or few arguments. Use !sell <vc_name> <amount>')
+        else:
+            vc_channels = client.guilds[0].voice_channels
+            voice_channels = list(vc_channels)
+            vc_name = str(str_split[1])
+            amount = np.abs(float(str_split[2]))
+            for key in voice_channels:
+                keyid = str(key.id)
+                if vc_name.lower() == str(key.name).lower():
+                    voice_channels_database[keyid]['name'] = key.name
+                    vc_value = float(voice_channels_database[keyid]['value'])
+                    if amount <= voice_channels_database[keyid]['users'][message.author.name]['amount']:
+                        target_earns = amount*vc_value
+                        database[message.author.name]['coins'] += target_earns
+                        voice_channels_database[keyid]['users'][message.author.name]['amount'] -= amount
+                        
+                        voice_channels_database[keyid]['value'] -= amount*0.05*vc_value
+                        # database[message.author.name]['rewards']['Investor'] = 1
+                        write_read_voice_channels(voice_channels_database)
+                        await message.channel.send(f'{message.author.name} Sold {amount} shares in {key.name} for {target_earns} <:CBCcoin:831506214659293214>.')
+                        write_db(database)
+                    else:
+                        await message.channel.send(f'You do not have that many shares!')
+
     
 
     if message.content.startswith('!vc'):
@@ -459,7 +491,7 @@ async def on_message(message):
                 income_per_member = percent_owned * 1*20
                 output += f'{user} | {percent_owned}%\n'
 
-            embed.add_field(name=f"{name}", value=f'Price/Amount {value} <:CBCcoin:831506214659293214> \n {output}')
+            embed.add_field(name=f"{name}", value=f'Price {value} <:CBCcoin:831506214659293214> + Fee\n {output}')
         await message.channel.send(embed=embed)
 
     
