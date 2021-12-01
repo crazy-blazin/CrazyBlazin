@@ -474,7 +474,7 @@ async def on_message(message):
     #                 else:
     #                     await message.channel.send(f'You do not have that many shares!')
 
-    
+    #
 
     if message.content.startswith('!vc'):
         embed = discord.Embed(title=f"Voice chat assets", description=f"Asset information for voice chats") #,color=Hex code
