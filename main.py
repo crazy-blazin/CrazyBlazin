@@ -443,37 +443,36 @@ async def on_message(message):
                         await message.channel.send(f'You do not have enough coins, you need {target_has_to_pay} <:CBCcoin:831506214659293214> for this purchase (amount^2 * 0.05*vc_value + vc_value*amount)).')
                     if not total_left:
                         await message.channel.send(f'All stocks of this channel has been bought or you are trying to buy too many!')
-    
 
     if message.content.startswith('!sell'):
-    
-        str_split = message.content.split(' ')
-        if len(str_split) > 3 or len(str_split) < 3:
-            await message.channel.send(f'Too many or few arguments. Use !sell <vc_name> <amount>')
-        else:
-            vc_channels = client.guilds[0].voice_channels
-            voice_channels = list(vc_channels)
-            vc_name = str(str_split[1])
-            amount = np.abs(float(str_split[2]))
-            for key in voice_channels:
-                keyid = str(key.id)
-                if vc_name.lower() == str(key.name).lower():
-                    voice_channels_database[keyid]['name'] = key.name
-                    vc_value = float(voice_channels_database[keyid]['value'])
-                    if amount <= voice_channels_database[keyid]['users'][message.author.name]['amount']:
-                        target_earns = round(amount*vc_value, 2)
-                        database[message.author.name]['coins'] += target_earns
-                        voice_channels_database[keyid]['users'][message.author.name]['amount'] -= amount
+        await message.channel.send(f'This function is disabled until fixed')
+        # str_split = message.content.split(' ')
+        # if len(str_split) > 3 or len(str_split) < 3:
+        #     await message.channel.send(f'Too many or few arguments. Use !sell <vc_name> <amount>')
+        # else:
+        #     vc_channels = client.guilds[0].voice_channels
+        #     voice_channels = list(vc_channels)
+        #     vc_name = str(str_split[1])
+        #     amount = np.abs(float(str_split[2]))
+        #     for key in voice_channels:
+        #         keyid = str(key.id)
+        #         if vc_name.lower() == str(key.name).lower():
+        #             voice_channels_database[keyid]['name'] = key.name
+        #             vc_value = float(voice_channels_database[keyid]['value'])
+        #             if amount <= voice_channels_database[keyid]['users'][message.author.name]['amount']:
+        #                 target_earns = round(amount*vc_value, 2)
+        #                 database[message.author.name]['coins'] += target_earns
+        #                 voice_channels_database[keyid]['users'][message.author.name]['amount'] -= amount
                         
-                        voice_channels_database[keyid]['value'] -= amount*0.05*vc_value
-                        if voice_channels_database[keyid]['value'] <= 0:
-                            voice_channels_database[keyid]['value'] = 0.5
-                        # database[message.author.name]['rewards']['Investor'] = 1
-                        write_read_voice_channels(voice_channels_database)
-                        await message.channel.send(f'{message.author.name} Sold {amount} shares in {key.name} for {target_earns} <:CBCcoin:831506214659293214>.')
-                        write_db(database)
-                    else:
-                        await message.channel.send(f'You do not have that many shares!')
+        #                 voice_channels_database[keyid]['value'] -= amount*0.05*vc_value
+        #                 if voice_channels_database[keyid]['value'] <= 0:
+        #                     voice_channels_database[keyid]['value'] = 0.5
+        #                 # database[message.author.name]['rewards']['Investor'] = 1
+        #                 write_read_voice_channels(voice_channels_database)
+        #                 await message.channel.send(f'{message.author.name} Sold {amount} shares in {key.name} for {target_earns} <:CBCcoin:831506214659293214>.')
+        #                 write_db(database)
+        #             else:
+        #                 await message.channel.send(f'You do not have that many shares!')
 
     #
 
