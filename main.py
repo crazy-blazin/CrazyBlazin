@@ -39,6 +39,7 @@ from qrcode.image.styles.colormasks import RadialGradiantColorMask
 import pickle
 from PIL import Image
 import datetime
+from config import *
 
 with open('version.txt', 'r') as f:
     version = float(f.read())
@@ -225,7 +226,7 @@ async def ticksystem():
                         if user in all_members_in_vc:
                             tot_members -= 1
                             # pass
-                        extra_earned += percent_ownage * tot_members*250
+                        extra_earned += percent_ownage * tot_members*EXTRA_PER_STOCK
                         # total_gained += extra_earned
                         database[user]['coins'] = round(database[user]['coins'] + extra_earned, 5)
             except IndexError:
@@ -306,7 +307,7 @@ async def on_message(message):
             if message.author.name in voice_channels_database[key]['users']:
                 total_owned = voice_channels_database[key]["users"][message.author.name]['amount']
                 percent_ownage = round((total_owned / voice_channels_database[key]['stocks']) * 100, 3)
-                income_per_member = round((total_owned / voice_channels_database[key]['stocks']) * 1*20, 5)
+                income_per_member = round((total_owned / voice_channels_database[key]['stocks']) * 1*EXTRA_PER_STOCK, 5)
                 total_shares = int(voice_channels_database[key]['users'][message.author.name]['amount'])
                 if total_shares > 0:
                     embed.add_field(name=f"{voice_channels_database[key]['name']} | Shares: {total_shares}", value=f'Stake: {percent_ownage}% | inc./mem.: {income_per_member}  <:CBCcoin:831506214659293214>')
