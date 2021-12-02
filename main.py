@@ -225,7 +225,7 @@ async def ticksystem():
                         if user in all_members_in_vc:
                             tot_members -= 1
                             # pass
-                        extra_earned += percent_ownage * tot_members*20
+                        extra_earned += percent_ownage * tot_members*250
                         # total_gained += extra_earned
                         database[user]['coins'] = round(database[user]['coins'] + extra_earned, 5)
             except IndexError:
