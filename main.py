@@ -258,10 +258,13 @@ async def card_drawing(total_sentence, type__, username):
             stl = styles['Mystical']
         random_seed = str(np.random.randint(0, 1000000))
         path_to_card = cardsystem.do_card(total_sentence, type_ = type__+random_seed+extra, style = stl)
-        try:
-            img = Image.open(path_to_card)
-        except:
-            print(path_to_card)
+        lock = True
+        while lock:
+            try:
+                img = Image.open(path_to_card)
+                lock = False
+            except:
+                print(path_to_card)
         img = Image.open(path_to_card)
         draw = ImageDraw.Draw(img)
         font = ImageFont.truetype("Roboto-Black.ttf", 30)
