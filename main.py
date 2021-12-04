@@ -275,15 +275,16 @@ async def ticksystem():
             total_stats[member.name] = {}
             role_names = [role.name for role in member.roles]
             if 'Bots' not in role_names:
-                if len(database[member.name]['cards']) > 0:
-                    for card in database[member.name]['cards']:
-                        for stat in database[member.name]['cards'][card]:
-                            if stat not in total_stats[member.name]:
-                                total_stats[member.name][stat] = database[member.name]['cards'][card][stat]
-                            else:
-                                total_stats[member.name][stat] += database[member.name]['cards'][card][stat]
+                if member.name in database:
+                    if len(database[member.name]['cards']) > 0:
+                        for card in database[member.name]['cards']:
+                            for stat in database[member.name]['cards'][card]:
+                                if stat not in total_stats[member.name]:
+                                    total_stats[member.name][stat] = database[member.name]['cards'][card][stat]
+                                else:
+                                    total_stats[member.name][stat] += database[member.name]['cards'][card][stat]
 
-                            database[member.name][stat] = total_stats[member.name][stat]
+                                database[member.name][stat] = total_stats[member.name][stat]
 
         write_db(database)
         for user in database:
