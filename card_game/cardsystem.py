@@ -52,7 +52,7 @@ def do_card(input_description = 'Grand Behemoth', type_ = 'BlackHole', style = '
             id_box.send_keys(input_description)
 
             id_box = driver.find_element_by_xpath('/html/body/div/div/div[3]/div/div/div[1]/div[2]/div/div[2]/div[2]/div/div[2]').click()
-            time.sleep(1)
+            time.sleep(2)
 
             time.sleep(1)
             id_box = driver.find_element_by_xpath('/html/body/div/div/div[3]/div/div/div[1]/div[2]/div/div[3]/div[1]/div/button').click()
@@ -61,7 +61,7 @@ def do_card(input_description = 'Grand Behemoth', type_ = 'BlackHole', style = '
             print('Still generating')
 
     # Reset
-    time.sleep(3)   
+    time.sleep(5)   
     driver.refresh()
     input_description = input_description.replace(' ', '_')
 
@@ -104,8 +104,9 @@ def do_card_regular(input_description = 'Grand Behemoth', style = '/html/body/di
     time.sleep(3)   
     driver.refresh()
     input_description = input_description.replace(' ', '_')
-
+    
     return f'C:/Users/foxx/Downloads/{input_description}_TradingCard.jpg'
+    # return f'C:/Users/Gimpe/Downloads/{input_description}_TradingCard.jpg'
 
 
 
