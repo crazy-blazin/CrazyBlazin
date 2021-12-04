@@ -41,6 +41,19 @@ from PIL import Image
 import datetime
 from config import *
 
+import card_game.cardsystem as cardsystem
+from PIL import Image
+from PIL import ImageFont
+from PIL import ImageDraw 
+
+
+MAIN_CARD_LOCK = True
+
+
+cards_stats = {'light': {':shield:': [40, 'Defence'], ':drop_of_blood:': [0, 'Steal']}, 'evil': {':drop_of_blood:': [20, 'Steal'], ':shield:': [0, 'Defence']}}
+
+
+
 with open('version.txt', 'r') as f:
     version = float(f.read())
     print(version)
@@ -64,10 +77,10 @@ def read_db():
     except:
         print('read error')
 
-def write_read_voice_channels(database):
+def write_read_cards_database(database):
     if database != None:
         try:
-            with open('../voice_channels_database.txt', 'w', encoding='utf-8') as f:
+            with open('../cards_database.txt', 'w', encoding='utf-8') as f:
                 f.write(str(database))
             return database
         except:
@@ -84,11 +97,11 @@ def read_rewards():
         print('read error')
 
 
-def read_voice_channels():
+def read_cards_database():
     try:
-        with open('../voice_channels_database.txt', 'r') as f:
-            voice_channels_database = eval(f.read())
-        return voice_channels_database
+        with open('../cards_database.txt', 'r') as f:
+            cards_database = eval(f.read())
+        return cards_database
     except:
         print('read error')
 
@@ -121,13 +134,14 @@ class MyClient(discord.Client):
         # database = read_db()
         vc_channels = client.guilds[0].voice_channels
         voice_channels = list(vc_channels)
-        voice_channels_save = {}
-        if not os.path.exists('../voice_channels_database.txt'):
-            with open('../voice_channels_database.txt', 'w', encoding='utf-8') as f:
-                for i in voice_channels:
-                    voice_channels_save[str(i.id)] = {'name': f'{str(i.name)}' ,'stocks': 1000, 'users': {}, 'value': 100}
-                f.write(str(voice_channels_save))
-                voice_channels_database = read_voice_channels()
+        cards_database_save = {}
+        if not os.path.exists('../cards_database.txt'):
+            with open('../cards_database.txt', 'w', encoding='utf-8') as f:
+                for member in members:
+                    cards_database_save[member.name] = {'cards': [], 'stats': {}}
+
+                f.write(str(cards_database_save))
+                cards_database = read_cards_database()
 
         for member in members:
             if member.name in database:
@@ -149,8 +163,6 @@ class MyClient(discord.Client):
         embed.add_field(name=f"Patch notes:", value=f'{patchnotes}')
         await patchchannel.send(embed=embed)
         write_db(database)
-
-
         # members = self.get_all_members()
         # for member in members:
         #     role_names = [role.name for role in member.roles]
@@ -171,7 +183,7 @@ intents = discord.Intents.default()
 intents.members = True
 client = MyClient(intents = intents)
 
-voice_channels_database = read_voice_channels()
+cards_database = read_cards_database()
 
 def add_coins(stream_state, user, cointype):
     # add coins to user
@@ -205,32 +217,90 @@ def add_coins(stream_state, user, cointype):
     write_db(database)
 
 
+
+async def card_drawing(total_sentence, type__, username):
+    styles = {'Steampunk': '/html/body/div/div/div[3]/div/div/div/div[1]/div[2]/div/div[2]/div[9]/div/div/img', 'Fantasy': '/html/body/div/div/div[3]/div/div/div/div[1]/div[2]/div/div[2]/div[8]/div/div/img', 'Synthwave': '/html/body/div/div/div[3]/div/div/div/div[1]/div[2]/div/div[2]/div[11]/div/div/img', 'Pastel': '/html/body/div/div/div[3]/div/div/div/div[1]/div[2]/div/div[2]/div[5]/div/div/img', 'Mystical': '/html/body/div/div/div[3]/div/div/div/div[1]/div[2]/div/div[2]/div[1]/div/div/img', 'Ukiyoe': '/html/body/div/div/div[3]/div/div/div/div[1]/div[2]/div/div[2]/div[10]/div/div/img', 'Dark fantasy': '/html/body/div/div/div[3]/div/div/div/div[1]/div[2]/div/div[2]/div[3]/div/div/img', 'HD': '/html/body/div/div/div[3]/div/div/div/div[1]/div[2]/div/div[2]/div[6]/div/div/img', 'Festive': '/html/body/div/div/div[3]/div/div/div/div[1]/div[2]/div/div[2]/div[2]/div/div/img', 'Psychic': '/html/body/div/div/div[3]/div/div/div/div[1]/div[2]/div/div[2]/div[4]/div/div/img', 'Vibrant': '/html/body/div/div/div[3]/div/div/div/div[1]/div[2]/div/div[2]/div[7]/div/div/img'}
+    global MAIN_CARD_LOCK
+    global cards_stats
+    stats_gained_text = {}
+    stats_gained_image = {}
+    if MAIN_CARD_LOCK:
+        MAIN_CARD_LOCK = False
+        if type__ == 'artifact':
+            stl = styles['Steampunk']
+        if type__ == 'evil':
+            stl = styles['Dark fantasy']
+        else:
+            stl = styles['Mystical']
+        path_to_card = cardsystem.do_card(total_sentence, type_ = type__ , style = stl)
+        img = Image.open(path_to_card)
+        draw = ImageDraw.Draw(img)
+        font = ImageFont.truetype("Roboto-Black.ttf", 30)
+        # draw.text((x, y),"Sample Text",(r,g,b))
+        if type__ in cards_stats:
+            stats = cards_stats[type__]
+            for i, stat in enumerate(stats):
+                stats_value = int(stats[stat][0])
+                if stats_value > 0:
+                    stats_gained = np.random.randint(0, int(stats[stat][0]))
+                    stats_gained_text[stats[stat][1]] = stats_gained
+                    stats_gained_image[stat] = stats_gained
+                else:
+                    stats_gained_text[stats[stat][1]] = 0
+                    stats_gained_image[stat] = 0
+                draw.text((70*(1 + 3*i), 1800),f"{stats[stat][1]}: {stats_gained_text[stats[stat][1]]}",(255,255,255),font=font)
+                
+        # draw.text((70*4, 1800),"CBC steal: 50",(255,255,255),font=font)
+        draw.text((70, 1860),f"Type: {type__}",(255,0,255),font=font)
+        draw.text((300, 1860),f"Rarity: Common",(255,0,255),font=font)
+        path = f'cards/{uuid.uuid4()}.jpg'
+        if username in database:
+            if 'cards' in database[username]:
+                database[username]['cards'][path] = stats_gained_image
+        img.save(path)
+        MAIN_CARD_LOCK = True
+        return path
+
+
 async def ticksystem():
     while True:
         global temp_status
         # database = read_db()
         global database
-        total_gained = 0
+
+        print('tick')
+        total_stats = {}
+        members = client.get_all_members()
+        for member in members:
+            total_stats[member.name] = {}
+            role_names = [role.name for role in member.roles]
+            if 'Bots' not in role_names:
+                if len(database[member.name]['cards']) > 0:
+                    for card in database[member.name]['cards']:
+                        for stat in database[member.name]['cards'][card]:
+                            if stat not in total_stats[member.name]:
+                                total_stats[member.name][stat] = database[member.name]['cards'][card][stat]
+                            else:
+                                total_stats[member.name][stat] += database[member.name]['cards'][card][stat]
+
+                            database[member.name][stat] = total_stats[member.name][stat]
+
         write_db(database)
         for user in database:
-            try:
-                vc_channels = client.guilds[0].voice_channels
-                voice_channels = list(vc_channels)
-                extra_earned = 0
-                for vc in voice_channels:
-                    all_members_in_vc = list(vc.members)
-                    tot_members = len(all_members_in_vc)
-                    if user in voice_channels_database[str(vc.id)]['users']:
-                        total_owned = voice_channels_database[str(vc.id)]["users"][user]['amount']
-                        percent_ownage = (total_owned / voice_channels_database[str(vc.id)]['stocks'])
-                        if user in all_members_in_vc:
-                            tot_members -= 1
-                            # pass
-                        extra_earned += percent_ownage * tot_members*EXTRA_PER_STOCK
-                        # total_gained += extra_earned
-                        database[user]['coins'] = round(database[user]['coins'] + extra_earned, 5)
-            except IndexError:
-                pass
+            # try:
+            #     vc_channels = client.guilds[0].voice_channels
+            #     voice_channels = list(vc_channels)
+            #     for vc in voice_channels:
+            #         all_members_in_vc = list(vc.members)
+            #         for member in all_members_in_vc:
+            #             if member.name in database:
+            #                 for member2 in database:
+            #                     if member.name != member2:
+                                        
+            #     #     tot_members = len(all_members_in_vc)
+
+            # except IndexError:
+            #     pass
 
             if user in temp_status:
                 state = temp_status[user]
@@ -254,11 +324,9 @@ async def ticksystem():
 # async def timer():
 #     await client.wait_until_ready()
 #  await asyncio.sleep(4)
-        
+
 
 client.loop.create_task(ticksystem())
-# client.loop.create_task(timer())
-
 
 @client.event
 async def on_voice_state_update(member, before, after):
@@ -286,7 +354,7 @@ async def on_message(message):
     
     global database
     global rewards
-    global voice_channels_database
+    global cards_database
 
     members = client.get_all_members()
     for member in members:
@@ -296,6 +364,7 @@ async def on_message(message):
                 database[member.name] = {}
                 database[member.name]['coins'] = 10
                 database[member.name]['rewards'] = {}
+                database[member.name]['cards'] = {}
     write_db(database)
 
 
@@ -303,56 +372,52 @@ async def on_message(message):
         value = database[message.author.name]['coins']
         embed = discord.Embed(title=f"Balance", description=f"{message.author.name} current balance") #,color=Hex code
         embed.add_field(name=f"Crazy Blazin Coins", value=f'{round(value,5)} <:CBCcoin:831506214659293214>')
-        for key in voice_channels_database:
-            if message.author.name in voice_channels_database[key]['users']:
-                total_owned = voice_channels_database[key]["users"][message.author.name]['amount']
-                percent_ownage = round((total_owned / voice_channels_database[key]['stocks']) * 100, 3)
-                income_per_member = round((total_owned / voice_channels_database[key]['stocks']) * 1*EXTRA_PER_STOCK, 5)
-                total_shares = int(voice_channels_database[key]['users'][message.author.name]['amount'])
-                if total_shares > 0:
-                    embed.add_field(name=f"{voice_channels_database[key]['name']} | Shares: {total_shares}", value=f'Stake: {percent_ownage}% | inc./mem.: {income_per_member}  <:CBCcoin:831506214659293214>')
-        
+
+        for stat in database[message.author.name]:
+            if stat != 'coins' and stat != 'rewards' and stat != 'cards':
+                embed.add_field(name=stat, value=f'{database[message.author.name][stat]}')
+
         await message.channel.send(embed=embed)
 
 
-    if message.content.startswith('!lookup'):
-        str_split = message.content.split(' ')
-        if len(str_split) > 2 or len(str_split) < 2:
-            await message.channel.send(f'Too many or few arguments. Use !lookup <target>')
-        else:
-            target = str(str_split[1])
-            if target in database:
-                value = database[target]['coins']
-                rewards_user = database[target]['rewards']
-                embed = discord.Embed(title=f"User stats", description=f"{target} current balance") #,color=Hex code
-                for reward in rewards_user:
-                    embed.add_field(name=f"{reward}", value=f'{rewards[reward][0]}')
-                embed.add_field(name=f"Crazy Blazin Coins", value=f'{round(value,2)} <:CBCcoin:831506214659293214>')
-                for key in voice_channels_database:
-                    if target in voice_channels_database[key]['users']:
-                        total_owned = voice_channels_database[key]["users"][target]['amount']
-                        percent_ownage = round((total_owned / voice_channels_database[key]['stocks']) * 100, 2)
-                        embed.add_field(name=f"{voice_channels_database[key]['name']}", value=f'Stake: {percent_ownage}%')
-                await message.channel.send(embed=embed)
-            else:
-                await message.channel.send(f'User does not exist!')    
+    # if message.content.startswith('!lookup'):
+    #     str_split = message.content.split(' ')
+    #     if len(str_split) > 2 or len(str_split) < 2:
+    #         await message.channel.send(f'Too many or few arguments. Use !lookup <target>')
+    #     else:
+    #         target = str(str_split[1])
+    #         if target in database:
+    #             value = database[target]['coins']
+    #             rewards_user = database[target]['rewards']
+    #             embed = discord.Embed(title=f"User stats", description=f"{target} current balance") #,color=Hex code
+    #             for reward in rewards_user:
+    #                 embed.add_field(name=f"{reward}", value=f'{rewards[reward][0]}')
+    #             embed.add_field(name=f"Crazy Blazin Coins", value=f'{round(value,2)} <:CBCcoin:831506214659293214>')
+    #             for key in voice_channels_database:
+    #                 if target in voice_channels_database[key]['users']:
+    #                     total_owned = voice_channels_database[key]["users"][target]['amount']
+    #                     percent_ownage = round((total_owned / voice_channels_database[key]['stocks']) * 100, 2)
+    #                     embed.add_field(name=f"{voice_channels_database[key]['name']}", value=f'Stake: {percent_ownage}%')
+    #             await message.channel.send(embed=embed)
+    #         else:
+    #             await message.channel.send(f'User does not exist!')    
                 
 
-    if message.content.startswith('!myrewards'):
-        rewards_user = database[message.author.name]['rewards']
-        embed = discord.Embed(title=f"Rewards", description=f"{message.author.name} current rewards") #,color=Hex code
-        for reward in rewards_user:
-            print(reward, rewards[reward])
-            embed.add_field(name=f"{reward}", value=f'{rewards[reward][0]}')
-        await message.channel.send(embed=embed)
+    # if message.content.startswith('!myrewards'):
+    #     rewards_user = database[message.author.name]['rewards']
+    #     embed = discord.Embed(title=f"Rewards", description=f"{message.author.name} current rewards") #,color=Hex code
+    #     for reward in rewards_user:
+    #         print(reward, rewards[reward])
+    #         embed.add_field(name=f"{reward}", value=f'{rewards[reward][0]}')
+    #     await message.channel.send(embed=embed)
 
 
-    if message.content.startswith('!rewardhelp'):
+    # if message.content.startswith('!rewardhelp'):
 
-        embed = discord.Embed(title=f"Rewards", description=f"Current rewards") #,color=Hex code
-        for reward in rewards:
-            embed.add_field(name=f"{reward} {rewards[reward][0]}", value=f'{rewards[reward][1]}')
-        await message.channel.send(embed=embed)
+    #     embed = discord.Embed(title=f"Rewards", description=f"Current rewards") #,color=Hex code
+    #     for reward in rewards:
+    #         embed.add_field(name=f"{reward} {rewards[reward][0]}", value=f'{rewards[reward][1]}')
+    #     await message.channel.send(embed=embed)
 
 
     if message.content.startswith('!top'):
@@ -374,26 +439,26 @@ async def on_message(message):
                     return
                 index += 1
 
-    if message.content.startswith('!givereward'):
-        str_split = message.content.split(' ')
-        if len(str_split) > 3 or len(str_split) < 3:
-            await message.channel.send(f'Too many or few arguments. Use !givereward <target> <reward>')
-        reward = str(str_split[2])
-        target = str_split[1]
-        role_names = [role.name for role in message.author.roles]
-        if 'Admin' in role_names or 'Server: Mod' in role_names:
-            if target in database:
-                if reward in rewards:
-                    if reward in database[target]['rewards']:
-                        database[target]['rewards'][reward] += 1
-                    else:
-                        database[target]['rewards'][reward] = 1
-                    write_db(database)
-                    await message.channel.send(f'{message.author.name} added {reward} {rewards[reward][0]} to {target}.')
-                else:
-                    await message.channel.send(f'Reward does not exist!')
-        else:
-            await message.channel.send(f'You are not admin or moderator!')
+    # if message.content.startswith('!givereward'):
+    #     str_split = message.content.split(' ')
+    #     if len(str_split) > 3 or len(str_split) < 3:
+    #         await message.channel.send(f'Too many or few arguments. Use !givereward <target> <reward>')
+    #     reward = str(str_split[2])
+    #     target = str_split[1]
+    #     role_names = [role.name for role in message.author.roles]
+    #     if 'Admin' in role_names or 'Server: Mod' in role_names:
+    #         if target in database:
+    #             if reward in rewards:
+    #                 if reward in database[target]['rewards']:
+    #                     database[target]['rewards'][reward] += 1
+    #                 else:
+    #                     database[target]['rewards'][reward] = 1
+    #                 write_db(database)
+    #                 await message.channel.send(f'{message.author.name} added {reward} {rewards[reward][0]} to {target}.')
+    #             else:
+    #                 await message.channel.send(f'Reward does not exist!')
+    #     else:
+    #         await message.channel.send(f'You are not admin or moderator!')
     
 
     if message.content.startswith('!changetime'):
@@ -407,45 +472,92 @@ async def on_message(message):
         else:
             await message.channel.send(f'You are not Foxxravin!')
 
-  
-    if message.content.startswith('!buy'):
-        
-        str_split = message.content.split(' ')
-        if len(str_split) > 3 or len(str_split) < 3:
-            await message.channel.send(f'Too many or few arguments. Use !buy <vc_name> <amount>')
-        else:
-            vc_channels = client.guilds[0].voice_channels
-            voice_channels = list(vc_channels)
-            vc_name = str(str_split[1])
-            amount = np.abs(float(str_split[2]))
-            for key in voice_channels:
-                keyid = str(key.id)
-                if vc_name.lower() == str(key.name).lower():
-                    voice_channels_database[keyid]['name'] = key.name
-                    vc_value = float(voice_channels_database[keyid]['value'])
-                    total_bought = [voice_channels_database[keyid]['users'][x]['amount'] for x in voice_channels_database[keyid]['users']]
-                    total_bought = np.array(total_bought).sum() + amount
-                    total_left =  (voice_channels_database[keyid]['stocks'] - total_bought) >= 0
-                    target_has_to_pay = round((amount*0.05*vc_value + vc_value)*amount,2)
-                    if (target_has_to_pay <= database[message.author.name]['coins']) and total_left:
-                        database[message.author.name]['coins'] -= target_has_to_pay
-                        if message.author.name in voice_channels_database[keyid]['users']:
-                            voice_channels_database[keyid]['users'][message.author.name]['amount'] += amount
-                        else:
-                            voice_channels_database[keyid]['users'][message.author.name] = {'amount':amount}
-                        
-                        voice_channels_database[keyid]['value'] += amount*0.05*vc_value
-                        # database[message.author.name]['rewards']['Investor'] = 1
-                        write_read_voice_channels(voice_channels_database)
-                        await message.channel.send(f'{message.author.name} Bought {amount} shares in {key.name} for {target_has_to_pay} <:CBCcoin:831506214659293214>.')
-                        write_db(database)
-                    else:
-                        await message.channel.send(f'You do not have enough coins, you need {target_has_to_pay} <:CBCcoin:831506214659293214> for this purchase (amount^2 * 0.05*vc_value + vc_value*amount)).')
-                    if not total_left:
-                        await message.channel.send(f'All stocks of this channel has been bought or you are trying to buy too many!')
 
-    if message.content.startswith('!sell'):
-        await message.channel.send(f'This function is disabled until fixed')
+    if message.content.startswith('!draw'):
+        if MAIN_CARD_LOCK:
+            str_split = message.content.split(' ')
+            if len(str_split) > 2 or len(str_split) < 2:
+                await message.channel.send(f'Too many or few arguments. Use !draw <target>')
+            else:
+                if len(database[message.author.name]['cards']) < 10:
+                        
+                    await message.channel.send(f'Drawing cards.... Please wait.')
+                    land = str_split[1].lower()
+                    # lands = ['forest', 'mountain', 'desert', 'swamp', 'blackhole', 'tundra', 'angel', 'artifact', 'mountain']
+                    lands = ['light', 'evil']
+                    descriptions = ['Exiled', 'Ginger', 'Crimson', 'Ugly', 'Sexy', 'Perverted']
+                    type = ['Skeleton', 'Monster', 'Dragon', 'Angel', 'Demon', 'Ghost', 'Vampire', 'Devil', 'Worm', 'Cunt', 'Country', 'Spacestation', 'Space', 'Table', 'Forest', 'Desert', 'blackhole']
+
+                    random_land = np.random.randint(0, len(lands))
+                    random_description = np.random.randint(0, len(descriptions))
+                    random_type = np.random.randint(0, len(type))
+
+                    total_sentence = f'{descriptions[random_description]} {type[random_type]}'
+                    if land in lands:
+                        path_imge = await card_drawing(total_sentence, land, message.author.name)
+                        await message.channel.send(file=discord.File(path_imge))
+                        
+                    else:
+                        await message.channel.send(f'Land does not exist!')
+                else:
+                    await message.channel.send(f'You can only have 10 cards!')
+        else:
+            await message.channel.send(f'Wait until last card is fully drawn!')
+
+    
+    if message.content.startswith('!paint'):
+        styles = {'Steampunk': '/html/body/div/div/div[3]/div/div/div/div[1]/div[2]/div/div[2]/div[9]/div/div/img', 'Fantasy': '/html/body/div/div/div[3]/div/div/div/div[1]/div[2]/div/div[2]/div[8]/div/div/img', 'Synthwave': '/html/body/div/div/div[3]/div/div/div/div[1]/div[2]/div/div[2]/div[11]/div/div/img', 'Pastel': '/html/body/div/div/div[3]/div/div/div/div[1]/div[2]/div/div[2]/div[5]/div/div/img', 'Mystical': '/html/body/div/div/div[3]/div/div/div/div[1]/div[2]/div/div[2]/div[1]/div/div/img', 'Ukiyoe': '/html/body/div/div/div[3]/div/div/div/div[1]/div[2]/div/div[2]/div[10]/div/div/img', 'Dark fantasy': '/html/body/div/div/div[3]/div/div/div/div[1]/div[2]/div/div[2]/div[3]/div/div/img', 'HD': '/html/body/div/div/div[3]/div/div/div/div[1]/div[2]/div/div[2]/div[6]/div/div/img', 'Festive': '/html/body/div/div/div[3]/div/div/div/div[1]/div[2]/div/div[2]/div[2]/div/div/img', 'Psychic': '/html/body/div/div/div[3]/div/div/div/div[1]/div[2]/div/div[2]/div[4]/div/div/img', 'Vibrant': '/html/body/div/div/div[3]/div/div/div/div[1]/div[2]/div/div[2]/div[7]/div/div/img'}
+        str_split = message.content.split(' ')
+        if len(str_split) < 2:
+                await message.channel.send(f'Too many or few arguments. Use !draw <target>')
+        else:
+            str_split = str_split[1:]
+            total_sentence = ''
+            for word in str_split:
+                total_sentence += word+' '
+            await message.channel.send(f'Painting.... Please wait.')
+            path_imge = cardsystem.do_card_regular(total_sentence)
+            await message.channel.send(file=discord.File(path_imge))
+
+
+    # if message.content.startswith('!buy'):
+        
+    #     str_split = message.content.split(' ')
+    #     if len(str_split) > 3 or len(str_split) < 3:
+    #         await message.channel.send(f'Too many or few arguments. Use !buy <vc_name> <amount>')
+    #     else:
+    #         vc_channels = client.guilds[0].voice_channels
+    #         voice_channels = list(vc_channels)
+    #         vc_name = str(str_split[1])
+    #         amount = np.abs(float(str_split[2]))
+    #         for key in voice_channels:
+    #             keyid = str(key.id)
+    #             if vc_name.lower() == str(key.name).lower():
+    #                 voice_channels_database[keyid]['name'] = key.name
+    #                 vc_value = float(voice_channels_database[keyid]['value'])
+    #                 total_bought = [voice_channels_database[keyid]['users'][x]['amount'] for x in voice_channels_database[keyid]['users']]
+    #                 total_bought = np.array(total_bought).sum() + amount
+    #                 total_left =  (voice_channels_database[keyid]['stocks'] - total_bought) >= 0
+    #                 target_has_to_pay = round((amount*0.05*vc_value + vc_value)*amount,2)
+    #                 if (target_has_to_pay <= database[message.author.name]['coins']) and total_left:
+    #                     database[message.author.name]['coins'] -= target_has_to_pay
+    #                     if message.author.name in voice_channels_database[keyid]['users']:
+    #                         voice_channels_database[keyid]['users'][message.author.name]['amount'] += amount
+    #                     else:
+    #                         voice_channels_database[keyid]['users'][message.author.name] = {'amount':amount}
+                        
+    #                     voice_channels_database[keyid]['value'] += amount*0.05*vc_value
+    #                     # database[message.author.name]['rewards']['Investor'] = 1
+    #                     write_read_voice_channels(voice_channels_database)
+    #                     await message.channel.send(f'{message.author.name} Bought {amount} shares in {key.name} for {target_has_to_pay} <:CBCcoin:831506214659293214>.')
+    #                     write_db(database)
+    #                 else:
+    #                     await message.channel.send(f'You do not have enough coins, you need {target_has_to_pay} <:CBCcoin:831506214659293214> for this purchase (amount^2 * 0.05*vc_value + vc_value*amount)).')
+    #                 if not total_left:
+    #                     await message.channel.send(f'All stocks of this channel has been bought or you are trying to buy too many!')
+
+    # if message.content.startswith('!sell'):
+    #     await message.channel.send(f'This function is disabled until fixed')
         # str_split = message.content.split(' ')
         # if len(str_split) > 3 or len(str_split) < 3:
         #     await message.channel.send(f'Too many or few arguments. Use !sell <vc_name> <amount>')
@@ -476,26 +588,26 @@ async def on_message(message):
 
     #
 
-    if message.content.startswith('!vc'):
-        embed = discord.Embed(title=f"Voice chat assets", description=f"Asset information for voice chats") #,color=Hex code
-        vc_channels = client.guilds[0].voice_channels
-        voice_channels = list(vc_channels)
-        for key in voice_channels:
-            voice_channels_database[str(key.id)]['name'] = str(key.name)
+    # if message.content.startswith('!vc'):
+    #     embed = discord.Embed(title=f"Voice chat assets", description=f"Asset information for voice chats") #,color=Hex code
+    #     vc_channels = client.guilds[0].voice_channels
+    #     voice_channels = list(vc_channels)
+    #     for key in voice_channels:
+    #         voice_channels_database[str(key.id)]['name'] = str(key.name)
 
-        for key in voice_channels_database:
-            name = voice_channels_database[key]['name']
-            value = round(voice_channels_database[key]['value'],3)
-            stocks = round(voice_channels_database[key]['stocks'],3)
-            users = voice_channels_database[key]['users']
-            output = ''
-            for user in users:
-                percent_owned = round(users[user]['amount']/stocks*100,2)
-                income_per_member = percent_owned * 1*20
-                output += f'{user} | {percent_owned}%\n'
+    #     for key in voice_channels_database:
+    #         name = voice_channels_database[key]['name']
+    #         value = round(voice_channels_database[key]['value'],3)
+    #         stocks = round(voice_channels_database[key]['stocks'],3)
+    #         users = voice_channels_database[key]['users']
+    #         output = ''
+    #         for user in users:
+    #             percent_owned = round(users[user]['amount']/stocks*100,2)
+    #             income_per_member = percent_owned * 1*20
+    #             output += f'{user} | {percent_owned}%\n'
 
-            embed.add_field(name=f"{name}", value=f'Price {value} <:CBCcoin:831506214659293214> + Fee\n {output}')
-        await message.channel.send(embed=embed)
+    #         embed.add_field(name=f"{name}", value=f'Price {value} <:CBCcoin:831506214659293214> + Fee\n {output}')
+    #     await message.channel.send(embed=embed)
 
     
     # if message.content.startswith('!buy gold'):
