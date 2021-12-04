@@ -65,7 +65,7 @@ def do_card(input_description = 'Grand Behemoth', type_ = 'BlackHole', style = '
     driver.refresh()
     input_description = input_description.replace(' ', '_')
 
-    return f'C:/Users/Gimpe/Downloads/{input_description}_TradingCard.jpg'
+    return f'C:/Users/foxx/Downloads/{input_description}_TradingCard.jpg'
 
 
 
@@ -104,7 +104,7 @@ def do_card_regular(input_description = 'Grand Behemoth', style = '/html/body/di
     driver.refresh()
     input_description = input_description.replace(' ', '_')
 
-    return f'C:/Users/Gimpe/Downloads/{input_description}_TradingCard.jpg'
+    return f'C:/Users/foxx/Downloads/{input_description}_TradingCard.jpg'
 
 
 

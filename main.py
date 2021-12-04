@@ -50,7 +50,7 @@ from PIL import ImageDraw
 MAIN_CARD_LOCK = True
 
 
-cards_stats = {'light': {':shield:': [40, 'Defence'], ':drop_of_blood:': [0, 'Steal']}, 'evil': {':drop_of_blood:': [20, 'Steal'], ':shield:': [0, 'Defence']}}
+cards_stats = {'light': {':shield:': [40, 'Defence'], ':drop_of_blood:': [5, 'Steal']}, 'evil': {':drop_of_blood:': [20, 'Steal'], ':shield:': [5, 'Defence']}, 'artifact': {':drop_of_blood:': [0, 'Steal'], ':shield:': [10, 'Defence'], ':coin:': [100, 'Gold']}  }
 
 
 
@@ -253,7 +253,7 @@ async def card_drawing(total_sentence, type__, username):
         # draw.text((70*4, 1800),"CBC steal: 50",(255,255,255),font=font)
         draw.text((70, 1860),f"Type: {type__}",(255,0,255),font=font)
         draw.text((300, 1860),f"Rarity: Common",(255,0,255),font=font)
-        path = f'cards/{uuid.uuid4()}.jpg'
+        path = f'../cards/{uuid.uuid4()}.jpg'
         if username in database:
             if 'cards' in database[username]:
                 database[username]['cards'][path] = stats_gained_image
@@ -484,9 +484,9 @@ async def on_message(message):
                     await message.channel.send(f'Drawing cards.... Please wait.')
                     land = str_split[1].lower()
                     # lands = ['forest', 'mountain', 'desert', 'swamp', 'blackhole', 'tundra', 'angel', 'artifact', 'mountain']
-                    lands = ['light', 'evil']
-                    descriptions = ['Exiled', 'Ginger', 'Crimson', 'Ugly', 'Sexy', 'Perverted']
-                    type = ['Skeleton', 'Monster', 'Dragon', 'Angel', 'Demon', 'Ghost', 'Vampire', 'Devil', 'Worm', 'Cunt', 'Country', 'Spacestation', 'Space', 'Table', 'Forest', 'Desert', 'blackhole']
+                    lands = ['light', 'evil', 'artifact']
+                    descriptions = ['Exiled', 'Ginger', 'Crimson', 'Ugly', 'Sexy', 'Perverted', 'Washed', 'Fermented']
+                    type = ['Skeleton', 'Monster', 'Dragon', 'Angel', 'Demon', 'Ghost', 'Vampire', 'Devil', 'Worm', 'Cunt', 'Land', 'Spacestation', 'Space', 'Table', 'Forest', 'Desert', 'Blackhole', 'Mountain', 'Sink', 'Falls', 'Bat', 'Asshole', 'Paint', 'Gobling', 'Sky', 'Heaven', 'Goblet', 'Chicken', 'Lizard', 'Softgun', 'Teacher', 'Mentor', 'Beer', 'Eye', 'Tower']
 
                     random_land = np.random.randint(0, len(lands))
                     random_description = np.random.randint(0, len(descriptions))
