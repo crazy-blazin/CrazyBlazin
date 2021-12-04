@@ -88,6 +88,27 @@ def write_read_cards_database(database):
     else:
         print('write error - voice database is none')
 
+
+
+def write_card_words(database):
+    if database != None:
+        try:
+            with open('../cards_words.txt', 'w', encoding='utf-8') as f:
+                f.write(str(database))
+            return database
+        except:
+            print('write error')
+    else:
+        print('write error - voice database is none')
+
+def read_card_words():
+    try:
+        with open('../cards_words.txt', 'r') as f:
+            database = eval(f.read())
+        return database
+    except:
+        print('read error')
+
 def read_rewards():
     try:
         with open('rewards.txt', 'r') as f:
@@ -120,6 +141,7 @@ def write_db(database):
 temp_status  = {}
 database = read_db()
 rewards = read_rewards()
+card_words_database = read_card_words()
         
 class MyClient(discord.Client):
     def __init__(self, *args, **kwargs):
@@ -225,14 +247,17 @@ async def card_drawing(total_sentence, type__, username):
     stats_gained_text = {}
     stats_gained_image = {}
     if MAIN_CARD_LOCK:
+        extra = ''
         MAIN_CARD_LOCK = False
         if type__ == 'artifact':
             stl = styles['Steampunk']
         if type__ == 'evil':
             stl = styles['Dark fantasy']
+            extra = 'Blackhole'
         else:
             stl = styles['Mystical']
-        path_to_card = cardsystem.do_card(total_sentence, type_ = type__ , style = stl)
+        random_seed = str(np.random.randint(0, 1000000))
+        path_to_card = cardsystem.do_card(total_sentence, type_ = type__+random_seed+extra, style = stl)
         img = Image.open(path_to_card)
         draw = ImageDraw.Draw(img)
         font = ImageFont.truetype("Roboto-Black.ttf", 30)
@@ -486,9 +511,9 @@ async def on_message(message):
                     land = str_split[1].lower()
                     # lands = ['forest', 'mountain', 'desert', 'swamp', 'blackhole', 'tundra', 'angel', 'artifact', 'mountain']
                     lands = ['light', 'evil', 'artifact']
-                    descriptions = ['Exiled', 'Ginger', 'Crimson', 'Ugly', 'Sexy', 'Perverted', 'Washed', 'Fermented']
-                    type = ['Skeleton', 'Monster', 'Dragon', 'Angel', 'Demon', 'Ghost', 'Vampire', 'Devil', 'Worm', 'Cunt', 'Land', 'Spacestation', 'Space', 'Table', 'Forest', 'Desert', 'Blackhole', 'Mountain', 'Sink', 'Falls', 'Bat', 'Asshole', 'Paint', 'Gobling', 'Sky', 'Heaven', 'Goblet', 'Chicken', 'Lizard', 'Softgun', 'Teacher', 'Mentor', 'Beer', 'Eye', 'Tower']
-
+                    descriptions = card_words_database['desc']
+                    type = card_words_database['thing']
+                
                     random_land = np.random.randint(0, len(lands))
                     random_description = np.random.randint(0, len(descriptions))
                     random_type = np.random.randint(0, len(type))
@@ -504,6 +529,31 @@ async def on_message(message):
                     await message.channel.send(f'You can only have 10 cards!')
         else:
             await message.channel.send(f'Wait until last card is fully drawn!')
+    
+    if message.content.startswith('!add_desc'):
+        str_split = message.content.split(' ')
+        if len(str_split) > 2 or len(str_split) < 2:
+            await message.channel.send(f'Too many or few arguments. Use !add_desc <word>')
+        else:
+            desc_word = str_split[1]
+            if desc_word not in card_words_database['desc']:
+                card_words_database['desc'].append(desc_word)
+            write_card_words(card_words_database)
+            await message.channel.send(f'Word added!')
+
+
+    if message.content.startswith('!add_thing'):
+        str_split = message.content.split(' ')
+        if len(str_split) > 2 or len(str_split) < 2:
+            await message.channel.send(f'Too many or few arguments. Use !add_thing <word>')
+        else:
+            desc_word = str_split[1]
+            if desc_word not in card_words_database['thing']:
+                card_words_database['thing'].append(desc_word)
+            write_card_words(card_words_database)
+            await message.channel.send(f'Word added!')
+    
+    
 
     
     if message.content.startswith('!paint'):
