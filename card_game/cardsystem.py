@@ -66,6 +66,7 @@ def do_card(input_description = 'Grand Behemoth', type_ = 'BlackHole', style = '
     input_description = input_description.replace(' ', '_')
 
     return f'C:/Users/foxx/Downloads/{input_description}_TradingCard.jpg'
+    # return f'C:/Users/Gimpe/Downloads/{input_description}_TradingCard.jpg'
 
 
 
