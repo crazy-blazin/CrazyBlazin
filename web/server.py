@@ -137,62 +137,88 @@ api = Api(app)
 #     if version < ver:
 #         exit()
 
-all_gifts = []
+# all_gifts = []
 
-class Gift:
-    def __init__(self, id, username, amount):
-        self.amount = amount
-        self.username = username
-        self.id = id
+# class Gift:
+#     def __init__(self, id, username, amount):
+#         self.amount = amount
+#         self.username = username
+#         self.id = id
 
-def read_db():
-    try:
-        with open('../../database.txt', 'r') as f:
-            database = eval(f.read())
-        return database
-    except:
-        print('read error')
-
-
-def write_db(database):
-    try:
-        with open('../database.txt', 'w', encoding='utf-8') as f:
-            f.write(str(database))
-    except:
-        print('write error')
+# def read_db():
+#     try:
+#         with open('../../database.txt', 'r') as f:
+#             database = eval(f.read())
+#         return database
+#     except:
+#         print('read error')
 
 
-
-@app.route("/")
-def frontpage():
-    return 'frontpage'
-
-@app.route("/admin/userinfo")
-def userinfo():
-    database = read_db()
-    return database
+# def write_db(database):
+#     try:
+#         with open('../database.txt', 'w', encoding='utf-8') as f:
+#             f.write(str(database))
+#     except:
+#         print('write error')
 
 
-@app.route("/test")
+
+# @app.route("/")
+# def frontpage():
+#     return 'frontpage'
+
+# @app.route("/admin/userinfo")
+# def userinfo():
+#     database = read_db()
+#     return database
+
+
+data = {'data':{'points': [[],[]] }}
+
+
+
+@app.route("/update")
+def upd():
+    global data
+    data['data']['points'][0].append(random.randint(0, 100))
+    data['data']['points'][1].append(datetime.now().strftime("%H:%M:%S"))
+    return data
+    # return render_template('lootcrate.html')
+
+
+
+@app.route('/search', methods=['POST'])
+def search():
+  return jsonify(['my_series', 'another_series'])
+
+@app.route('/')
+def health_check():
+  return 'This datasource is healthy.'
+
+
+
+@app.route("/query")
 def test():
-    return render_template('lootcrate.html')
+    global data
+    return jsonify(data)
+    # return render_template('lootcrate.html')
 
 
-@app.route("/restart")
-def end():
-    subprocess.run("start restart.bat", shell=True, check=True)
+# @app.route("/restart")
+# def end():
+#     subprocess.run("start restart.bat", shell=True, check=True)
 
 
 
-@app.route("/<id>/shop")
-def shop(id):
-    return render_template('cards.html')
+# @app.route("/<id>/shop")
+# def shop(id):
+#     return render_template('cards.html')
     
 
-@app.route("/admin/api/gift_creation/<id>/<username>/<amount>")
-def create_gift(id, username, amount):
-    all_gifts.append(Gift(id, username, round(float(amount),2)))
-    return f'Gift created! -> {id}, {username}, {amount}'
+# @app.route("/admin/api/gift_creation/<id>/<username>/<amount>")
+# def create_gift(id, username, amount):
+#     all_gifts.append(Gift(id, username, round(float(amount),2)))
+#     return f'Gift created! -> {id}, {username}, {amount}'
 
 
 
@@ -214,23 +240,23 @@ def create_gift(id, username, amount):
 #     return f'Gift created! -> {id}, {username}, {amount}'
 
 
-@app.route("/api/<id>")
-def redeem(id):
-    database = read_db()
-    lock = True
-    for gift in all_gifts:
-        if gift.id == id:
-            with open('giftcard.txt', 'a') as f:
-                out = [gift.username, gift.amount]
-                f.write(str(out)+'\n')
-            all_gifts.remove(gift)
-            lock = False
-    if lock:
-        return f'This gift code is no longer valid!'
-    else:
-        write_db(database)
-        return f'<h1>Gift redeemed! {gift.username} recieved {gift.amount} CBC!</h1>'
-    # return f'{gift.username} recieved {gift.amount}!'
+# @app.route("/api/<id>")
+# def redeem(id):
+#     database = read_db()
+#     lock = True
+#     for gift in all_gifts:
+#         if gift.id == id:
+#             with open('giftcard.txt', 'a') as f:
+#                 out = [gift.username, gift.amount]
+#                 f.write(str(out)+'\n')
+#             all_gifts.remove(gift)
+#             lock = False
+#     if lock:
+#         return f'This gift code is no longer valid!'
+#     else:
+#         write_db(database)
+#         return f'<h1>Gift redeemed! {gift.username} recieved {gift.amount} CBC!</h1>'
+#     # return f'{gift.username} recieved {gift.amount}!'
 
 
 print('Server running')

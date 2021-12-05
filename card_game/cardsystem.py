@@ -126,6 +126,12 @@ async def do_card_regular(input_description = 'Grand Behemoth', style = '/html/b
 
 
 
+# import requests
+
+
+# response = requests.post('')
+
+
     # Art styles;
 
     # /html/body/div/div/div[3]/div/div/div/div[1]/div[2]/div/div[2]/div[9]/div/div/img - Steampunk
