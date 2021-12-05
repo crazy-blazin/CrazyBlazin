@@ -506,65 +506,67 @@ async def on_message(message):
             await message.channel.send(f'You are not Foxxravin!')
 
 
-    if message.content.startswith('!draw'):
-        if MAIN_CARD_LOCK:
-            str_split = message.content.split(' ')
-            if len(str_split) > 2 or len(str_split) < 2:
-                await message.channel.send(f'Too many or few arguments. Use !draw <target>')
-            else:
-                if len(database[message.author.name]['cards']) < 10:
+    # if message.content.startswith('!draw'):
+    #     if MAIN_CARD_LOCK:
+    #         str_split = message.content.split(' ')
+    #         if len(str_split) > 2 or len(str_split) < 2:
+    #             await message.channel.send(f'Too many or few arguments. Use !draw <target>')
+    #         else:
+    #             if len(database[message.author.name]['cards']) < 10:
                         
-                    await message.channel.send(f'Drawing cards.... Please wait.')
-                    land = str_split[1].lower()
-                    # lands = ['forest', 'mountain', 'desert', 'swamp', 'blackhole', 'tundra', 'angel', 'artifact', 'mountain']
-                    lands = ['light', 'evil', 'artifact']
-                    descriptions = card_words_database['desc']
-                    type = card_words_database['thing']
+    #                 await message.channel.send(f'Drawing cards.... Please wait.')
+    #                 land = str_split[1].lower()
+    #                 # lands = ['forest', 'mountain', 'desert', 'swamp', 'blackhole', 'tundra', 'angel', 'artifact', 'mountain']
+    #                 lands = ['light', 'evil', 'artifact']
+    #                 descriptions = card_words_database['desc']
+    #                 type = card_words_database['thing']
                 
-                    random_land = np.random.randint(0, len(lands))
-                    random_description = np.random.randint(0, len(descriptions))
-                    random_type = np.random.randint(0, len(type))
+    #                 random_land = np.random.randint(0, len(lands))
+    #                 random_description = np.random.randint(0, len(descriptions))
+    #                 random_type = np.random.randint(0, len(type))
 
-                    total_sentence = f'{descriptions[random_description]} {type[random_type]}'
-                    if land in lands:
-                        path_imge = await card_drawing(total_sentence, land, message.author.name)
-                        await message.channel.send(file=discord.File(path_imge))
+    #                 total_sentence = f'{descriptions[random_description]} {type[random_type]}'
+    #                 if land in lands:
+    #                     path_imge = await card_drawing(total_sentence, land, message.author.name)
+    #                     await message.channel.send(file=discord.File(path_imge))
                         
-                    else:
-                        await message.channel.send(f'Land does not exist!')
-                else:
-                    await message.channel.send(f'You can only have 10 cards!')
-        else:
-            await message.channel.send(f'Wait until last card is fully drawn!')
+    #                 else:
+    #                     await message.channel.send(f'Land does not exist!')
+    #             else:
+    #                 await message.channel.send(f'You can only have 10 cards!')
+    #     else:
+    #         await message.channel.send(f'Wait until last card is fully drawn!')
     
-    if message.content.startswith('!add_desc'):
-        str_split = message.content.split(' ')
-        if len(str_split) > 2 or len(str_split) < 2:
-            await message.channel.send(f'Too many or few arguments. Use !add_desc <word>')
-        else:
-            desc_word = str_split[1]
-            if desc_word not in card_words_database['desc']:
-                card_words_database['desc'].append(desc_word)
-            write_card_words(card_words_database)
-            await message.channel.send(f'Word added!')
+    # if message.content.startswith('!add_desc'):
+    #     str_split = message.content.split(' ')
+    #     if len(str_split) > 2 or len(str_split) < 2:
+    #         await message.channel.send(f'Too many or few arguments. Use !add_desc <word>')
+    #     else:
+    #         desc_word = str_split[1]
+    #         if desc_word not in card_words_database['desc']:
+    #             card_words_database['desc'].append(desc_word)
+    #         write_card_words(card_words_database)
+    #         await message.channel.send(f'Word added!')
 
 
-    if message.content.startswith('!add_thing'):
-        str_split = message.content.split(' ')
-        if len(str_split) > 2 or len(str_split) < 2:
-            await message.channel.send(f'Too many or few arguments. Use !add_thing <word>')
-        else:
-            desc_word = str_split[1]
-            if desc_word not in card_words_database['thing']:
-                card_words_database['thing'].append(desc_word)
-            write_card_words(card_words_database)
-            await message.channel.send(f'Word added!')
+    # if message.content.startswith('!add_thing'):
+    #     str_split = message.content.split(' ')
+    #     if len(str_split) > 2 or len(str_split) < 2:
+    #         await message.channel.send(f'Too many or few arguments. Use !add_thing <word>')
+    #     else:
+    #         desc_word = str_split[1]
+    #         if desc_word not in card_words_database['thing']:
+    #             card_words_database['thing'].append(desc_word)
+    #         write_card_words(card_words_database)
+    #         await message.channel.send(f'Word added!')
     
     
 
     
     if message.content.startswith('!paint'):
         styles = {'Steampunk': '/html/body/div/div/div[3]/div/div/div/div[1]/div[2]/div/div[2]/div[9]/div/div/img', 'Fantasy': '/html/body/div/div/div[3]/div/div/div/div[1]/div[2]/div/div[2]/div[8]/div/div/img', 'Synthwave': '/html/body/div/div/div[3]/div/div/div/div[1]/div[2]/div/div[2]/div[11]/div/div/img', 'Pastel': '/html/body/div/div/div[3]/div/div/div/div[1]/div[2]/div/div[2]/div[5]/div/div/img', 'Mystical': '/html/body/div/div/div[3]/div/div/div/div[1]/div[2]/div/div[2]/div[1]/div/div/img', 'Ukiyoe': '/html/body/div/div/div[3]/div/div/div/div[1]/div[2]/div/div[2]/div[10]/div/div/img', 'Dark fantasy': '/html/body/div/div/div[3]/div/div/div/div[1]/div[2]/div/div[2]/div[3]/div/div/img', 'HD': '/html/body/div/div/div[3]/div/div/div/div[1]/div[2]/div/div[2]/div[6]/div/div/img', 'Festive': '/html/body/div/div/div[3]/div/div/div/div[1]/div[2]/div/div[2]/div[2]/div/div/img', 'Psychic': '/html/body/div/div/div[3]/div/div/div/div[1]/div[2]/div/div[2]/div[4]/div/div/img', 'Vibrant': '/html/body/div/div/div[3]/div/div/div/div[1]/div[2]/div/div[2]/div[7]/div/div/img'}
+        import random
+        import glob
         str_split = message.content.split(' ')
         if len(str_split) < 2:
                 await message.channel.send(f'Too many or few arguments. Use !draw <target>')
@@ -574,8 +576,13 @@ async def on_message(message):
             for word in str_split:
                 total_sentence += word+' '
             await message.channel.send(f'Painting.... Please wait.')
-            path_imge = cardsystem.do_card_regular(total_sentence)
+            stl = random.choice(list(styles.items()))
+            path_imge = cardsystem.do_card_regular(total_sentence, style = stl[1])
             await message.channel.send(file=discord.File(path_imge))
+            time.sleep(2)
+            files = glob.glob('C:/Users/foxx/Downloads/*')
+            for f in files:
+                os.remove(f)
 
 
     # if message.content.startswith('!buy'):

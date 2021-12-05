@@ -48,24 +48,30 @@ def do_card(input_description = 'Grand Behemoth', type_ = 'BlackHole', style = '
         try:
             time.sleep(15)
             id_box = driver.find_element_by_xpath('/html/body/div/div/div[3]/div/div/div[1]/div[2]/div/div[1]/input')
-            time.sleep(1)
+            time.sleep(3)
             id_box.send_keys(input_description)
+            time.sleep(3)
 
             id_box = driver.find_element_by_xpath('/html/body/div/div/div[3]/div/div/div[1]/div[2]/div/div[2]/div[2]/div/div[2]').click()
-            time.sleep(2)
+            time.sleep(3)
 
-            time.sleep(1)
             id_box = driver.find_element_by_xpath('/html/body/div/div/div[3]/div/div/div[1]/div[2]/div/div[3]/div[1]/div/button').click()
             lock = False
         except:
             print('Still generating')
 
-    # Reset
-    time.sleep(5)   
-    driver.refresh()
     input_description = input_description.replace(' ', '_')
+    # path_out = f'C:/Users/Gimpe/Downloads/{input_description}_TradingCard.jpg'
+    path_out = f'C:/Users/foxx/Downloads/{input_description}_TradingCard.jpg'
+    while not os.path.exists(path_out):
+        print('not exist')
+        time.sleep(1)
 
-    return f'C:/Users/foxx/Downloads/{input_description}_TradingCard.jpg'
+    # Reset
+    time.sleep(1)   
+    driver.refresh()
+
+    return path_out
     # return f'C:/Users/Gimpe/Downloads/{input_description}_TradingCard.jpg'
 
 
@@ -91,21 +97,28 @@ def do_card_regular(input_description = 'Grand Behemoth', style = '/html/body/di
         try:
             time.sleep(15)
             id_box = driver.find_element_by_xpath('/html/body/div/div/div[3]/div/div/div[1]/div[2]/div/div[1]/input')
-            time.sleep(1)
+            time.sleep(3)
             id_box.send_keys(input_description)
 
-            time.sleep(1)
+            time.sleep(3)
             id_box = driver.find_element_by_xpath('/html/body/div/div/div[3]/div/div/div[1]/div[2]/div/div[3]/div[1]/div/button').click()
             lock = False
         except:
             print('Still generating')
 
     # Reset
+    input_description = input_description.replace(' ', '_')
+    # path_out = f'C:/Users/Gimpe/Downloads/{input_description}_TradingCard.jpg'
+    path_out = f'C:/Users/foxx/Downloads/{input_description}_TradingCard.jpg'
+    print(os.path.exists(path_out))
+    while not os.path.exists(path_out):
+        print('not exist')
+        time.sleep(1)
+
     time.sleep(3)   
     driver.refresh()
-    input_description = input_description.replace(' ', '_')
     
-    return f'C:/Users/foxx/Downloads/{input_description}_TradingCard.jpg'
+    return path_out
     # return f'C:/Users/Gimpe/Downloads/{input_description}_TradingCard.jpg'
 
 
