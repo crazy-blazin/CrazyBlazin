@@ -85,30 +85,29 @@ async def on_message(message):
                 await message.channel.send(f'Too many or few arguments. Use !paint <description/words>')
         else:
             str_split = str_split[1:]
-            queue.append(str_split)
+            total_sentence = ''
+            for word in str_split:
+                total_sentence += word+' '
+            queue.append(total_sentence)
             if len(queue) > 1:
                 await message.channel.send('Painting added to queue!')
             while len(queue) >= 1:
-                for sentence in queue:
-                    if PAINT_LOCK:
-                        PAINT_LOCK = False
-                        total_sentence = ''
-                        for word in sentence:
-                            total_sentence += word+' '
-                        await message.channel.send(f'Painting "{total_sentence}"... Please wait.')
-                        stl = random.choice(list(styles.items()))
-                        path_imge = await cardsystem.do_card_regular(total_sentence, style = stl[1])
-                        await message.channel.send(file=discord.File(path_imge))
-                        await asyncio.sleep(2)
-                        files = glob.glob('C:/Users/foxx/Downloads/*')
-                        # files = glob.glob('C:/Users/Gimpe/Downloads/*')
-                        for f in files:
-                            os.remove(f)
-                        PAINT_LOCK = True
-                        queue.remove(sentence)
-                    else:
-                        await asyncio.sleep(1)
-                        print('Painting is currently locked!')
+                if PAINT_LOCK:
+                    PAINT_LOCK = False
+                    await message.channel.send(f'Painting "{queue[0]}"... Please wait.')
+                    stl = random.choice(list(styles.items()))
+                    path_imge = await cardsystem.do_card_regular(queue[0], style = stl[1])
+                    await message.channel.send(file=discord.File(path_imge))
+                    await asyncio.sleep(2)
+                    files = glob.glob('C:/Users/foxx/Downloads/*')
+                    # files = glob.glob('C:/Users/Gimpe/Downloads/*')
+                    for f in files:
+                        os.remove(f)
+                    PAINT_LOCK = True
+                    queue.remove(queue[0])
+                else:
+                    await asyncio.sleep(1)
+
     
     if message.content.startswith('!test'):
         await message.channel.send(f'test')
