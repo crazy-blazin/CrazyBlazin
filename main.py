@@ -88,19 +88,19 @@ async def on_message(message):
             total_sentence = ''
             for word in str_split:
                 total_sentence += word+' '
-            queue.append(total_sentence)
+            queue.append([total_sentence, message.channel])
             if len(queue) > 1:
-                await message.channel.send('Painting added to queue!')
+                await queue[0][1].send(f'Painting "{queue[0][0]}" added to queue!')
             while len(queue) >= 1:
                 if PAINT_LOCK:
                     PAINT_LOCK = False
-                    await message.channel.send(f'Painting "{queue[0]}"... Please wait.')
+                    await queue[0][1].send(f'Painting "{queue[0][0]}"... Please wait. Currently {len(queue)-1} in queue.')
                     stl = random.choice(list(styles.items()))
-                    path_imge = await cardsystem.do_card_regular(queue[0], style = stl[1])
-                    await message.channel.send(file=discord.File(path_imge))
+                    path_imge = await cardsystem.do_card_regular(queue[0][0], style = stl[1])
+                    await queue[0][1].send(file=discord.File(path_imge))
                     await asyncio.sleep(2)
-                    files = glob.glob('C:/Users/foxx/Downloads/*')
-                    # files = glob.glob('C:/Users/Gimpe/Downloads/*')
+                    # files = glob.glob('C:/Users/foxx/Downloads/*')
+                    files = glob.glob('C:/Users/Gimpe/Downloads/*')
                     for f in files:
                         os.remove(f)
                     PAINT_LOCK = True
