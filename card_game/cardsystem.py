@@ -22,12 +22,13 @@ from PIL import Image
 #                                       # and if it doesn't exist, download it automatically,
 #                                       # then add chromedriver to path
 
-driver = webdriver.Chrome()
-driver.get("https://app.wombo.art/")
 
 
 
 def do_card(input_description = 'Grand Behemoth', type_ = 'BlackHole', style = '/html/body/div/div/div[3]/div/div/div/div[1]/div[2]/div/div[2]/div[1]/div/div/img'):
+    driver = webdriver.Chrome()
+    driver.get("https://app.wombo.art/")
+
 
     # Equivalent Outcome! 
     time.sleep(2)
@@ -76,31 +77,33 @@ def do_card(input_description = 'Grand Behemoth', type_ = 'BlackHole', style = '
 
 
 
-def do_card_regular(input_description = 'Grand Behemoth', style = '/html/body/div/div/div[3]/div/div/div/div[1]/div[2]/div/div[2]/div[1]/div/div/img'):
+async def do_card_regular(input_description = 'Grand Behemoth', style = '/html/body/div/div/div[3]/div/div/div/div[1]/div[2]/div/div[2]/div[1]/div/div/img'):
+    driver = webdriver.Chrome()
+    driver.get("https://app.wombo.art/")
 
     # Equivalent Outcome! 
-    time.sleep(2)
+    await asyncio.sleep(5)
     id_box = driver.find_element_by_xpath('/html/body/div/div/div[3]/div/div/div[1]/div[1]/div[1]/div[1]/input')
 
     # Send id information
     id_box.send_keys(input_description)
-    time.sleep(1)
+    await asyncio.sleep(2)
 
     # ART STYLE
     id_box = driver.find_element_by_xpath(style).click()
-    time.sleep(2)
+    await asyncio.sleep(2)
 
     id_box = driver.find_element_by_xpath('/html/body/div/div/div[3]/div/div/div/div[2]/div/button').click()
 
     lock = True
     while lock:
         try:
-            time.sleep(15)
+            await asyncio.sleep(5)
             id_box = driver.find_element_by_xpath('/html/body/div/div/div[3]/div/div/div[1]/div[2]/div/div[1]/input')
-            time.sleep(3)
+            await asyncio.sleep(2)
             id_box.send_keys(input_description)
 
-            time.sleep(3)
+            await asyncio.sleep(2)
             id_box = driver.find_element_by_xpath('/html/body/div/div/div[3]/div/div/div[1]/div[2]/div/div[3]/div[1]/div/button').click()
             lock = False
         except:
@@ -113,10 +116,10 @@ def do_card_regular(input_description = 'Grand Behemoth', style = '/html/body/di
     print(os.path.exists(path_out))
     while not os.path.exists(path_out):
         print('not exist')
-        time.sleep(1)
+        await asyncio.sleep(1)
 
-    time.sleep(3)   
-    driver.refresh()
+    await asyncio.sleep(2)
+    driver.close()
     
     return path_out
     # return f'C:/Users/Gimpe/Downloads/{input_description}_TradingCard.jpg'

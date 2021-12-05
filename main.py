@@ -62,7 +62,7 @@ class MyClient(discord.Client):
         print('------')
 
 
-
+PAINT_LOCK = True
 
 intents = discord.Intents.default()
 intents.members = True
@@ -71,6 +71,7 @@ client = MyClient(intents = intents)
 
 @client.event
 async def on_message(message):
+    global PAINT_LOCK
     if message.author == client.user:
         return
 
@@ -81,18 +82,27 @@ async def on_message(message):
         if len(str_split) < 2:
                 await message.channel.send(f'Too many or few arguments. Use !paint <description/words>')
         else:
-            str_split = str_split[1:]
-            total_sentence = ''
-            for word in str_split:
-                total_sentence += word+' '
-            await message.channel.send(f'Painting.... Please wait.')
-            stl = random.choice(list(styles.items()))
-            path_imge = cardsystem.do_card_regular(total_sentence, style = stl[1])
-            await message.channel.send(file=discord.File(path_imge))
-            time.sleep(2)
-            files = glob.glob('C:/Users/foxx/Downloads/*')
-            for f in files:
-                os.remove(f)
+            if PAINT_LOCK:
+                PAINT_LOCK = False
+                str_split = str_split[1:]
+                total_sentence = ''
+                for word in str_split:
+                    total_sentence += word+' '
+                await message.channel.send(f'Painting.... Please wait.')
+                stl = random.choice(list(styles.items()))
+                path_imge = await cardsystem.do_card_regular(total_sentence, style = stl[1])
+                await message.channel.send(file=discord.File(path_imge))
+                await asyncio.sleep(2)
+                files = glob.glob('C:/Users/foxx/Downloads/*')
+                # files = glob.glob('C:/Users/Gimpe/Downloads/*')
+                for f in files:
+                    os.remove(f)
+                PAINT_LOCK = True
+            else:
+                await message.channel.send('Painting is locked. Please wait.')
+    
+    if message.content.startswith('!test'):
+        await message.channel.send(f'test')
 
 
 client.run(k)
