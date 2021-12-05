@@ -90,7 +90,7 @@ async def on_message(message):
                 total_sentence += word+' '
             queue.append([total_sentence, message.channel])
             if len(queue) > 1:
-                await queue[0][1].send(f'Painting "{queue[0][0]}" added to queue!')
+                await queue[-1][1].send(f'Painting "{queue[-1][0]}" added to queue!')
             while len(queue) >= 1:
                 if PAINT_LOCK:
                     PAINT_LOCK = False
