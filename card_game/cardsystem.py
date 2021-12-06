@@ -111,15 +111,15 @@ async def do_card_regular(input_description = 'Grand Behemoth', style = '/html/b
 
     # Reset
     input_description = input_description.replace(' ', '_')
-    # path_out = f'C:/Users/Gimpe/Downloads/{input_description}_TradingCard.jpg'
-    path_out = f'C:/Users/foxx/Downloads/{input_description}_TradingCard.jpg'
+    path_out = f'C:/Users/Gimpe/Downloads/{input_description}_TradingCard.jpg'
+    # path_out = f'C:/Users/foxx/Downloads/{input_description}_TradingCard.jpg'
     print(os.path.exists(path_out))
     timeout_counter = 0
     while not os.path.exists(path_out):
         print('not exist')
         await asyncio.sleep(1)
         timeout_counter += 1
-        if timeout_counter > 70:
+        if timeout_counter > 500:
             break
     path_out = 'error.jpg'
     await asyncio.sleep(2)
