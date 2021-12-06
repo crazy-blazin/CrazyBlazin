@@ -99,8 +99,8 @@ async def on_message(message):
                     path_imge = await cardsystem.do_card_regular(queue[0][0], style = stl[1])
                     await queue[0][1].send(file=discord.File(path_imge))
                     await asyncio.sleep(2)
-                    # files = glob.glob('C:/Users/foxx/Downloads/*')
-                    files = glob.glob('C:/Users/Gimpe/Downloads/*')
+                    files = glob.glob('C:/Users/foxx/Downloads/*')
+                    # files = glob.glob('C:/Users/Gimpe/Downloads/*')
                     for f in files:
                         os.remove(f)
                     PAINT_LOCK = True
