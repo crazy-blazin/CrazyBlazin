@@ -120,8 +120,8 @@ async def do_card_regular(input_description = 'Grand Behemoth', style = '/html/b
         await asyncio.sleep(1)
         timeout_counter += 1
         if timeout_counter > 500:
+            path_out = 'error.jpg'
             break
-    path_out = 'error.jpg'
     await asyncio.sleep(2)
     driver.close()
     
