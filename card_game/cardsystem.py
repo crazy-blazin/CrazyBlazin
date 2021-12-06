@@ -119,7 +119,7 @@ async def do_card_regular(input_description = 'Grand Behemoth', style = '/html/b
         print('not exist')
         await asyncio.sleep(1)
         timeout_counter += 1
-        if timeout_counter > 500:
+        if timeout_counter > 70:
             path_out = 'error.jpg'
             break
     await asyncio.sleep(2)
