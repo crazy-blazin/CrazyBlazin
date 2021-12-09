@@ -173,15 +173,15 @@ api = Api(app)
 #     return database
 
 
-data = {'data':{'points': [[],[]] }}
+data = {"data":{"points": [], "time": []}}
 
 
 
 @app.route("/update")
 def upd():
     global data
-    data['data']['points'][0].append(random.randint(0, 100))
-    data['data']['points'][1].append(datetime.now().strftime("%H:%M:%S"))
+    data['data']['points'].append(random.randint(0, 100))
+    data['data']['time'].append(datetime.now().timestamp())
     return data
     # return render_template('lootcrate.html')
 
