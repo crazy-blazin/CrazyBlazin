@@ -79,9 +79,7 @@ async def on_message(message):
 
 
     if message.content.startswith('!paint'):
-        # styles = {'Steampunk': '/html/body/div/div/div[3]/div/div/div/div[1]/div[2]/div/div[2]/div[9]/div/div/img', 'Fantasy': '/html/body/div/div/div[3]/div/div/div/div[1]/div[2]/div/div[2]/div[8]/div/div/img', 'Synthwave': '/html/body/div/div/div[3]/div/div/div/div[1]/div[2]/div/div[2]/div[11]/div/div/img', 'Pastel': '/html/body/div/div/div[3]/div/div/div/div[1]/div[2]/div/div[2]/div[5]/div/div/img', 'Mystical': '/html/body/div/div/div[3]/div/div/div/div[1]/div[2]/div/div[2]/div[1]/div/div/img', 'Ukiyoe': '/html/body/div/div/div[3]/div/div/div/div[1]/div[2]/div/div[2]/div[10]/div/div/img', 'Dark fantasy': '/html/body/div/div/div[3]/div/div/div/div[1]/div[2]/div/div[2]/div[3]/div/div/img', 'HD': '/html/body/div/div/div[3]/div/div/div/div[1]/div[2]/div/div[2]/div[6]/div/div/img', 'Festive': '/html/body/div/div/div[3]/div/div/div/div[1]/div[2]/div/div[2]/div[2]/div/div/img', 'Psychic': '/html/body/div/div/div[3]/div/div/div/div[1]/div[2]/div/div[2]/div[4]/div/div/img', 'Vibrant': '/html/body/div/div/div[3]/div/div/div/div[1]/div[2]/div/div[2]/div[7]/div/div/img'}
 
-        styles = {'Steampunk': '/html/body/div/div/div[3]/div/div/div/div[1]/div[2]/div/div[2]/div[9]/div/div/img', 'Fantasy': '/html/body/div/div/div[3]/div/div/div/div[1]/div[2]/div/div[2]/div[8]/div/div/img', 'Synthwave': '/html/body/div/div/div[3]/div/div/div/div[1]/div[2]/div/div[2]/div[11]/div/div/img', 'Mystical': '/html/body/div/div/div[3]/div/div/div/div[1]/div[2]/div/div[2]/div[1]/div/div/img', 'Psychic': '/html/body/div/div/div[3]/div/div/div/div[1]/div[2]/div/div[2]/div[4]/div/div/img', 'Vibrant': '/html/body/div/div/div[3]/div/div/div/div[1]/div[2]/div/div[2]/div[7]/div/div/img'}
         str_split = message.content.split(' ')
         if len(str_split) < 2:
                 await message.channel.send(f'Too many or few arguments. Use !paint <description/words>')
@@ -97,12 +95,19 @@ async def on_message(message):
                 if PAINT_LOCK:
                     PAINT_LOCK = False
                     await queue[0][1].send(f'Painting "{queue[0][0]}"... Please wait. Currently {len(queue)-1} in queue.')
-                    stl = random.choice(list(styles.items()))
-                    path_imge = await cardsystem.do_card_regular(queue[0][0], style = stl[1])
+                    # mystic = '11'
+                    # dark_fantasy = '10'
+                    # psychic = '9'
+                    # synthwave = '1'
+                    # vibrant = '6'
+                    # jule = "12"
+                    # steampunk = '4'
+                    # fantasy_art = '5'
+                    stl = random.choice([11, 10, 9, 1, 6, 4, 5])
+                    path_imge = await cardsystem.do_card_regular(queue[0][0], style = stl)
                     await queue[0][1].send(file=discord.File(path_imge))
                     await asyncio.sleep(2)
                     files = glob.glob('C:/Users/foxx/Downloads/*')
-                    # files = glob.glob('C:/Users/Gimpe/Downloads/*')
                     for f in files:
                         os.remove(f)
                     PAINT_LOCK = True

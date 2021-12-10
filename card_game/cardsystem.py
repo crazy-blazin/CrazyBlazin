@@ -15,12 +15,17 @@ from PIL import Image
 from PIL import ImageDraw, ImageSequence
 import pickle
 from PIL import Image
+import json
+import requests
+from requests.structures import CaseInsensitiveDict
 # import chromedriver_autoinstaller
 
 
 # chromedriver_autoinstaller.install()  # Check if the current version of chromedriver exists
 #                                       # and if it doesn't exist, download it automatically,
 #                                       # then add chromedriver to path
+
+
 
 
 
@@ -76,44 +81,43 @@ def do_card(input_description = 'Grand Behemoth', type_ = 'BlackHole', style = '
     # return f'C:/Users/Gimpe/Downloads/{input_description}_TradingCard.jpg'
 
 
+def grab_keys():
+    with open('../apikeys.txt', 'r') as f:
+        keys = eval(str(f.read()))
+    return keys
 
-async def do_card_regular(input_description = 'Grand Behemoth', style = '/html/body/div/div/div[3]/div/div/div/div[1]/div[2]/div/div[2]/div[1]/div/div/img'):
-    driver = webdriver.Chrome()
-    driver.get("https://app.wombo.art/")
+async def do_card_regular(input_description = 'Grand Behemoth', style = 5):
 
-    # Equivalent Outcome! 
-    await asyncio.sleep(5)
-    id_box = driver.find_element_by_xpath('/html/body/div/div/div[3]/div/div/div[1]/div[1]/div[1]/div[1]/input')
+    to_send = json.dumps({"input_spec":{"prompt":input_description,"style":style,"display_freq":10}})
+    headers = CaseInsensitiveDict()
+    keys_ = grab_keys()
+    googapi = keys_['googapi']
+    paintlink = keys_['paintlink']
+    response_token = requests.post(googapi, data = {"returnSecureToken":'true'})
+    idToken = response_token.json()['idToken']
 
-    # Send id information
-    id_box.send_keys(input_description)
-    await asyncio.sleep(2)
+    headers["Authorization"] = "bearer " + idToken
+    response_painter = requests.post(paintlink, headers = headers, data = json.dumps({"premium":"false"}))
+    id = response_painter.json()['id']
+    response_put = requests.put(f'{paintlink}{id}', headers = headers, data = to_send)
 
-    # ART STYLE
-    id_box = driver.find_element_by_xpath(style).click()
-    await asyncio.sleep(2)
+    await asyncio.sleep(3)
+    while True:
+        response = requests.get(f'{paintlink}{id}', headers = headers)
+        img_list = len(response.json()['photo_url_list'])
+        await asyncio.sleep(5)
+        response = requests.get(f'{paintlink}{id}', headers = headers)
+        img_list2 = len(response.json()['photo_url_list'])
+        print(img_list2, img_list)
+        if img_list2 == img_list:
+            photo = response.json()['photo_url_list'][-1]
+            path_out = f'C:/Users/foxx/Downloads/output.jpg'
+            # requests download image from url and save it to path
+            with open(path_out, 'wb') as f:
+                f.write(requests.get(photo).content)
+            break
 
-    id_box = driver.find_element_by_xpath('/html/body/div/div/div[3]/div/div/div/div[2]/div/button').click()
 
-    lock = True
-    while lock:
-        try:
-            await asyncio.sleep(5)
-            id_box = driver.find_element_by_xpath('/html/body/div/div/div[3]/div/div/div[1]/div[2]/div/div[1]/input')
-            await asyncio.sleep(2)
-            id_box.send_keys(input_description)
-
-            await asyncio.sleep(2)
-            id_box = driver.find_element_by_xpath('/html/body/div/div/div[3]/div/div/div[1]/div[2]/div/div[3]/div[1]/div/button').click()
-            lock = False
-        except:
-            print('Still generating')
-
-    # Reset
-    input_description = input_description.replace(' ', '_')
-    # path_out = f'C:/Users/Gimpe/Downloads/{input_description}_TradingCard.jpg'
-    path_out = f'C:/Users/foxx/Downloads/{input_description}_TradingCard.jpg'
-    print(os.path.exists(path_out))
     timeout_counter = 0
     while not os.path.exists(path_out):
         print('not exist')
@@ -122,30 +126,6 @@ async def do_card_regular(input_description = 'Grand Behemoth', style = '/html/b
         if timeout_counter > 70:
             path_out = 'error.jpg'
             break
-    await asyncio.sleep(2)
-    driver.close()
     
     return path_out
-    # return f'C:/Users/Gimpe/Downloads/{input_description}_TradingCard.jpg'
 
-
-
-# import requests
-
-
-# response = requests.post('')
-
-
-    # Art styles;
-
-    # /html/body/div/div/div[3]/div/div/div/div[1]/div[2]/div/div[2]/div[9]/div/div/img - Steampunk
-    # /html/body/div/div/div[3]/div/div/div/div[1]/div[2]/div/div[2]/div[8]/div/div/img - Fantasy
-    # /html/body/div/div/div[3]/div/div/div/div[1]/div[2]/div/div[2]/div[11]/div/div/img - Synthwave
-    # /html/body/div/div/div[3]/div/div/div/div[1]/div[2]/div/div[2]/div[5]/div/div/img - Pastel
-    # /html/body/div/div/div[3]/div/div/div/div[1]/div[2]/div/div[2]/div[1]/div/div/img - Mystical
-    # /html/body/div/div/div[3]/div/div/div/div[1]/div[2]/div/div[2]/div[10]/div/div/img - Ukiyoe
-    # /html/body/div/div/div[3]/div/div/div/div[1]/div[2]/div/div[2]/div[3]/div/div/img - Dark fantasy
-    # /html/body/div/div/div[3]/div/div/div/div[1]/div[2]/div/div[2]/div[6]/div/div/img - HD
-    # /html/body/div/div/div[3]/div/div/div/div[1]/div[2]/div/div[2]/div[2]/div/div/img - Festive
-    # /html/body/div/div/div[3]/div/div/div/div[1]/div[2]/div/div[2]/div[4]/div/div/img - Psychic
-    # /html/body/div/div/div[3]/div/div/div/div[1]/div[2]/div/div[2]/div[7]/div/div/img - Vibrant
