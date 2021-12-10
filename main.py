@@ -5,7 +5,6 @@ from discord import voice_client
 import matplotlib.pyplot as plt
 import numpy as np
 import discord
-from discord.ext import commands
 import matplotlib.pyplot as plt
 import time
 import threading
@@ -41,12 +40,15 @@ import datetime
 from config import *
 import random
 import glob
-import card_game.cardsystem as cardsystem
+import tools.painting as painting
 from PIL import Image
 from PIL import ImageFont
 from PIL import ImageDraw 
 
 
+# Globals
+PAINT_LOCK = True
+queue = []
 
 
 with open('../key.txt', 'r') as f:
@@ -62,10 +64,7 @@ class MyClient(discord.Client):
         print('------')
 
 
-PAINT_LOCK = True
-queue = []
-
-
+# Startups
 intents = discord.Intents.default()
 intents.members = True
 client = MyClient(intents = intents)
@@ -74,46 +73,19 @@ client = MyClient(intents = intents)
 @client.event
 async def on_message(message):
     global PAINT_LOCK
+    global queue
     if message.author == client.user:
         return
 
-
-    if message.content.startswith('!paint'):
-
-        str_split = message.content.split(' ')
-        if len(str_split) < 2:
-                await message.channel.send(f'Too many or few arguments. Use !paint <description/words>')
-        else:
-            str_split = str_split[1:]
-            total_sentence = ''
-            for word in str_split:
-                total_sentence += word+' '
-            queue.append([total_sentence, message.channel])
-            if len(queue) > 1:
-                await queue[-1][1].send(f'Painting "{queue[-1][0]}" added to queue!')
-            while len(queue) >= 1:
-                if PAINT_LOCK:
-                    PAINT_LOCK = False
-                    await queue[0][1].send(f'Painting "{queue[0][0]}"... Please wait. Currently {len(queue)-1} in queue.')
-                    # mystic = '11'
-                    # dark_fantasy = '10'
-                    # psychic = '9'
-                    # synthwave = '1'
-                    # vibrant = '6'
-                    # jule = "12"
-                    # steampunk = '4'
-                    # fantasy_art = '5'
-                    stl = random.choice([11, 10, 9, 1, 6, 4, 5])
-                    path_imge = await cardsystem.do_card_regular(queue[0][0], style = stl)
-                    await queue[0][1].send(file=discord.File(path_imge))
-                    await asyncio.sleep(2)
-                    files = glob.glob('C:/Users/foxx/Downloads/*')
-                    for f in files:
-                        os.remove(f)
-                    PAINT_LOCK = True
-                    queue.remove(queue[0])
-                else:
-                    await asyncio.sleep(1)
+    if str(message.channel.id) == '916636184707493958' or str(message.channel.id) == '734481490431443068':
+        queue.append([str(message.content), message.channel])
+        if len(queue) > 1:
+            await queue[-1][1].send(f'Painting "{queue[-1][0]}" added to queue!')
+        while len(queue) >= 1:
+            if PAINT_LOCK:
+                PAINT_LOCK = False
+                PAINT_LOCK, queue = await painting.do_paint(queue)
+            await asyncio.sleep(2)
 
     
     if message.content.startswith('!restart'):
