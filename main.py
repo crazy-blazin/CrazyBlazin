@@ -91,11 +91,12 @@ async def ticksystem():
         for member in members:
             role_names = [role.name for role in member.roles]
             if 'Bots' not in role_names:
-                if member.activity is not None and member.activity not in remove_status:
-                    if member.activity.name not in temp_stats:
-                        temp_stats[member.activity.name] = 1
-                    else:
-                        temp_stats[member.activity.name] += 1
+                if member.activity is not None:
+                    if member.activity.name not in remove_status:
+                        if member.activity.name not in temp_stats:
+                            temp_stats[member.activity.name] = 1
+                        else:
+                            temp_stats[member.activity.name] += 1
         
         db.update_stats(temp_stats)
         db.plot_data()
