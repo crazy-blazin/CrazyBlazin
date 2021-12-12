@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 from asyncio.tasks import wait
 import os
+from sys import path
 from discord import voice_client
 import matplotlib.pyplot as plt
 import numpy as np
@@ -41,6 +42,7 @@ from config import *
 import random
 import glob
 import tools.painting as painting
+import tools.animepaint as arcanetool
 from PIL import Image
 from PIL import ImageFont
 from PIL import ImageDraw 
@@ -86,6 +88,19 @@ async def on_message(message):
                 PAINT_LOCK = False
                 PAINT_LOCK, queue = await painting.do_paint(queue)
             await asyncio.sleep(2)
+
+
+    if message.content.startswith('!arcane'):
+        str_split = message.content.split(' ')
+        if len(str_split) > 2 or len(str_split) < 2:
+            await message.channel.send(f'Too many or few arguments. Use !arcace <link to image>')
+        else:
+            await message.channel.send(f'Arcanifying....')
+            path_imge = await arcanetool.arcanify(str_split[-1])
+            if path_imge:
+                await message.channel.send(file=discord.File(path_imge))
+            else:
+                await message.channel.send(f'You need to input link and the link should be a .png or .jpg')
 
     
     if message.content.startswith('!restart'):
