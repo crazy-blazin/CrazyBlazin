@@ -30,7 +30,7 @@ def face2paint_(device="cpu", size=512, side_by_side=False):
 
             output = (output * 0.5 + 0.5).clip(0, 1)
         output = to_pil_image(output)
-        # output = output.resize((w, h), Image.BILINEAR)
+        # output = output.resize((w, h), Image.LANCZOS)
         return output
 
     return face2paint

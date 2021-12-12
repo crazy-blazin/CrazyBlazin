@@ -46,12 +46,17 @@ import tools.animepaint as arcanetool
 from PIL import Image
 from PIL import ImageFont
 from PIL import ImageDraw 
+import tools.activitydb as activitydb
+
+
+
 
 
 # Globals
 PAINT_LOCK = True
 queue = []
 
+# print(message.author.activity.name)
 
 with open('../key.txt', 'r') as f:
     k = str(f.read())
@@ -67,9 +72,51 @@ class MyClient(discord.Client):
 
 
 # Startups
-intents = discord.Intents.default()
+intents = discord.Intents.all()
 intents.members = True
 client = MyClient(intents = intents)
+
+
+db = activitydb.ActivityDB()
+
+
+async def ticksystem():
+    while True:
+        global temp_status
+        # database = read_db()
+        global database
+
+        temp_stats = {}
+        members = client.get_all_members()
+        for member in members:
+            if member.activity is not None:
+                if member.activity.name not in temp_stats:
+                    temp_stats[member.activity.name] = 1
+                else:
+                    temp_stats[member.activity.name] += 1
+        
+        db.update_stats(temp_stats)
+        print(db.db)
+        await asyncio.sleep(5)
+        db.plot_data()
+
+
+async def timer():
+    await client.wait_until_ready()
+    await asyncio.sleep(4)
+
+client.loop.create_task(ticksystem())
+
+
+
+
+
+
+
+
+
+
+
 
 
 @client.event
@@ -101,6 +148,9 @@ async def on_message(message):
                 await message.channel.send(file=discord.File(path_imge))
             else:
                 await message.channel.send(f'You need to input link with correct format (link, .png, .jpg) and be an downloadable image!')
+    
+    if message.content.startswith('!activity'):
+        await message.channel.send(file=discord.File('../activitydb.png'))
 
     
     if message.content.startswith('!restart'):
