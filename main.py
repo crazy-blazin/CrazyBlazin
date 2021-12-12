@@ -98,8 +98,8 @@ async def ticksystem():
                         temp_stats[member.activity.name] += 1
         
         db.update_stats(temp_stats)
-        await asyncio.sleep(60*10)
         db.plot_data()
+        await asyncio.sleep(60*10)
 
 
 async def timer():
