@@ -100,7 +100,7 @@ async def on_message(message):
             if path_imge:
                 await message.channel.send(file=discord.File(path_imge))
             else:
-                await message.channel.send(f'You need to input link and the link should be a .png or .jpg')
+                await message.channel.send(f'You need to input link with correct format (link, .png, .jpg) and be an downloadable image!')
 
     
     if message.content.startswith('!restart'):
