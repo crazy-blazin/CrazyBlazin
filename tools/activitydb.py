@@ -47,7 +47,7 @@ class ActivityDB:
     def plot_data(self):
         plt.rcParams["xtick.labelsize"] = 7
         fig, ax = plt.subplots(1, 1, figsize=(15,10))
-        sns.lineplot(x='Time', y='Amount', data=pd.DataFrame(self.db), hue="Activity", alpha =.6, ax = ax)
+        sns.lineplot(x='Time', y='Amount', data=pd.DataFrame(self.db), hue="Activity", style="Activity", alpha =.6, ax = ax, markers=True, dashes=False)
         plt.ylim([0, 10])
         plt.legend(fontsize=10) # using a size in points
         plt.tight_layout()
