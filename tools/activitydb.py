@@ -43,7 +43,7 @@ class ActivityDB:
         sns.lineplot(x='Time', y='Amount', data=pd.DataFrame(self.db), style="Activity")
         plt.tight_layout()
         plt.title('Activity @ crazy blazin')
-        plt.savefig('activitydb.png')
+        plt.savefig('../activitydb.png')
         plt.close()
 
     

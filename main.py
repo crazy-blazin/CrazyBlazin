@@ -85,21 +85,20 @@ async def ticksystem():
         global temp_status
         # database = read_db()
         global database
-
+        remove_status = ["any problem can always be solved with generous amount's of big explosions and fire", "penis", "Sassy cunt, not rectifiable in any way."]
         temp_stats = {}
         members = client.get_all_members()
         for member in members:
             role_names = [role.name for role in member.roles]
             if 'Bots' not in role_names:
-                if member.activity is not None:
+                if member.activity is not None and member.activity not in remove_status:
                     if member.activity.name not in temp_stats:
                         temp_stats[member.activity.name] = 1
                     else:
                         temp_stats[member.activity.name] += 1
         
         db.update_stats(temp_stats)
-        print(db.db)
-        await asyncio.sleep(5)
+        await asyncio.sleep(60*10)
         db.plot_data()
 
 
