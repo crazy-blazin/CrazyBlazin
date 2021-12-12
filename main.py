@@ -97,10 +97,9 @@ async def ticksystem():
                             temp_stats[member.activity.name] = 1
                         else:
                             temp_stats[member.activity.name] += 1
-        
         db.update_stats(temp_stats)
         db.plot_data()
-        await asyncio.sleep(60*10)
+        await asyncio.sleep(60)
 
 
 async def timer():
@@ -108,16 +107,6 @@ async def timer():
     await asyncio.sleep(4)
 
 client.loop.create_task(ticksystem())
-
-
-
-
-
-
-
-
-
-
 
 
 
