@@ -21,6 +21,13 @@ class ActivityDB:
             self.db['Activity'].append(data_point_key)
             self.db['Amount'].append(data[data_point_key])
             self.db['Time'].append(str(datetime.datetime.now().strftime('%H:%M:%S')))
+        
+        for data_point_key in set(self.db['Activity']):
+            print(set(self.db['Activity']))
+            if data_point_key not in data:
+                self.db['Activity'].append(data_point_key)
+                self.db['Amount'].append(0)
+                self.db['Time'].append(str(datetime.datetime.now().strftime('%H:%M:%S')))
 
         self.write_data()
     
@@ -40,8 +47,10 @@ class ActivityDB:
 
     def plot_data(self):
         plt.rcParams["xtick.labelsize"] = 7
-        sns.lineplot(x='Time', y='Amount', data=pd.DataFrame(self.db), style="Activity", alpha =.6)
+        fig, ax = plt.subplots(1, 1, figsize=(15,10))
+        sns.lineplot(x='Time', y='Amount', data=pd.DataFrame(self.db), style="Activity", alpha =.6, ax = ax)
         plt.ylim([0, 10])
+        plt.legend(fontsize=10) # using a size in points
         plt.tight_layout()
         plt.title('Activity @ crazy blazin')
         plt.savefig('../activitydb.png')
