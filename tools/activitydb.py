@@ -40,7 +40,7 @@ class ActivityDB:
 
     def plot_data(self):
         plt.rcParams["xtick.labelsize"] = 7
-        sns.lineplot(x='Time', y='Amount', data=pd.DataFrame(self.db), style="Activity")
+        sns.lineplot(x='Time', y='Amount', data=pd.DataFrame(self.db), style="Activity", alpha =.6)
         plt.ylim([0, 10])
         plt.tight_layout()
         plt.title('Activity @ crazy blazin')
