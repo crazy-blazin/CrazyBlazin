@@ -86,7 +86,7 @@ async def ticksystem():
         global temp_status
         # database = read_db()
         global database
-        remove_status = ["any problem can always be solved with generous amount's of big explosions and fire", "penis", "Sassy cunt, not rectifiable in any way."]
+        remove_status = ["any problem can always be solved with generous amount's of big explosions and fire", "penis", "The consensus is this: Fuck off, immediately. <3"]
         temp_stats = {}
         members = client.get_all_members()
         for member in members:
@@ -131,7 +131,7 @@ async def on_message(message):
     if message.content.startswith('!arcane'):
         str_split = message.content.split(' ')
         if len(str_split) > 2 or len(str_split) < 2:
-            await message.channel.send(f'Too many or few arguments. Use !arcace <link to image>')
+            await message.channel.send(f'Too many or few arguments. Use !arcane <link to image>')
         else:
             await message.channel.send(f'Arcanifying....')
             path_imge = await arcanetool.arcanify(str_split[-1])

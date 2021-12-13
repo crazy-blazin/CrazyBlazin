@@ -20,13 +20,19 @@ class ActivityDB:
         for data_point_key in data:
             self.db['Activity'].append(data_point_key)
             self.db['Amount'].append(data[data_point_key])
-            self.db['Time'].append(str(datetime.datetime.now().strftime('%H:%M:%S')))
+            self.db['Time'].append(str(datetime.datetime.now().strftime('%H')))
         
         for data_point_key in set(self.db['Activity']):
             if data_point_key not in data:
                 self.db['Activity'].append(data_point_key)
                 self.db['Amount'].append(0)
-                self.db['Time'].append(str(datetime.datetime.now().strftime('%H:%M:%S')))
+                self.db['Time'].append(str(datetime.datetime.now().strftime('%H')))
+        
+        y = self.db['Time']
+        y1 = []
+        for stamp in y:
+            y1.append(stamp.split(':')[0])
+        self.db['Time'] = y1
 
         self.write_data()
     
