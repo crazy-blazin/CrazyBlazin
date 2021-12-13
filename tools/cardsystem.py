@@ -1,19 +1,7 @@
-from selenium import webdriver
-import time
-from asyncio.tasks import wait
-import os
-from discord import voice_client
-import discord
-from discord.ext import commands
-from discord.utils import get
-import asyncio
-from discord.ext import tasks
 
+import os
+import asyncio
 # Image modules
-from PIL import ImageFont
-from PIL import Image
-from PIL import ImageDraw, ImageSequence
-import pickle
 from PIL import Image
 import json
 import requests

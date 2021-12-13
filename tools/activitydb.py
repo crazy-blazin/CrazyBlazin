@@ -45,10 +45,11 @@ class ActivityDB:
 
 
     def plot_data(self):
-        plt.rcParams["xtick.labelsize"] = 7
-        fig, ax = plt.subplots(1, 1, figsize=(15,10))
+        plt.rcParams["xtick.labelsize"] = 5
+        fig, ax = plt.subplots(1, 1, figsize=(20,10), dpi=250)
         sns.lineplot(x='Time', y='Amount', data=pd.DataFrame(self.db), hue="Activity", style="Activity", alpha =.6, ax = ax, markers=True, dashes=False)
         plt.ylim([0, 10])
+        plt.xticks(rotation = 45) # Rotates X-Axis Ticks by 45-degrees
         plt.legend(fontsize=10) # using a size in points
         plt.tight_layout()
         plt.title('Activity @ crazy blazin')

@@ -82,6 +82,7 @@ db = activitydb.ActivityDB()
 
 async def ticksystem():
     while True:
+        await asyncio.sleep(10)
         global temp_status
         # database = read_db()
         global database
@@ -100,8 +101,6 @@ async def ticksystem():
 
         db.update_stats(temp_stats)
         db.plot_data()
-        await asyncio.sleep(5)
-
 
 async def timer():
     await client.wait_until_ready()
