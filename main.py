@@ -77,36 +77,36 @@ intents.members = True
 client = MyClient(intents = intents)
 
 
-db = activitydb.ActivityDB()
+# db = activitydb.ActivityDB()
 
 
-async def ticksystem():
-    while True:
-        await asyncio.sleep(10)
-        global temp_status
-        # database = read_db()
-        global database
-        remove_status = ["any problem can always be solved with generous amount's of big explosions and fire", "penis", "The consensus is this: Fuck off, immediately. <3"]
-        temp_stats = {}
-        members = client.get_all_members()
-        for member in members:
-            role_names = [role.name for role in member.roles]
-            if 'Bots' not in role_names:
-                if member.activity is not None:
-                    if member.activity.name not in remove_status:
-                        if member.activity.name not in temp_stats:
-                            temp_stats[member.activity.name] = 1
-                        else:
-                            temp_stats[member.activity.name] += 1
+# async def ticksystem():
+#     while True:
+#         await asyncio.sleep(10)
+#         global temp_status
+#         # database = read_db()
+#         global database
+#         remove_status = ["any problem can always be solved with generous amount's of big explosions and fire", "penis", "The consensus is this: Fuck off, immediately. <3"]
+#         temp_stats = {}
+#         members = client.get_all_members()
+#         for member in members:
+#             role_names = [role.name for role in member.roles]
+#             if 'Bots' not in role_names:
+#                 if member.activity is not None:
+#                     if member.activity.name not in remove_status:
+#                         if member.activity.name not in temp_stats:
+#                             temp_stats[member.activity.name] = 1
+#                         else:
+#                             temp_stats[member.activity.name] += 1
 
-        db.update_stats(temp_stats)
-        db.plot_data()
+#         db.update_stats(temp_stats)
+#         db.plot_data()
 
-async def timer():
-    await client.wait_until_ready()
-    await asyncio.sleep(4)
+# async def timer():
+#     await client.wait_until_ready()
+#     await asyncio.sleep(4)
 
-client.loop.create_task(ticksystem())
+# client.loop.create_task(ticksystem())
 
 
 

@@ -53,7 +53,7 @@ class ActivityDB:
         sns.lineplot(x='Timenew', y='Amount', data=data, hue="Activity", style="Activity", alpha =.6, ax = ax, markers=True, dashes=False)
         plt.ylim([0, 6])
         # ['08', '09', '10', '11', '12', '13', '14','15', '16', '17', '18', '19', '20', '21', '22', '23', '00', '01', '02', '03', '04', '05', '06', '07']
-        timetable  = np.array(['07','08', '09', '01', '11', '12', '13', '14','15', '16', '17', '18', '19', '20', '21', '22', '23', '00', '01', '02', '03', '04', '05', '06']).astype('int')
+        timetable  = np.array(['07','08', '09', '10', '11', '12', '13', '14','15', '16', '17', '18', '19', '20', '21', '22', '23', '00', '01', '02', '03', '04', '05', '06']).astype('int')
         plt.xticks(range(24), timetable, rotation = 45) # Rotates X-Axis Ticks by 45-degrees
         plt.legend(fontsize=10) # using a size in points
         plt.tight_layout()
