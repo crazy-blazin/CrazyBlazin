@@ -69,11 +69,11 @@ class MyClient(discord.Client):
     async def on_ready(self):
         print(f'Logged in as {self.user} (ID: {self.user.id})')
         print('------')
-        members = self.get_all_members()
-        for member in members:
-            if member.name not in db.db['users']:
-                db.db['users'][member.name] = {'channels_owned': [], 'coins': 0, 'channels_permission': []}
-                db.write_data()
+        # members = self.get_all_members()
+        # for member in members:
+        #     if member.name not in db.db['users']:
+        #         db.db['users'][member.name] = {'channels_owned': [], 'coins': 0, 'channels_permission': []}
+        #         db.write_data()
 
 
 
@@ -112,19 +112,19 @@ client = MyClient(intents = intents)
 
 # client.loop.create_task(ticksystem())
 
-@client.event
-async def on_voice_state_update(member, before, after):
-    print(after)
-    if after.channel != None:
-        if after.channel.category.name == 'Spesialiserte kanaler':
-            if member.name in db.db['users']:
-                current_channel = after.channel.name
-                if current_channel in db.db['users'][member.name]['channels_permission']:
-                    await member.edit(mute = False)
-                else:
-                    await member.edit(mute = True)
-        else:
-            await member.edit(mute = False)
+# @client.event
+# async def on_voice_state_update(member, before, after):
+#     print(after)
+#     if after.channel != None:
+#         if after.channel.category.name == 'Spesialiserte kanaler':
+#             if member.name in db.db['users']:
+#                 current_channel = after.channel.name
+#                 if current_channel in db.db['users'][member.name]['channels_permission']:
+#                     await member.edit(mute = False)
+#                 else:
+#                     await member.edit(mute = True)
+#         else:
+#             await member.edit(mute = False)
 
 @client.event
 async def on_message(message):
@@ -157,7 +157,7 @@ async def on_message(message):
                 await message.channel.send(f'You need to input link with correct format (link, .png, .jpg) and be an downloadable image!')
 
 
-    if message.content.startswith('!mkchannel'):
+    if message.content.startswith('!mkchann'):
         str_split = message.content.split(' ')
         if len(str_split) > 2 or len(str_split) < 2:
             await message.channel.send(f'Too many or few arguments. Use !mkchannel <name>')
@@ -173,31 +173,42 @@ async def on_message(message):
                 await message.channel.send(f'Voice channel with name "{vc_creation_name}" already exists!')
             else:
                 await message.channel.send(f'Creating voice channel "{vc_creation_name}"')
-                await message.guild.create_voice_channel(vc_creation_name, category = category)
+                await message.guild.create_role(name=vc_creation_name)
+                role = discord.utils.get(message.guild.roles, name=vc_creation_name)
+                await message.author.add_roles(role)
+                await message.guild.create_voice_channel(vc_creation_name, category = category, sync_permissions=True)
+                channel = discord.utils.get(message.guild.channels, name = vc_creation_name)
+                await channel.set_permissions(role, speak=True, use_voice_activation = True)
                 await message.channel.send(f'Channel created')
-                db.create_channel_for_user(username = message.author.name, channel_name = vc_creation_name)
-                db.update_rights(username = message.author.name, channel_name = vc_creation_name, type = 'give')
 
 
-    if message.content.startswith('!rights'):
+    if message.content.startswith('!right'):
         str_split = message.content.split(' ')
         if len(str_split) > 3 or len(str_split) < 3:
             await message.channel.send(f'Too many or few arguments. Use !rights <channelname> <user>')
         else:
             channel_name = str_split[-2]
             user_name = str_split[-1]
-            if user_name in db.db['users']:
-                if channel_name in db.db['users'][message.author.name]['channels_permission']:
-                    if channel_name in db.db['users'][user_name]['channels_permission']:
-                        await message.channel.send(f'{user_name} already has rights to {channel_name}')
-                    else:
-                        await message.channel.send(f'Giving rights to {user_name} to {channel_name}...')
-                        db.update_rights(username = user_name, channel_name = channel_name, type = 'give')
-                else:
-                    await message.channel.send(f'{user_name} does not own {channel_name}')
+            role_names = [role.name for role in message.author.roles]
+            lock = True
+            if channel_name in role_names:
+                members = client.get_all_members()
+                for member in members:
+                    if member.name == user_name:
+                        user = member
+                        role_names = [role.name for role in user.roles]
+                        if channel_name in role_names:
+                            await message.channel.send(f'{user.name} already have rights to "{channel_name}"')
+                        else:
+                            await message.channel.send(f'Giving rights to {user.name} to "{channel_name}"')
+                            await user.add_roles(discord.utils.get(message.guild.roles, name=channel_name))
+                            await message.channel.send(f"Rights given to {user.name}")
+                        lock = False
+                if lock:
+                    await message.channel.send(f'User {user_name} not found')
             else:
-                await message.channel.send(f'{user_name} does not exist')
-    
+                await message.channel.send(f"You don't have permission to do that!")
+
 
     if message.content.startswith('!restart'):
         subprocess.run("start killall.bat", shell=True, check=True)
