@@ -157,7 +157,7 @@ async def on_message(message):
                 await message.channel.send(f'You need to input link with correct format (link, .png, .jpg) and be an downloadable image!')
 
 
-    if message.content.startswith('!mkchann'):
+    if message.content.startswith('!mkchannel'):
         str_split = message.content.split(' ')
         if len(str_split) > 2 or len(str_split) < 2:
             await message.channel.send(f'Too many or few arguments. Use !mkchannel <name>')
@@ -182,7 +182,7 @@ async def on_message(message):
                 await message.channel.send(f'Channel created')
 
 
-    if message.content.startswith('!right'):
+    if message.content.startswith('!rights'):
         str_split = message.content.split(' ')
         if len(str_split) > 3 or len(str_split) < 3:
             await message.channel.send(f'Too many or few arguments. Use !rights <channelname> <user>')
