@@ -46,7 +46,7 @@ import tools.animepaint as arcanetool
 from PIL import Image
 from PIL import ImageFont
 from PIL import ImageDraw 
-import tools.activitydb as activitydb
+import tools.database_main
 
 
 
@@ -60,7 +60,7 @@ queue = []
 
 with open('../key.txt', 'r') as f:
     k = str(f.read())
-
+db = tools.database_main.Database()
 
 class MyClient(discord.Client):
     def __init__(self, *args, **kwargs):
@@ -69,6 +69,12 @@ class MyClient(discord.Client):
     async def on_ready(self):
         print(f'Logged in as {self.user} (ID: {self.user.id})')
         print('------')
+        members = self.get_all_members()
+        for member in members:
+            if member.name not in db.db['users']:
+                db.db['users'][member.name] = {'channels_owned': [], 'coins': 0, 'channels_permission': []}
+                db.write_data()
+
 
 
 # Startups
@@ -77,7 +83,6 @@ intents.members = True
 client = MyClient(intents = intents)
 
 
-# db = activitydb.ActivityDB()
 
 
 # async def ticksystem():
@@ -86,7 +91,6 @@ client = MyClient(intents = intents)
 #         global temp_status
 #         # database = read_db()
 #         global database
-#         remove_status = ["any problem can always be solved with generous amount's of big explosions and fire", "penis", "The consensus is this: Fuck off, immediately. <3"]
 #         temp_stats = {}
 #         members = client.get_all_members()
 #         for member in members:
@@ -108,7 +112,19 @@ client = MyClient(intents = intents)
 
 # client.loop.create_task(ticksystem())
 
-
+@client.event
+async def on_voice_state_update(member, before, after):
+    print(after)
+    if after.channel != None:
+        if after.channel.category.name == 'Spesialiserte kanaler':
+            if member.name in db.db['users']:
+                current_channel = after.channel.name
+                if current_channel in db.db['users'][member.name]['channels_permission']:
+                    await member.edit(mute = False)
+                else:
+                    await member.edit(mute = True)
+        else:
+            await member.edit(mute = False)
 
 @client.event
 async def on_message(message):
@@ -139,11 +155,47 @@ async def on_message(message):
                 await message.channel.send(file=discord.File(path_imge))
             else:
                 await message.channel.send(f'You need to input link with correct format (link, .png, .jpg) and be an downloadable image!')
-    
-    if message.content.startswith('!activity'):
-        await message.channel.send(file=discord.File('../activitydb.png'))
 
+
+    if message.content.startswith('!mkchannel'):
+        str_split = message.content.split(' ')
+        if len(str_split) > 2 or len(str_split) < 2:
+            await message.channel.send(f'Too many or few arguments. Use !mkchannel <name>')
+        else:
+            vc_creation_name = str_split[-1]
+            # vc_channels = client.guilds[0].voice_channels
+            for cat in client.guilds[0].categories:
+                if cat.name == 'Spesialiserte kanaler':
+                    category = cat
+            # voice_channels = list(vc_channels)
+            voicechannel_names = [channel.name for channel in category.channels]
+            if vc_creation_name in voicechannel_names:
+                await message.channel.send(f'Voice channel with name "{vc_creation_name}" already exists!')
+            else:
+                await message.channel.send(f'Creating voice channel "{vc_creation_name}"')
+                await client.guilds[0].create_voice_channel(vc_creation_name, category = category)
+                await message.channel.send(f'Channel created')
+                db.create_channel_for_user(username = message.author.name, channel_name = vc_creation_name)
+                db.update_rights(username = message.author.name, channel_name = vc_creation_name, type = 'give')
+
+
+    if message.content.startswith('!rights'):
+        str_split = message.content.split(' ')
+        if len(str_split) > 3 or len(str_split) < 3:
+            await message.channel.send(f'Too many or few arguments. Use !rights <channelname> <user>')
+        else:
+            channel_name = str_split[-2]
+            user_name = str_split[-1]
+            if channel_name in db.db['users'][user_name]['channels_permission']:
+                if channel_name in db.db['users'][user_name]['channels_permission']:
+                    await message.channel.send(f'{user_name} already has rights to {channel_name}')
+                else:
+                    await message.channel.send(f'Giving rights to {user_name} to {channel_name}...')
+                    db.update_rights(username = user_name, channel_name = channel_name, type = 'give')
+            else:
+                await message.channel.send(f'{user_name} does not own {channel_name}')
     
+
     if message.content.startswith('!restart'):
         subprocess.run("start killall.bat", shell=True, check=True)
         await message.channel.send(f'Restarting...')
