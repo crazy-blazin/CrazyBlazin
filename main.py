@@ -186,7 +186,7 @@ async def on_message(message):
         else:
             channel_name = str_split[-2]
             user_name = str_split[-1]
-            if channel_name in db.db['users'][user_name]['channels_permission']:
+            if channel_name in db.db['users'][message.author.name]['channels_permission']:
                 if channel_name in db.db['users'][user_name]['channels_permission']:
                     await message.channel.send(f'{user_name} already has rights to {channel_name}')
                 else:
