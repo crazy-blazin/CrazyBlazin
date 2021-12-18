@@ -163,8 +163,8 @@ async def on_message(message):
             await message.channel.send(f'Too many or few arguments. Use !mkchannel <name>')
         else:
             vc_creation_name = str_split[-1]
-            # vc_channels = client.guilds[0].voice_channels
-            for cat in client.guilds[0].categories:
+            # vc_channels = client.guilds[1].voice_channels
+            for cat in message.guild.categories:
                 if cat.name == 'Spesialiserte kanaler':
                     category = cat
             # voice_channels = list(vc_channels)
@@ -173,7 +173,7 @@ async def on_message(message):
                 await message.channel.send(f'Voice channel with name "{vc_creation_name}" already exists!')
             else:
                 await message.channel.send(f'Creating voice channel "{vc_creation_name}"')
-                await client.guilds[0].create_voice_channel(vc_creation_name, category = category)
+                await message.guild.create_voice_channel(vc_creation_name, category = category)
                 await message.channel.send(f'Channel created')
                 db.create_channel_for_user(username = message.author.name, channel_name = vc_creation_name)
                 db.update_rights(username = message.author.name, channel_name = vc_creation_name, type = 'give')
