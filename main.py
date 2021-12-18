@@ -186,14 +186,17 @@ async def on_message(message):
         else:
             channel_name = str_split[-2]
             user_name = str_split[-1]
-            if channel_name in db.db['users'][message.author.name]['channels_permission']:
-                if channel_name in db.db['users'][user_name]['channels_permission']:
-                    await message.channel.send(f'{user_name} already has rights to {channel_name}')
+            if user_name in db.db['users']:
+                if channel_name in db.db['users'][message.author.name]['channels_permission']:
+                    if channel_name in db.db['users'][user_name]['channels_permission']:
+                        await message.channel.send(f'{user_name} already has rights to {channel_name}')
+                    else:
+                        await message.channel.send(f'Giving rights to {user_name} to {channel_name}...')
+                        db.update_rights(username = user_name, channel_name = channel_name, type = 'give')
                 else:
-                    await message.channel.send(f'Giving rights to {user_name} to {channel_name}...')
-                    db.update_rights(username = user_name, channel_name = channel_name, type = 'give')
+                    await message.channel.send(f'{user_name} does not own {channel_name}')
             else:
-                await message.channel.send(f'{user_name} does not own {channel_name}')
+                await message.channel.send(f'{user_name} does not exist')
     
 
     if message.content.startswith('!restart'):
