@@ -134,6 +134,7 @@ async def on_message(message):
         return
 
     if str(message.channel.id) == '916636184707493958' or str(message.channel.id) == '734481490431443068':
+
         queue.append([str(message.content), message.channel])
         if len(queue) > 1:
             await queue[-1][1].send(f'Painting "{queue[-1][0]}" added to queue!')
