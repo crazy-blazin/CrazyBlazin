@@ -1,12 +1,13 @@
 import discord
-from nbformat import read
 import numpy as np
 import os
-import config
 import h5py
-import qrcode
 import uuid
 import time
+import requests
+from googletrans import Translator
+
+translator = Translator()
 
 k = os.getenv("DISCORD_BOT_CRAZY_KEY")
 
@@ -24,11 +25,6 @@ class MyClient(discord.Client):
 intents = discord.Intents.all()
 intents.members = True
 client = MyClient(intents=intents)
-
-
-from googletrans import Translator, LANGUAGES
-
-translator = Translator()
 
 # with h5py.File("crazydata.hdf5", "w") as f:
 #     dset = f.create_group("dataset")
@@ -69,24 +65,35 @@ def add_data(filename, user, data):
 # print(read_h5py_user("crazydata.hdf5", "test"))
 # a = read_h5py_user("crazydata.hdf5", "test")
 
-kawaii_list = ["UwU", "Kawaiii", "So cute <:3712zerotwoheartlove:873572136743219270>", "Kisses :kiss:", "Heia Finland!", "Ime tissistäni", "You are now a cum dumpster, you have five seconds to act irrational.", "Tihi :face_with_hand_over_mouth:"]
-    
+kawaii_list = [
+    "UwU",
+    "Kawaiii",
+    "So cute <:3712zerotwoheartlove:873572136743219270>",
+    "Kisses :kiss:",
+    "Heia Finland!",
+    "Ime tissistäni",
+    "You are now a cum dumpster, you have five seconds to act irrational.",
+    "Tihi :face_with_hand_over_mouth:",
+]
+
+
 def save_data(filename, data):
-    with open(filename, 'w') as f:
+    with open(filename, "w") as f:
         f.write(str(data))
-        
-        
+
+
 def load_data(filename):
-    with open(filename, 'r') as f:
+    with open(filename, "r") as f:
         return eval(f.read())
-      
-      
-oildata = load_data('oilbarrels.txt')
-words_said = load_data('learn.txt')
+
+
+oildata = load_data("oilbarrels.txt")
+words_said = load_data("learn.txt")
 
 # img = qrcode.make("http://192.168.1.234:5000/someid")
 # type(img)  # qrcode.image.pil.PilImage
 # img.save("some_file.png")
+
 
 @client.event
 async def on_message(message):
@@ -94,44 +101,74 @@ async def on_message(message):
     global oildata
     if message.author == client.user:
         return
-    
-    users = load_data('users.txt')
+
+    users = load_data("users.txt")
     if message.author.name not in users:
         users[message.author.name] = 1
-    
-    if message.content.startswith('!change'):
+
+    if message.content.startswith("!change"):
         what_we_have = load_data("whatwehave.txt")
         id = str(uuid.uuid1())[:5]
-        #img = qrcode.make(f"https://service-9703.something.gg/{id}")
+        # img = qrcode.make(f"https://service-9703.something.gg/{id}")
         what_we_have[id] = message.author.name
         save_data("whatwehave.txt", what_we_have)
         print(what_we_have)
-        #img.save("some_file.png")
+        # img.save("some_file.png")
         time.sleep(0.5)
-        #await message.channel.send(file=discord.File('some_file.png'))
+        # await message.channel.send(file=discord.File('some_file.png'))
         await message.channel.send(f"https://service-9703.something.gg/{id}")
-    
-    
+
     rand = np.random.randint(0, 100)
     if rand > 90:
         country_chosen = np.random.choice(list(oildata["Country"].keys()))
-        await message.channel.send(f"You diverted {int(users[message.author.name])} oil barrel :fuelpump: to {country_chosen} from your pipeline.")
-        oildata['Country'][country_chosen]['oilstorage'] += int(users[message.author.name])
-        save_data('oilbarrels.txt', oildata)
-    
-    if message.content.startswith('!stats'):
+        await message.channel.send(
+            f"You diverted {int(users[message.author.name])} oil barrel :fuelpump: to {country_chosen} from your pipeline."
+        )
+        oildata["Country"][country_chosen]["oilstorage"] += int(
+            users[message.author.name]
+        )
+        save_data("oilbarrels.txt", oildata)
+
+    if message.content.startswith("!stats"):
         for main_stat in oildata:
             if main_stat == "Country":
                 for country in oildata[main_stat]:
-                    embedVar = discord.Embed(title=country, description="The current portofolio of country",color=0x00ff00)
+                    embedVar = discord.Embed(
+                        title=country,
+                        description="The current portofolio of country",
+                        color=0x00FF00,
+                    )
                     for data in oildata[main_stat][country]:
-                        embedVar.add_field(name="Oil storage:", value=f":fuelpump: {oildata[main_stat][country][data]}", inline=False)
+                        embedVar.add_field(
+                            name="Oil storage:",
+                            value=f":fuelpump: {oildata[main_stat][country][data]}",
+                            inline=False,
+                        )
         await message.channel.send(embed=embedVar)
-      
-        
-        
-    
-                
-            
-               
+
+    rand = np.random.randint(0, 100)
+    if rand < 10:
+        msg = str(message.content)
+        msg = translator.translate(str(msg), dest="en").text
+
+        url = "https://api.tiyaro.ai/v1/ent/huggingface/1/Invincible/Chat_bot-Harrypotter-medium"
+
+        payload = {
+            "oldInputs": ["The Olympics are right around the corner."],
+            "oldOutputs": [
+                "I know! I cant wait to watch the games! I love the winter games!"
+            ],
+            "input": msg,
+        }
+        headers = {
+            "accept": "*/*",
+            "content-type": "application/json",
+            "authorization": "Bearer KEY",
+        }
+
+        response = requests.request("POST", url, json=payload, headers=headers).text
+        response = response.json()["response"]
+        await message.channel.send(response)
+
+
 client.run(k)
