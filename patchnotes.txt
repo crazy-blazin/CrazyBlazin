@@ -1,5 +1,0 @@
-commit 79e55fbb74d5b990e68c0b5129ec6b030c78ed35
-Author: Martin Soria Røvang <martinrovang@gmail.com>
-Date:   Sat Jul 31 12:12:26 2021 +0200
-
-    Updated lootbox gif to give it more of a "opening" experience

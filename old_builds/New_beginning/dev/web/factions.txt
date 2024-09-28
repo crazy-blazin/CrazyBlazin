@@ -1,1 +1,0 @@
-{'The High Council': {'current_health': 0, 'maxtickets': 30, 'tickets': 30, 'armor': 0, 'maxhp': 0, 'health_regen': 0, 'dmg': [0, 0]}, 'The Resistance': {'current_health': 0, 'maxtickets': 30, 'tickets': 30, 'armor': 0, 'maxhp': 0, 'health_regen': 0, 'dmg': [0, 0]}}

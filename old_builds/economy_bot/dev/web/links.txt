@@ -1,5 +1,0 @@
-https://localtunnel.me
-
-
-npm install -g localtunnel
-lt --port 5000
