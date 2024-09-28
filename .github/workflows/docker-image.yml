@@ -3,11 +3,13 @@ name: Build and Push Docker Image
 on:
   push:
     branches:
-      - main  # Trigger on push to the main branch
+      - main
   pull_request:
     branches:
-      - main  # Trigger on pull request to the main branch
-  workflow_dispatch:  # Allows manual trigger via GitHub Actions UI
+      - main
+  release:
+    types: [published]  # Trigger when a release is published
+  workflow_dispatch:  # Allows manual trigger
 
 jobs:
   build-and-push:
@@ -26,9 +28,19 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      - name: Set Docker image tag
+        id: vars
+        run: |
+          # If triggered by a release, use the release tag, otherwise use the branch name
+          if [ "${{ github.event_name }}" == "release" ]; then
+            echo "RELEASE_TAG=${{ github.event.release.tag_name }}" >> $GITHUB_ENV
+          else
+            echo "RELEASE_TAG=${{ github.ref_name }}" >> $GITHUB_ENV
+          fi
+
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
           context: .
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/crazyblazin:v1.0.3
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/crazyblazin:${{ env.RELEASE_TAG }}
