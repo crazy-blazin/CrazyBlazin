@@ -69,7 +69,7 @@ async def manage_multiplier():
 
         # Activate the multiplier for 30 minutes
         multiplier_active = True
-        print("2x coin multiplier is now active!")
+        logger.info("2x coin multiplier has started!")
 
         # Send a message to the channel to notify users
         if channel:
@@ -77,7 +77,7 @@ async def manage_multiplier():
 
         await asyncio.sleep(30 * 60)  # Wait for 30 minutes
         multiplier_active = False
-        print("2x coin multiplier has ended.")
+        logger.info("2x coin multiplier has ended!")
 
         # Send a message to the channel when the multiplier ends
         if channel:
