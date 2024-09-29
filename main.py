@@ -4,6 +4,8 @@ import random
 from datetime import timedelta, datetime
 from discord.ext import commands
 from beartype import beartype
+from loguru import logger
+import toml
 
 from utils.dbhandler import DataBaseHandler
 from config import config
@@ -58,7 +60,7 @@ async def manage_multiplier():
         next_day = datetime.utcnow() + timedelta(days=1)
 
         # Choose a random time during the next 24 hours for the multiplier to start
-        random_minutes = random.randint(0, 23 * 60 + 30)  # Random time within 24 hours (in minutes)
+        random_minutes = random.randint(0, config.RANDOM_TIME_WITHIN)  # Random time within 24 hours (in minutes)
         multiplier_start = datetime.utcnow() + timedelta(minutes=random_minutes)
 
         # Wait until the random start time
@@ -88,7 +90,17 @@ async def manage_multiplier():
 
 @bot.event
 async def on_ready():
-    print(f'Logged in as {bot.user}')
+    # Fetch the specific channel by ID
+    channel_id = 802307794053234728  # Replace with your channel ID
+    channel = bot.get_channel(channel_id)
+    # read version with toml
+    with open("pyproject.toml", "r") as f:
+        data = toml.load(f)
+        version = data["tool"]["poetry"]["version"]
+    if channel:
+        await channel.send(f"🤖 **Bot is online!** Version: {version}")
+    logger.info(f"🤖 Bot is online! Version: {version}")
+
     bot.loop.create_task(give_coins())
     bot.loop.create_task(manage_multiplier())  # Start the multiplier task
 

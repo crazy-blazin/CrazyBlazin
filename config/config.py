@@ -10,6 +10,9 @@ STREAM_BONUS = 1
 # Database settings
 DB_NAME = '/data/coins.db'
 
+# Multiplier settings
+RANDOM_TIME_WITHIN = 23 * 60 + 30 # 23 hours and 30 minutes
+
 
 # Grace
 
