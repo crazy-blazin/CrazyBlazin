@@ -29,7 +29,10 @@ async def give_coins():
             for vc in guild.voice_channels:
                 for member in vc.members:
                     if not member.bot:  # Don't give coins to bots
-                        db_handler.add_coins(user_id=member.id, username=member.display_name, amount=config.PAY_AMOUNT)
+                        coins_to_give = config.PAY_AMOUNT
+                        if member.voice.self_stream:  # Check if the member is streaming
+                            coins_to_give += config.STREAM_BONUS  # Add bonus coins for streaming
+                        db_handler.add_coins(user_id=member.id, username=member.display_name, amount=coins_to_give)
         await asyncio.sleep(config.GRACIOUS_DELAY)
 
 
