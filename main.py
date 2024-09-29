@@ -27,7 +27,7 @@ async def give_coins():
                 for member in vc.members:
                     if not member.bot:  # Don't give coins to bots
                         db_handler.add_coins(user_id=member.id, username=member.display_name, amount=config.PAY_AMOUNT)
-        await asyncio.sleep(5)
+        await asyncio.sleep(config.GRACIOUS_DELAY)
 
 
 @bot.event
