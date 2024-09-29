@@ -1,6 +1,8 @@
 import discord
 import asyncio
 from discord.ext import commands
+from beartype import beartype
+
 from utils.dbhandler import DataBaseHandler
 from config import config
 
@@ -14,6 +16,7 @@ db_handler = DataBaseHandler()
 
 
 # Function to add coins to a user
+
 def add_coins(user_id, username, amount):
     db_handler.add_coins(user_id=user_id, username=username, amount=amount)
 

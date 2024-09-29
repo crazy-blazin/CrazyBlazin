@@ -8,7 +8,12 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "^3.10"
 discord = "^2.3.2"
+beartype = "^0.19.0"
 
+
+[tool.poetry.group.dev.dependencies]
+nox = "^2024.4.15"
+pytest = "^8.3.3"
 
 [build-system]
 requires = ["poetry-core"]

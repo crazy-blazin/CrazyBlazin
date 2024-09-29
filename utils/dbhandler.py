@@ -1,5 +1,8 @@
 import sqlite3
 from dataclasses import dataclass
+from beartype import beartype
+from typing import Tuple, Union
+
 import utils.queries as queries
 from config import config
 
@@ -8,19 +11,22 @@ from config import config
 class DataBaseHandler:
     db_name: str = config.DB_NAME
 
-    def _get_connection(self):
+    @beartype
+    def _get_connection(self) -> Tuple[sqlite3.Connection, sqlite3.Cursor]:
         """Establish and return a database connection and cursor."""
         conn = sqlite3.connect(self.db_name, check_same_thread=False)  # Thread-safe connection
         return conn, conn.cursor()
 
-    def __post_init__(self):
+    @beartype
+    def __post_init__(self) -> None:
         """Initialize the database tables."""
         conn, c = self._get_connection()
         c.execute(queries.INIT_DB_TABLE)
         conn.commit()
         conn.close()
 
-    def add_coins(self, user_id, username, amount):
+    @beartype
+    def add_coins(self, user_id: int, username: str, amount: int) -> None:
         """Add coins to a user or create a new user entry if they don't exist."""
         conn, c = self._get_connection()
         c.execute(queries.GET_COINS, (user_id,))
@@ -35,7 +41,8 @@ class DataBaseHandler:
         conn.commit()
         conn.close()
 
-    def run_query(self, query, params):
+    @beartype
+    def run_query(self, query: str, params: tuple) -> sqlite3.Cursor:
         """Execute a generic query with parameters and return the cursor."""
         conn, c = self._get_connection()
         c.execute(query, params)
@@ -43,14 +50,16 @@ class DataBaseHandler:
         conn.close()
         return c
 
-    def update_coins(self, user_id, amount):
+    @beartype
+    def update_coins(self, user_id: int, amount: int) -> None:
         """Update the amount of coins for a specific user."""
         conn, c = self._get_connection()
         c.execute(queries.UPDATE_COINS, (amount, user_id))
         conn.commit()
         conn.close()
 
-    def get_coins(self, user_id):
+    @beartype
+    def get_coins(self, user_id: int) -> Union[None, Tuple[int]]:
         """Retrieve the number of coins for a specific user."""
         conn, c = self._get_connection()
         c.execute(queries.GET_COINS, (user_id,))
@@ -58,7 +67,8 @@ class DataBaseHandler:
         conn.close()
         return result
 
-    def reset_coins(self, user_id):
+    @beartype
+    def reset_coins(self, user_id: int) -> None:
         """Reset the number of coins for a specific user."""
         conn, c = self._get_connection()
         c.execute(queries.RESET_COINS, (user_id,))
