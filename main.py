@@ -21,11 +21,35 @@ db_handler = DataBaseHandler()
 # Variable to track whether the multiplier is active
 multiplier_active = False
 
+# Track the last time someone was awarded for being the first to join any voice channel
+last_awarded_time = None
 
 # Function to add coins to a user
 @beartype
 def add_coins(user_id: int, username: str, amount: int) -> None:
     db_handler.add_coins(user_id=user_id, username=username, amount=amount)
+
+
+@bot.event
+async def on_voice_state_update(member, before, after):
+    global last_awarded_time
+
+    # Check if the member has joined a voice channel
+    if after.channel is not None and before.channel != after.channel:
+        now = datetime.utcnow()
+        # If there hasn't been a first joiner in the past 24 hours
+        if last_awarded_time is None or now - last_awarded_time >= timedelta(days=config.FIRST_IN_CHANNEL_TIMER_DAYS):
+            # Award coins to the first joiner in 24 hours
+            first_join_reward = config.FIRST_IN_CHANNEL_REWARD_COINS  # Adjust the reward amount as you wish
+            db_handler.add_coins(user_id=member.id, username=member.display_name, amount=first_join_reward)
+
+            # Send a message to the specific text channel
+            announcement_channel = bot.get_channel(802307794053234728)
+            if announcement_channel:
+                await announcement_channel.send(f"🎉 {member.display_name} is the first to join a voice channel in the past 24 hours and earns {first_join_reward} CBC coins!")
+
+            # Update the last awarded time
+            last_awarded_time = now
 
 
 # Background task to give coins to users in voice channels
