@@ -64,7 +64,3 @@ class DataBaseHandler:
         c.execute(queries.RESET_COINS, (user_id,))
         conn.commit()
         conn.close()
-
-    def close(self):
-        """This method is redundant now as connections are closed per operation."""
-        pass
