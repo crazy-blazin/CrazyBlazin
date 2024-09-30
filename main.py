@@ -60,8 +60,6 @@ async def give_coins():
     while not bot.is_closed():
         for guild in bot.guilds:
             # Fetch leaderboard from the database (this is an example, adjust for your system)
-            top_users = db_handler.get_top_users(limit=3)  # [(user_id, username, coins), ...]
-
             for vc in guild.voice_channels:
                 for member in vc.members:
                     if not member.bot:  # Skip bots
@@ -69,7 +67,7 @@ async def give_coins():
 
                         # Apply 2x multiplier if it's active
                         if multiplier_active:
-                            coins_to_give *= 2
+                            coins_to_give *= config.EVENT_MULTIPLIER
 
                         # Add bonus coins if the member is streaming
                         if member.voice.self_stream:
@@ -78,32 +76,6 @@ async def give_coins():
                         # Give coins to the member
                         db_handler.add_coins(user_id=member.id, username=member.display_name, amount=coins_to_give)
 
-                        # Find the member in the leaderboard to assign a medal
-                        try:
-                            for rank, (user_id, _, _) in enumerate(top_users, start=1):
-                                if member.id == user_id:
-                                    # Assign a medal based on their position in the leaderboard
-                                    if rank == 1:
-                                        medal = "🥇"
-                                    elif rank == 2:
-                                        medal = "🥈"
-                                    elif rank == 3:
-                                        medal = "🥉"
-                                    else:
-                                        medal = None  # No medal for users outside the top 3
-
-                                    # Update the member's nickname with their medal
-                                    if medal:
-                                        # Check if the member has permission to change nicknames
-                                        if member.guild_permissions.change_nickname:
-                                            # Append the medal to their nickname
-                                            new_nickname = f"{medal}{member.display_name}"
-                                            await member.edit(nick=new_nickname)
-                                        else:
-                                            print(f"Cannot change nickname for {member.display_name}, missing permissions.")
-
-                        except Exception as e:
-                            print(f"Error assigning medal: {e}")
         # Wait for the next cycle
         await asyncio.sleep(config.GRACIOUS_DELAY)
 
@@ -131,19 +103,19 @@ async def manage_multiplier():
 
         # Activate the multiplier for 30 minutes
         multiplier_active = True
-        logger.info("2x coin multiplier has started!")
+        logger.info(f"{config.EVENT_MULTIPLIER}x coin multiplier has started!")
 
         # Send a message to the channel to notify users
         if channel:
-            await channel.send("🚀 **2x Coin Multiplier is now active!** Earn double CBC coins for the next 30 minutes!")
+            await channel.send(f"🚀 **{config.EVENT_MULTIPLIER}x Coin Multiplier is now active!** Earn double CBC coins for the next {config.BONUS_TIMER_MINUTES} minutes!")
 
-        await asyncio.sleep(30 * 60)  # Wait for 30 minutes
+        await asyncio.sleep(config.BONUS_TIMER_MINUTES)
         multiplier_active = False
-        logger.info("2x coin multiplier has ended!")
+        logger.info(f"{config.EVENT_MULTIPLIER}x coin multiplier has ended!")
 
         # Send a message to the channel when the multiplier ends
         if channel:
-            await channel.send("⏳ **The 2x Coin Multiplier has ended.** Stay tuned for the next random bonus!")
+            await channel.send(f"⏳ **The {config.EVENT_MULTIPLIER}x Coin Multiplier has ended.** Stay tuned for the next random bonus!")
 
         # Sleep until the start of the next 24-hour period
         time_to_next_day = (next_day - datetime.utcnow()).total_seconds()
