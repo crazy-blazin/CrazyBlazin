@@ -56,17 +56,55 @@ async def on_voice_state_update(member, before, after):
 async def give_coins():
     await bot.wait_until_ready()
     global multiplier_active
+
     while not bot.is_closed():
         for guild in bot.guilds:
+            # Fetch leaderboard from the database (this is an example, adjust for your system)
+            top_users = db_handler.get_top_users(limit=3)  # [(user_id, username, coins), ...]
+
             for vc in guild.voice_channels:
                 for member in vc.members:
-                    if not member.bot:  # Don't give coins to bots
+                    if not member.bot:  # Skip bots
                         coins_to_give = config.PAY_AMOUNT
-                        if multiplier_active:  # Apply 2x multiplier
+
+                        # Apply 2x multiplier if it's active
+                        if multiplier_active:
                             coins_to_give *= 2
-                        if member.voice.self_stream:  # Check if the member is streaming
-                            coins_to_give += config.STREAM_BONUS  # Add bonus coins for streaming
+
+                        # Add bonus coins if the member is streaming
+                        if member.voice.self_stream:
+                            coins_to_give += config.STREAM_BONUS
+
+                        # Give coins to the member
                         db_handler.add_coins(user_id=member.id, username=member.display_name, amount=coins_to_give)
+
+                        # Find the member in the leaderboard to assign a medal
+                        try:
+                            for rank, (user_id, _, _) in enumerate(top_users, start=1):
+                                if member.id == user_id:
+                                    # Assign a medal based on their position in the leaderboard
+                                    if rank == 1:
+                                        medal = "🥇"
+                                    elif rank == 2:
+                                        medal = "🥈"
+                                    elif rank == 3:
+                                        medal = "🥉"
+                                    else:
+                                        medal = None  # No medal for users outside the top 3
+
+                                    # Update the member's nickname with their medal
+                                    if medal:
+                                        # Check if the member has permission to change nicknames
+                                        if member.guild_permissions.change_nickname:
+                                            # Append the medal to their nickname
+                                            new_nickname = f"{medal}{member.display_name}"
+                                            await member.edit(nick=new_nickname)
+                                        else:
+                                            print(f"Cannot change nickname for {member.display_name}, missing permissions.")
+
+                        except Exception as e:
+                            print(f"Error assigning medal: {e}")
+        # Wait for the next cycle
         await asyncio.sleep(config.GRACIOUS_DELAY)
 
 
@@ -122,7 +160,8 @@ async def on_ready():
         data = toml.load(f)
         version = data["tool"]["poetry"]["version"]
     if channel:
-        await channel.send(f"🤖 **Bot is online!** Version: {version}")
+        # await channel.send(f"🤖 **Bot is online!** Version: {version}")
+        pass
     logger.info(f"🤖 Bot is online! Version: {version}")
 
     bot.loop.create_task(give_coins())
@@ -148,6 +187,32 @@ async def reset_coins(ctx, member: discord.Member = None):
         member = ctx.author
     db_handler.reset_coins(user_id=member.id)
     await ctx.send(f"{member.display_name}'s coins have been reset to 0.")
+
+
+@bot.command()
+async def leaderboard(ctx):
+    """Display the top 10 users with the most coins."""
+    top_users = db_handler.get_top_users(limit=10)  # Assumes db_handler has a method for this
+    if not top_users:
+        await ctx.send("No one has earned any coins yet.")
+        return
+
+    leaderboard_text = "**Top Coin Leaders:**\n"
+    position = 1
+    for _, username, coins in top_users:
+        if position == 1:
+            leaderboard_text += f"🥇 **{username}**: {coins} coins\n"
+        elif position == 2:
+            leaderboard_text += f"🥈 **{username}**: {coins} coins\n"
+        elif position == 3:
+            leaderboard_text += f"🥉 **{username}**: {coins} coins\n"
+        else:
+            leaderboard_text += f"{position}. **{username}**: {coins} coins\n"
+        position += 1
+
+    embed = discord.Embed(title="Leaderboard", description=leaderboard_text, color=0x00ff00)
+    await ctx.send(embed=embed)
+
 
 
 bot.run(config.TOKEN)

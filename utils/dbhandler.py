@@ -74,3 +74,12 @@ class DataBaseHandler:
         c.execute(queries.RESET_COINS, (user_id,))
         conn.commit()
         conn.close()
+
+    @beartype
+    def get_top_users(self, limit: int) -> list:
+        """Retrieve the top users with the most coins."""
+        conn, c = self._get_connection()
+        c.execute(f'SELECT * FROM users ORDER BY coins DESC LIMIT {limit}')
+        result = c.fetchall()
+        conn.close()
+        return result
