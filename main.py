@@ -109,7 +109,7 @@ async def manage_multiplier():
         if channel:
             await channel.send(f"🚀 **{config.EVENT_MULTIPLIER}x Coin Multiplier is now active!** Earn double CBC coins for the next {config.BONUS_TIMER_MINUTES} minutes!")
 
-        await asyncio.sleep(config.BONUS_TIMER_MINUTES)
+        await asyncio.sleep(config.BONUS_TIMER_MINUTES * 60)
         multiplier_active = False
         logger.info(f"{config.EVENT_MULTIPLIER}x coin multiplier has ended!")
 
