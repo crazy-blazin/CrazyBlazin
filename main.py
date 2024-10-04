@@ -188,10 +188,15 @@ async def leaderboard(ctx):
     await ctx.send(embed=embed)
 
 
-# admin should be able to trigger *special event* which makes the bot give 3x coins for whole day
+
 @bot.command()
 @commands.has_permissions(administrator=True)
 async def special(ctx):
+    """
+    Start a special event with a 3x coin multiplier for 12 hours. (Or whatever is set in the config)
+
+    This command can only be used by administrators and will need 3 unique reactions to start the event.
+    """
     channel = bot.get_channel(config.CHAT_CHANNEL_ID)
 
     global multiplier_active_special
