@@ -16,6 +16,10 @@ DB_NAME = '/data/coins.db'
 # Multiplier settings
 RANDOM_TIME_WITHIN = 23 * 60 + 30 # 23 hours and 30 minutes
 EVENT_MULTIPLIER = 5
+SPECIAL_EVENT_MULTIPLIER = 3
 
 # Grace
 GRACIOUS_DELAY = 5
+
+# chat
+CHAT_CHANNEL_ID = 802307794053234728

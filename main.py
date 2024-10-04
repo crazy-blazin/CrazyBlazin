@@ -20,6 +20,7 @@ db_handler = DataBaseHandler()
 
 # Variable to track whether the multiplier is active
 multiplier_active = False
+multiplier_active_special = False
 
 # Track the last time someone was awarded for being the first to join any voice channel
 last_awarded_time = None
@@ -44,7 +45,7 @@ async def on_voice_state_update(member, before, after):
             db_handler.add_coins(user_id=member.id, username=member.display_name, amount=first_join_reward)
 
             # Send a message to the specific text channel
-            announcement_channel = bot.get_channel(802307794053234728)
+            announcement_channel = bot.get_channel(config.CHAT_CHANNEL_ID)
             if announcement_channel:
                 await announcement_channel.send(f"🎉 {member.display_name} is the first to join a voice channel in the past 24 hours and earns {first_join_reward} CBC coins!")
 
@@ -56,6 +57,7 @@ async def on_voice_state_update(member, before, after):
 async def give_coins():
     await bot.wait_until_ready()
     global multiplier_active
+    global multiplier_active_special
 
     while not bot.is_closed():
         for guild in bot.guilds:
@@ -68,6 +70,8 @@ async def give_coins():
                         # Apply 2x multiplier if it's active
                         if multiplier_active:
                             coins_to_give *= config.EVENT_MULTIPLIER
+                        if multiplier_active_special:
+                            coins_to_give *= config.SPECIAL_EVENT_MULTIPLIER
 
                         # Add bonus coins if the member is streaming
                         if member.voice.self_stream:
@@ -86,8 +90,7 @@ async def manage_multiplier():
     global multiplier_active
 
     # Fetch the specific channel by ID
-    channel_id = 802307794053234728  # Replace with your channel ID
-    channel = bot.get_channel(channel_id)
+    channel = bot.get_channel(config.CHAT_CHANNEL_ID)
 
     while not bot.is_closed():
         # Calculate when the next 24-hour period starts
@@ -125,8 +128,7 @@ async def manage_multiplier():
 @bot.event
 async def on_ready():
     # Fetch the specific channel by ID
-    channel_id = 802307794053234728  # Replace with your channel ID
-    channel = bot.get_channel(channel_id)
+    channel = bot.get_channel(config.CHAT_CHANNEL_ID)
     # read version with toml
     with open("pyproject.toml", "r") as f:
         data = toml.load(f)
@@ -190,14 +192,43 @@ async def leaderboard(ctx):
 @bot.command()
 @commands.has_permissions(administrator=True)
 async def special(ctx):
-    global multiplier_active
-    if multiplier_active:
-        await ctx.send("Event is already active!")
-    else:
-        multiplier_active = True
-        await ctx.send(f"🚀 🥳 🎉 **SUPER DUPER FUN EVENT {config.EVENT_MULTIPLIER}x Coin Multiplier is now active!** Earn double CBC coins for the next 12 HOURSE! 🚀 🥳 🎉")
-        await asyncio.sleep(12*60*60)
-        multiplier_active = False
-        await ctx.send(f"⏳ **The SUPER FUN EVENT WITH {config.EVENT_MULTIPLIER}x Coin Multiplier has ended.** Stay tuned for the next random bonus!")
+    channel = bot.get_channel(config.CHAT_CHANNEL_ID)
 
-bot.run(config.TOKEN)
+    global multiplier_active_special
+    if multiplier_active_special:
+        await channel.send("Event is already active!")
+    else:
+        # Send initial message for reactions
+        event_message = await channel.send(f"🚀 🥳 🎉 **SUPER DUPER EVENT INITIATED! If 3 people react, the {config.SPECIAL_EVENT_MULTIPLIER}x Coin Multiplier event will begin!** 🚀 🥳 🎉")
+
+        # React to the message to indicate it's reactable
+        await event_message.add_reaction('🎉')
+
+        def check(reaction, user):
+            return str(reaction.emoji) == '🎉' and reaction.message.id == event_message.id
+
+        # Wait for up to 3 unique users to react
+        reactions = set()
+        while len(reactions) < 3:
+            try:
+                reaction, user = await bot.wait_for('reaction_add', timeout=3600.0, check=check)
+                if user.id != bot.user.id:  # Ignore bot's own reaction
+                    reactions.add(user.id)
+            except asyncio.TimeoutError:
+                await channel.send("Not enough people reacted in time! The event has been cancelled.")
+                return
+
+        # Activate the event after getting 3 reactions
+        multiplier_active_special = True
+        await channel.send(f"🚀 🥳 🎉 **SUPER DUPER FUN EVENT {config.SPECIAL_EVENT_MULTIPLIER}x Coin Multiplier is now active!** Earn {config.SPECIAL_EVENT_MULTIPLIER}x CBC coins for the next 12 HOURS! 🚀 🥳 🎉")
+
+        # Event lasts for 12 hours
+        await asyncio.sleep(12*60*60)
+
+        # End the event
+        multiplier_active_special = False
+        await channel.send(f"⏳ **The SUPER FUN EVENT WITH {config.SPECIAL_EVENT_MULTIPLIER}x Coin Multiplier has ended.** Stay tuned for the next random bonus!")
+
+
+if __name__ == "__main__":
+    bot.run(config.TOKEN)
