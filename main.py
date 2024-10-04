@@ -186,5 +186,18 @@ async def leaderboard(ctx):
     await ctx.send(embed=embed)
 
 
+# admin should be able to trigger *special event* which makes the bot give 3x coins for whole day
+@bot.command()
+@commands.has_permissions(administrator=True)
+async def special(ctx):
+    global multiplier_active
+    if multiplier_active:
+        await ctx.send("Event is already active!")
+    else:
+        multiplier_active = True
+        await ctx.send(f"🚀 🥳 🎉 **SUPER DUPER FUN EVENT {config.EVENT_MULTIPLIER}x Coin Multiplier is now active!** Earn double CBC coins for the next 12 HOURSE! 🚀 🥳 🎉")
+        await asyncio.sleep(12*60*60)
+        multiplier_active = False
+        await ctx.send(f"⏳ **The SUPER FUN EVENT WITH {config.EVENT_MULTIPLIER}x Coin Multiplier has ended.** Stay tuned for the next random bonus!")
 
 bot.run(config.TOKEN)
