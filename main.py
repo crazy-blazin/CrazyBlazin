@@ -235,5 +235,8 @@ async def special(ctx):
         await channel.send(f"⏳ **The SUPER FUN EVENT WITH {config.SPECIAL_EVENT_MULTIPLIER}x Coin Multiplier has ended.** Stay tuned for the next random bonus!")
 
 
+
+wldwds
+
 if __name__ == "__main__":
     bot.run(config.TOKEN)
