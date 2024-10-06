@@ -39,18 +39,27 @@ app = Flask(__name__)
 
 
 @app.route('/webhook', methods=['POST'])
-def webhook():
+async def webhook():
     logger.info("Webhook received!")
     try:
         data = json.loads(request.data)
         if data['action'] == 'opened':
             pr_url = data['pull_request']['html_url']
             channel = bot.get_channel(config.CHAT_CHANNEL_ID)  # Replace with your Discord channel ID
-            post_pr_message(channel, pr_url)
+
+            # Set a timeout for the task
+            try:
+                async with asyncio.timeout(10):  # Set timeout in seconds
+                    await post_pr_message(channel, pr_url)
+            except asyncio.TimeoutError:
+                logger.error("Timeout occurred while posting PR message")
+                return 'Timeout', 504  # HTTP 504 Gateway Timeout
+
         return '', 200
     except Exception as e:
         logger.exception(e)
         return '', 500
+
 
 # Function to add coins to a user
 @beartype
