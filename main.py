@@ -7,6 +7,7 @@ from beartype import beartype
 from loguru import logger
 import toml
 
+from utils.github_con import approve_pull_request
 from utils.dbhandler import DataBaseHandler
 from config import config
 
@@ -21,6 +22,9 @@ db_handler = DataBaseHandler()
 # Variable to track whether the multiplier is active
 multiplier_active = False
 multiplier_active_special = False
+
+# tracked messages for PR approvals
+tracked_messages = {}
 
 # Track the last time someone was awarded for being the first to join any voice channel
 last_awarded_time = None
@@ -188,51 +192,36 @@ async def leaderboard(ctx):
     await ctx.send(embed=embed)
 
 
+# Parse the pull request URL (to extract repo name and PR number)
+def parse_pr_url(pr_url):
+    parts = pr_url.split('/')
+    repo_name = f"{parts[3]}/{parts[4]}"
+    pr_number = int(parts[-1])
+    return repo_name, pr_number
+
+
+@bot.event
+async def on_reaction_add(reaction, user):
+    message = reaction.message
+    if user == bot.user:
+        return  # Skip bot's own reactions
+
+    # Check if the message is tracked for a pull request
+    if message.id in tracked_messages:
+        if reaction.emoji == '👍':  # Check if the reaction is the specific emoji
+            tracked_messages[message.id] += 1
+            if tracked_messages[message.id] >= config.REACTION_THRESHOLD:
+                pr_url = tracked_messages[message.id]
+                repo_name, pr_number = parse_pr_url(pr_url)
+                approve_pull_request(repo_name, pr_number)
+                await message.channel.send(f"PR {pr_url} has been approved with {reaction_threshold} 👍 reactions!")
+
 
 @bot.command()
-@commands.has_permissions(administrator=True)
-async def special(ctx):
-    """
-    Start a special event with a 3x coin multiplier for 12 hours. (Or whatever is set in the config)
-
-    This command can only be used by administrators and will need 3 unique reactions to start the event.
-    """
-    channel = bot.get_channel(config.CHAT_CHANNEL_ID)
-
-    global multiplier_active_special
-    if multiplier_active_special:
-        await channel.send("Event is already active!")
-    else:
-        # Send initial message for reactions
-        event_message = await channel.send(f"🚀 🥳 🎉 **SUPER DUPER EVENT INITIATED! If 3 people react, the {config.SPECIAL_EVENT_MULTIPLIER}x Coin Multiplier event will begin!** 🚀 🥳 🎉")
-
-        # React to the message to indicate it's reactable
-        await event_message.add_reaction('🎉')
-
-        def check(reaction, user):
-            return str(reaction.emoji) == '🎉' and reaction.message.id == event_message.id
-
-        # Wait for up to 3 unique users to react
-        reactions = set()
-        while len(reactions) < 3:
-            try:
-                reaction, user = await bot.wait_for('reaction_add', timeout=3600.0, check=check)
-                if user.id != bot.user.id:  # Ignore bot's own reaction
-                    reactions.add(user.id)
-            except asyncio.TimeoutError:
-                await channel.send("Not enough people reacted in time! The event has been cancelled.")
-                return
-
-        # Activate the event after getting 3 reactions
-        multiplier_active_special = True
-        await channel.send(f"🚀 🥳 🎉 **SUPER DUPER FUN EVENT {config.SPECIAL_EVENT_MULTIPLIER}x Coin Multiplier is now active!** Earn {config.SPECIAL_EVENT_MULTIPLIER}x CBC coins for the next 12 HOURS! 🚀 🥳 🎉")
-
-        # Event lasts for 12 hours
-        await asyncio.sleep(12*60*60)
-
-        # End the event
-        multiplier_active_special = False
-        await channel.send(f"⏳ **The SUPER FUN EVENT WITH {config.SPECIAL_EVENT_MULTIPLIER}x Coin Multiplier has ended.** Stay tuned for the next random bonus!")
+async def post_pr_message(ctx, pr_url):
+    message = await ctx.send(f'A new PR has been created: {pr_url}')
+    tracked_messages[message.id] = 0
+    await message.add_reaction('👍')
 
 
 if __name__ == "__main__":
