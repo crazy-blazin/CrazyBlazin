@@ -47,19 +47,17 @@ async def webhook():
             pr_url = data['pull_request']['html_url']
             channel = bot.get_channel(config.CHAT_CHANNEL_ID)  # Replace with your Discord channel ID
 
-            # Set a timeout for the task
             try:
-                async with asyncio.timeout(10):  # Set timeout in seconds
-                    await post_pr_message(channel, pr_url)
+                # Use asyncio.wait_for to set a timeout for the task
+                await asyncio.wait_for(post_pr_message(channel, pr_url), timeout=10)  # Set timeout in seconds
             except asyncio.TimeoutError:
                 logger.error("Timeout occurred while posting PR message")
                 return 'Timeout', 504  # HTTP 504 Gateway Timeout
-
+        
         return '', 200
     except Exception as e:
         logger.exception(e)
         return '', 500
-
 
 # Function to add coins to a user
 @beartype
