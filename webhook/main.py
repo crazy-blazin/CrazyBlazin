@@ -20,5 +20,6 @@ def post_pr_to_discord(pr_url):
     # Use an internal mechanism to trigger the Discord bot to post the PR message
     pass
 
+
 if __name__ == '__main__':
     app.run(port=config.WEBHOOK_PORT)

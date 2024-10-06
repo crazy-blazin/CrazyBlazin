@@ -6,6 +6,8 @@ from discord.ext import commands
 from beartype import beartype
 from loguru import logger
 import toml
+import threading
+
 
 from utils.github_con import approve_pull_request
 from utils.dbhandler import DataBaseHandler
@@ -28,6 +30,27 @@ tracked_messages = {}
 
 # Track the last time someone was awarded for being the first to join any voice channel
 last_awarded_time = None
+
+
+from flask import Flask, request
+import json
+
+app = Flask(__name__)
+
+
+@app.route('/webhook', methods=['POST'])
+def webhook():
+    logger.info("Webhook received!")
+    try:
+        data = json.loads(request.data)
+        if data['action'] == 'opened':
+            pr_url = data['pull_request']['html_url']
+            channel = bot.get_channel(config.CHAT_CHANNEL_ID)  # Replace with your Discord channel ID
+            post_pr_message(channel, pr_url)
+        return '', 200
+    except Exception as e:
+        logger.exception(e)
+        return '', 500
 
 # Function to add coins to a user
 @beartype
@@ -214,7 +237,7 @@ async def on_reaction_add(reaction, user):
                 pr_url = tracked_messages[message.id]
                 repo_name, pr_number = parse_pr_url(pr_url)
                 approve_pull_request(repo_name, pr_number)
-                await message.channel.send(f"PR {pr_url} has been approved with {reaction_threshold} 👍 reactions!")
+                await message.channel.send(f"PR {pr_url} has been approved with {config.REACTION_THRESHOLD} 👍 reactions!")
 
 
 @bot.command()
@@ -224,5 +247,16 @@ async def post_pr_message(ctx, pr_url):
     await message.add_reaction('👍')
 
 
+def run_flask():
+    app.run(port=config.WEBHOOK_PORT)
+
+
 if __name__ == "__main__":
-    bot.run(config.TOKEN)
+    # Start the Flask server in a separate thread
+    try:
+        flask_thread = threading.Thread(target=run_flask)
+        flask_thread.start()
+        bot.run(config.TOKEN)
+    except KeyboardInterrupt:
+        flask_thread.join()
+        logger.info("Bot stopped.")
