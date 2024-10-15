@@ -2,6 +2,7 @@ from flask import Flask, request
 import json
 from config import config
 from http import HTTPStatus
+import uvicorn
 
 app = Flask(__name__)
 
@@ -43,4 +44,4 @@ def post_pr_to_discord(pr_url):
 
 
 if __name__ == '__main__':
-    app.run(host=config.WEBHOOK_HOST, port=config.WEBHOOK_PORT)
+    uvicorn.run(app, host=config.WEBHOOK_HOST, port=config.WEBHOOK_PORT)
