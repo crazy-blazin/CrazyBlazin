@@ -1,8 +1,29 @@
 from flask import Flask, request
 import json
 from config import config
+from http import HTTPStatus
 
 app = Flask(__name__)
+
+
+@app.route('/health', methods=['GET'])
+def health():
+    return 'OK', HTTPStatus.OK
+
+
+@app.route('/liveness', methods=['GET'])
+def liveness():
+    return 'OK', HTTPStatus.OK
+
+
+@app.route('/readiness', methods=['GET'])
+def readiness():
+    return 'OK', HTTPStatus.OK
+
+
+@app.route('startup', methods=['GET'])
+def startup():
+    return 'OK', HTTPStatus.OK
 
 
 @app.route('/webhook', methods=['POST'])
@@ -13,7 +34,7 @@ def webhook():
         # Trigger the bot to post the PR message on Discord
         # You can use a queue or shared state to communicate between Flask and Discord bot
         post_pr_to_discord(pr_url)
-    return '', 200
+    return '', HTTPStatus.OK
 
 
 def post_pr_to_discord(pr_url):
@@ -22,4 +43,4 @@ def post_pr_to_discord(pr_url):
 
 
 if __name__ == '__main__':
-    app.run(port=config.WEBHOOK_PORT)
+    app.run(host=config.WEBHOOK_HOST, port=config.WEBHOOK_PORT)
