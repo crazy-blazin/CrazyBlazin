@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "discordbb"
-version = "1.2.4beta"
+version = "1.2.5beta"
 description = ""
 authors = ["Martin Røvang <martinrovang@gmail.com>"]
 readme = "README.md"
