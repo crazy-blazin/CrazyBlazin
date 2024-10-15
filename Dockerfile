@@ -11,5 +11,7 @@ COPY . /app
 RUN pip install poetry
 RUN poetry install
 
+EXPOSE 80:5000
+
 # Run app.py when the container launches
 ENTRYPOINT [ "poetry", "run", "python", "main.py" ]
