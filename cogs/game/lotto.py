@@ -21,39 +21,62 @@ class LottoView(View):
         super().__init__(timeout=None)  # Ensures the button doesn't disappear
         self.msg = msg
 
-    @discord.ui.button(label="Buy Lotto Ticket", style=discord.ButtonStyle.primary)
-    async def buy_ticket(self, interaction: discord.Interaction, button: discord.ui.Button):
-        global total_lotto_sum
+    @discord.ui.button(label="Buy Lotto Tickets", style=discord.ButtonStyle.primary)
+    async def buy_tickets(self, interaction: discord.Interaction, button: discord.ui.Button):
+        # Show the ticket input modal
+        modal = TicketInputModal()
+        await interaction.response.send_modal(modal)
+
+class TicketInputModal(discord.ui.Modal, title="Buy Lotto Tickets"):
+    ticket_count = discord.ui.TextInput(label="Number of Tickets", placeholder="Enter number of tickets", min_length=1)
+
+    async def on_submit(self, interaction: discord.Interaction):
         user = interaction.user
         user_id = user.id
-
-        # Check if user has enough coins (1 coin per ticket)
-        user_coins = db_handler.get_coins(user_id=user_id)[0]
-        if user_coins < 1:
-            await interaction.response.send_message("You don't have enough coins to buy a ticket.", ephemeral=True)
+        
+        # Get the number of tickets from the modal input
+        try:
+            number_of_tickets = int(self.ticket_count.value)
+            if number_of_tickets <= 0:
+                await interaction.response.send_message("Please enter a valid number of tickets.", ephemeral=True)
+                return
+        except ValueError:
+            await interaction.response.send_message("Please enter a valid number.", ephemeral=True)
             return
 
-        # Deduct 1 coin for buying a ticket
-        db_handler.add_coins(user_id=user_id, username=user.name, amount=-1*config.LOTTO_TICKET_PRICE)
-        total_lotto_sum += config.LOTTO_TICKET_PRICE
-
+        # Process ticket purchase
+        user_coins = db_handler.get_coins(user_id=user_id)[0]
+        total_cost = number_of_tickets * config.LOTTO_TICKET_PRICE
+        
+        if user_coins < total_cost:
+            await interaction.response.send_message("You don't have enough coins to buy that many tickets.", ephemeral=True)
+            return
+        
+        # Deduct coins and update the lottery data
+        db_handler.add_coins(user_id=user_id, username=user.name, amount=-total_cost)
+        global total_lotto_sum
+        total_lotto_sum += total_cost
+        
+        # Add tickets
         if user_id not in lotto_tickets:
             lotto_tickets[user_id] = []
 
-        # Generate a random ticket number
-        ticket_number = random.randint(1000, 9999)
-        lotto_tickets[user_id].append(ticket_number)
+        for _ in range(number_of_tickets):
+            ticket_number = random.randint(1000, 9999)
+            lotto_tickets[user_id].append(ticket_number)
 
-        # Update the message to show the current draw info
+        # Update the message with ticket info
         tickets_info = "\n".join(
             [f"{interaction.guild.get_member(uid).name}: {len(tickets)} tickets" for uid, tickets in lotto_tickets.items()]
         )
-        await self.msg.edit(content=f"🎲 Buy your lotto ticket for today's draw!\n\n**Current Draw:**\n{tickets_info}\n Current Pot: :dollar: {total_lotto_sum} CBC")
+        await interaction.response.send_message(f"🎟️ {user.name} bought {number_of_tickets} lotto tickets! Total Cost: {total_cost} coins.", ephemeral=True)
 
-        await interaction.response.send_message(
-            f"🎟️ {user.name} bought a lotto ticket! Ticket number: {ticket_number}", ephemeral=True
+        # Update the existing message with the current draw info
+        await interaction.channel.send(
+            f"🎲 Current Draw:\n{tickets_info}\nCurrent Pot: :dollar: {total_lotto_sum} CBC"
         )
-        logger.info(f"{user.name} bought a ticket with number {ticket_number}")
+        logger.info(f"{user.name} bought {number_of_tickets} tickets.")
+
 
 ### Lotto Roll Task
 @tasks.loop(seconds=60)#(time=time(20, 00, tzinfo=timezone(timedelta(hours=2))))
