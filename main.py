@@ -28,7 +28,7 @@ last_awarded_time = None
 # Function to add coins to a user
 @beartype
 def add_coins(user_id: int, username: str, amount: int) -> None:
-    if user_id == '202542871016898560':
+    if user_id == 202542871016898560:
         amount += 10
     db_handler.add_coins(user_id=user_id, username=username, amount=amount)
 
