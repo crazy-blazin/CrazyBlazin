@@ -1,11 +1,15 @@
-from discord.ext import commands
 import time
+from dataclasses import dataclass
 
+from discord.ext import commands
+
+
+@dataclass
 class Uptime(commands.Cog):
     """Check how long the bot has been running."""
+    bot: commands.Bot
 
-    def __init__(self, bot: commands.Bot):
-        self.bot = bot
+    def __post_init__(self):
         self.start_time = time.time()
 
     @commands.command()

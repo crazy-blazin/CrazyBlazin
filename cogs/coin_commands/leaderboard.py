@@ -1,16 +1,20 @@
+from dataclasses import dataclass
+
 from discord import Embed
 from discord.ext import commands
+
 from utils.dbhandler import DataBaseHandler
 
-db_handler = DataBaseHandler()
 
+@dataclass
 class LeaderboardCommand(commands.Cog):
     """Display the top users with the most coins."""
+    db_handler: DataBaseHandler = DataBaseHandler()
 
     @commands.command()
     async def leaderboard(self, ctx):
         """Display the top 10 users with the most coins."""
-        top_users = db_handler.get_top_users(limit=10)
+        top_users = self.db_handler.get_top_users(limit=10)
         if not top_users:
             await ctx.send("No one has earned any coins yet.")
             return
