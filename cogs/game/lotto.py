@@ -13,7 +13,7 @@ db_handler = DataBaseHandler()
 
 # Keep track of tickets
 lotto_tickets = {}
-
+total_lotto_sum = 0
 
 # Create a Lotto View with a Button
 class LottoView(View):
@@ -23,6 +23,7 @@ class LottoView(View):
 
     @discord.ui.button(label="Buy Lotto Ticket", style=discord.ButtonStyle.primary)
     async def buy_ticket(self, interaction: discord.Interaction, button: discord.ui.Button):
+        global total_lotto_sum
         user = interaction.user
         user_id = user.id
 
@@ -33,7 +34,8 @@ class LottoView(View):
             return
 
         # Deduct 1 coin for buying a ticket
-        db_handler.add_coins(user_id=user_id, username=user.name, amount=-1)
+        db_handler.add_coins(user_id=user_id, username=user.name, amount=-1*config.LOTTO_TICKET_PRICE)
+        total_lotto_sum += config.LOTTO_TICKET_PRICE
 
         if user_id not in lotto_tickets:
             lotto_tickets[user_id] = []
@@ -46,7 +48,7 @@ class LottoView(View):
         tickets_info = "\n".join(
             [f"{interaction.guild.get_member(uid).name}: {len(tickets)} tickets" for uid, tickets in lotto_tickets.items()]
         )
-        await self.msg.edit(content=f"🎲 Buy your lotto ticket for today's draw!\n\n**Current Draw:**\n{tickets_info}")
+        await self.msg.edit(content=f"🎲 Buy your lotto ticket for today's draw!\n\n**Current Draw:**\n{tickets_info}\n Current Pot: :dollar: {total_lotto_sum} CBC")
 
         await interaction.response.send_message(
             f"🎟️ {user.name} bought a lotto ticket! Ticket number: {ticket_number}", ephemeral=True
@@ -54,8 +56,9 @@ class LottoView(View):
         logger.info(f"{user.name} bought a ticket with number {ticket_number}")
 
 ### Lotto Roll Task
-@tasks.loop(seconds=5)#(time=time(20, 00, tzinfo=timezone(timedelta(hours=2))))
+@tasks.loop(seconds=60)#(time=time(20, 00, tzinfo=timezone(timedelta(hours=2))))
 async def roll_lotto(ctx):
+    global total_lotto_sum
     if lotto_tickets:
         winning_ticket = random.randint(1000, 9999)
         winner = None
@@ -66,11 +69,10 @@ async def roll_lotto(ctx):
 
         if winner:
             winner_user = await ctx.fetch_user(winner)
-            reward = config.LOTTO_REWARD_AMOUNT  # Get reward from config
-            db_handler.add_coins(user_id=winner, username=winner_user.name, amount=reward)
-            message = f"🏆 The winning ticket is {winning_ticket}! Congratulations {winner_user.name}! You've won {reward} coins!"
+            db_handler.add_coins(user_id=winner, username=winner_user.name, amount=total_lotto_sum)
+            message = f"🏆 The winning ticket is {winning_ticket}! Congratulations {winner_user.name}! You've won {total_lotto_sum} coins!"
         else:
-            message = f"No winners today. Better luck tomorrow! Winning ticket #: 🎟️ {winning_ticket}"
+            message = f"No winners today. Better luck tomorrow! Winning ticket #: 🎟️ {winning_ticket} total pot: {total_lotto_sum}"
 
         # Reset tickets for the next day
         lotto_tickets.clear()
@@ -85,6 +87,9 @@ async def roll_lotto(ctx):
         logger.info(f"Lotto rolled. Winning ticket: {winning_ticket}")
     else:
         logger.info("No tickets were bought today.")
+
+    # Reset the total lotto sum
+    total_lotto_sum = 0
 
 @dataclass
 class LottoGame(commands.Cog):
