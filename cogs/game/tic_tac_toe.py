@@ -111,6 +111,35 @@ class TicTacToeView(View):
         logger.info(f"Refunded {self.bet_amount} coins to {self.player_x.name} and {self.player_o.name}")
 
 
+# Define the view for accepting or declining the game
+class AcceptDeclineView(View):
+    def __init__(self, challenger: discord.Member, opponent: discord.Member, bet: int):
+        super().__init__(timeout=60)  # Timeout after 60 seconds if no response
+        self.challenger = challenger
+        self.opponent = opponent
+        self.bet = bet
+
+    @discord.ui.button(label="Accept", style=discord.ButtonStyle.success)
+    async def accept(self, button: Button, interaction: discord.Interaction):
+        """Start the game if the opponent accepts."""
+        if interaction.user != self.opponent:
+            await interaction.response.send_message("Only the challenged player can accept.", ephemeral=True)
+            return
+
+        # Start the game with the bet
+        view = TicTacToeView(self.challenger, self.opponent, self.bet)
+        await interaction.message.edit(content=f"Tic-Tac-Toe: {self.challenger.mention} vs {self.opponent.mention}\n{self.challenger.mention}'s turn (X)\nBet: {self.bet} coins each", view=view)
+
+    @discord.ui.button(label="Decline", style=discord.ButtonStyle.danger)
+    async def decline(self, button: Button, interaction: discord.Interaction):
+        """Cancel the game if the opponent declines."""
+        if interaction.user != self.opponent:
+            await interaction.response.send_message("Only the challenged player can decline.", ephemeral=True)
+            return
+
+        await interaction.message.edit(content=f"{self.opponent.mention} declined the Tic-Tac-Toe challenge.", view=None)
+
+
 # Define the command for starting the Tic-Tac-Toe game
 class TicTacToeGame(commands.Cog):
     """Tic-Tac-Toe game with betting between two players."""
@@ -138,9 +167,9 @@ class TicTacToeGame(commands.Cog):
             await ctx.send(f"{opponent.mention} doesn't have enough coins to bet {bet}.")
             return
 
-        # Start the game with the bet
-        view = TicTacToeView(ctx.author, opponent, bet)
-        await ctx.send(f"Tic-Tac-Toe: {ctx.author.mention} vs {opponent.mention}\n{ctx.author.mention}'s turn (X)\nBet: {bet} coins each", view=view)
+        # Send challenge request to opponent with Accept/Decline buttons
+        view = AcceptDeclineView(ctx.author, opponent, bet)
+        await ctx.send(f"{opponent.mention}, {ctx.author.mention} has challenged you to a Tic-Tac-Toe game with a bet of {bet} coins! Do you accept?", view=view)
 
 # The setup function to load the cog
 async def setup(bot):

@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 import discord
 from discord.ext import commands
@@ -9,7 +9,7 @@ from utils.dbhandler import DataBaseHandler
 @dataclass
 class ResetCoinsCommand(commands.Cog):
     """Reset a user's coin balance."""
-    db_handler: DataBaseHandler = DataBaseHandler()
+    db_handler: DataBaseHandler = field(default_factory=DataBaseHandler)
 
     @commands.command()
     async def reset_coins(self, ctx, member: discord.Member = None):

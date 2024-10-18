@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from discord import Embed
 from discord.ext import commands
@@ -9,7 +9,7 @@ from utils.dbhandler import DataBaseHandler
 @dataclass
 class LeaderboardCommand(commands.Cog):
     """Display the top users with the most coins."""
-    db_handler: DataBaseHandler = DataBaseHandler()
+    db_handler: DataBaseHandler = field(default_factory=DataBaseHandler)
 
     @commands.command()
     async def leaderboard(self, ctx):

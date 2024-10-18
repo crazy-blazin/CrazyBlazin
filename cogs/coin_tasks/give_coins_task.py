@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from discord.ext import commands, tasks
 
@@ -10,7 +10,7 @@ from utils.dbhandler import DataBaseHandler
 class GiveCoinsTask(commands.Cog):
     """Task to give coins to users in voice channels."""
     bot: commands.Bot
-    db_handler: DataBaseHandler = DataBaseHandler()
+    db_handler: DataBaseHandler = field(default_factory=DataBaseHandler)
 
     def __post_init__(self):
         self.give_coins.start()
