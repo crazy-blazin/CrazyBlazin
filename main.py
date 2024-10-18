@@ -14,12 +14,13 @@ intents.voice_states = True
 intents.message_content = True
 intents.guilds = True
 
-bot = commands.Bot(command_prefix='!', intents=intents)
+bot = commands.Bot(command_prefix='!', intents=intents, help_command=None)
 
 
 async def load_all_cogs():
     """Load all cogs from different categories."""
     cogs = [
+        "cogs.help",
         "cogs.coin_tasks",
         "cogs.coin_commands",
         "cogs.fun_commands",

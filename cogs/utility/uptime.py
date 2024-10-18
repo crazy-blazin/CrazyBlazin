@@ -12,7 +12,13 @@ class Uptime(commands.Cog):
     def __post_init__(self):
         self.start_time = time.time()
 
-    @commands.command()
+    @commands.command(
+        help="""
+        Use `!uptime` to see how long the bot has been running.
+        """,
+        aliases=["botuptime", "up"],
+        brief="Shows the bot's uptime."
+    )
     async def uptime(self, ctx):
         """Shows the bot's uptime."""
         current_time = time.time()

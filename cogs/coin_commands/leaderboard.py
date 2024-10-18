@@ -11,7 +11,14 @@ class LeaderboardCommand(commands.Cog):
     """Display the top users with the most coins."""
     db_handler: DataBaseHandler = field(default_factory=DataBaseHandler)
 
-    @commands.command()
+    @commands.command(
+        help="""
+        Use `!leaderboard` to check the top 10 users with the most coins.
+        """,
+        aliases=["top", "rankings"],
+        brief="Check the top 10 users."
+    )
+
     async def leaderboard(self, ctx):
         """Display the top 10 users with the most coins."""
         top_users = self.db_handler.get_top_users(limit=10)
