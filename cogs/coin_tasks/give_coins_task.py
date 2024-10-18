@@ -15,7 +15,7 @@ class GiveCoinsTask(commands.Cog):
     def __post_init__(self):
         self.give_coins.start()
 
-    @tasks.loop(minutes=config.PAY_INTERVAL)
+    @tasks.loop(seconds=config.PAY_INTERVAL)
     async def give_coins(self):
         """Give coins to users in active voice channels."""
         for guild in self.bot.guilds:
