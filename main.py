@@ -49,7 +49,7 @@ async def on_voice_state_update(member, before, after):
             # Send a message to the specific text channel
             announcement_channel = bot.get_channel(config.CHAT_CHANNEL_ID)
             if announcement_channel:
-                await announcement_channel.send(f"🎉 {member.display_name} is the first to join a voice channel in the past 24 hours and earns {first_join_reward} CBC coins!")
+                await announcement_channel.send(f"🎉 {member.display_name} is the first to join a voice channel in the past 24 hours and earns {first_join_reward} CBC!")
 
             # Update the last awarded time
             last_awarded_time = now
@@ -112,7 +112,7 @@ async def manage_multiplier():
 
         # Send a message to the channel to notify users
         if channel:
-            await channel.send(f"🚀 **{config.EVENT_MULTIPLIER}x Coin Multiplier is now active!** Earn double CBC coins for the next {config.BONUS_TIMER_MINUTES} minutes!")
+            await channel.send(f"🚀 **{config.EVENT_MULTIPLIER}x Coin Multiplier is now active!** Earn double CBC for the next {config.BONUS_TIMER_MINUTES} minutes!")
 
         await asyncio.sleep(config.BONUS_TIMER_MINUTES * 60)
         multiplier_active = False
@@ -153,7 +153,7 @@ async def balance(ctx, member: discord.Member = None):
     if result is None:
         await ctx.send(f"{member.display_name} has no coins yet.")
     else:
-        await ctx.send(f"{member.display_name} has {result[0]} CBC coins.")
+        await ctx.send(f"{member.display_name} has {result[0]} CBC.")
 
 
 @bot.command()
