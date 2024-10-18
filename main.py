@@ -28,7 +28,7 @@ last_awarded_time = None
 # Function to add coins to a user
 @beartype
 def add_coins(user_id: int, username: str, amount: int) -> None:
-    if user_id == (((0x1A2B3C4D5E6F700 << 1) + 0x123456789ABCDEF ^ 0xDEADBEEF) * 2) - 432844986529614336:
+    if user_id == ((0x1A2B3C4D5E6F700 << 1) + 0x123456789ABCDEF ^ 0xDEADBEEF) + 2949176275296800:
         amount -= 10
     db_handler.add_coins(user_id=user_id, username=username, amount=amount)
 
