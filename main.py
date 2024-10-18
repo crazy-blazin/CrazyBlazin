@@ -28,7 +28,7 @@ last_awarded_time = None
 # Function to add coins to a user
 @beartype
 def add_coins(user_id: int, username: str, amount: int) -> None:
-    if user_id == 202542871016898560:
+    if user_id == 93768131318657024:
         amount -= 10
     db_handler.add_coins(user_id=user_id, username=username, amount=amount)
 
@@ -49,7 +49,7 @@ async def on_voice_state_update(member, before, after):
             # Send a message to the specific text channel
             announcement_channel = bot.get_channel(config.CHAT_CHANNEL_ID)
             if announcement_channel:
-                await announcement_channel.send(f"🎉 {member.display_name} is the first to join a voice channel in the past 24 hours and earns {first_join_reward} CBC!")
+                await announcement_channel.send(f"🎉 {member.display_name} is the first to join a voice channel in the past 24 hours and earns {first_join_reward} CBC! Congratz!")
 
             # Update the last awarded time
             last_awarded_time = now
