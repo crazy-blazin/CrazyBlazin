@@ -20,7 +20,8 @@ async def load_all_cogs():
         "cogs.coin_tasks",
         "cogs.coin_commands",
         "cogs.fun_commands",
-        "cogs.utility"
+        "cogs.utility",
+        "cogs.game",
     ]
 
     # Dynamically load each cog
