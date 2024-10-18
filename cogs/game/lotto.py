@@ -139,7 +139,7 @@ class LottoGame(commands.Cog):
     )
     async def lotto(self, ctx: commands.Context):
         """Buy a lotto ticket and win the jackpot!"""
-        view = LottoView(msg=await ctx.send("🎲 Buy your lotto ticket for today's draw!"))
+        view = LottoView(msg=await ctx.send("🎲 Buy your lotto ticket for today's draw! (Draw starts at 20:00!)"))
         await view.msg.edit(view=view)  # Set the view for the existing message
         logger.info("Lotto command used.")
 
