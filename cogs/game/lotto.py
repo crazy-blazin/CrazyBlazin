@@ -13,7 +13,7 @@ db_handler = DataBaseHandler()
 
 # Keep track of tickets
 lotto_tickets = {}
-total_lotto_sum = 0
+total_lotto_sum = config.LOTTO_BASELINE
 
 # Create a Lotto View with a Button
 class LottoView(View):
@@ -21,7 +21,7 @@ class LottoView(View):
         super().__init__(timeout=None)  # Ensures the button doesn't disappear
         self.msg = msg
 
-    @discord.ui.button(label="Buy Lotto Tickets", style=discord.ButtonStyle.primary)
+    @discord.ui.button(label="💵Buy Lotto Tickets", style=discord.ButtonStyle.primary)
     async def buy_tickets(self, interaction: discord.Interaction, button: discord.ui.Button):
         # Show the ticket input modal
         modal = TicketInputModal(view=self)  # Pass the current view instance to the modal
@@ -65,7 +65,7 @@ class TicketInputModal(discord.ui.Modal, title="Buy Lotto Tickets - 💵150💵 
             lotto_tickets[user_id] = []
 
         for _ in range(number_of_tickets):
-            ticket_number = random.randint(1000, 9999)
+            ticket_number = random.randint(1, 10000)
             lotto_tickets[user_id].append(ticket_number)
 
         # Update the existing message with ticket info
@@ -85,11 +85,11 @@ class TicketInputModal(discord.ui.Modal, title="Buy Lotto Tickets - 💵150💵 
 
 
 ### Lotto Roll Task
-@tasks.loop(seconds=60)#(time=time(20, 00, tzinfo=timezone(timedelta(hours=2))))
+@tasks.loop(time=time(20, 00, tzinfo=timezone(timedelta(hours=2))))
 async def roll_lotto(ctx):
     global total_lotto_sum
     if lotto_tickets:
-        winning_ticket = random.randint(1000, 9999)
+        winning_ticket = random.randint(1, 10000)
         winner = None
         for user_id, tickets in lotto_tickets.items():
             if winning_ticket in tickets:
@@ -118,7 +118,7 @@ async def roll_lotto(ctx):
         logger.info("No tickets were bought today.")
 
     # Reset the total lotto sum
-    total_lotto_sum = 0
+    total_lotto_sum = config.LOTTO_BASELINE
 
 @dataclass
 class LottoGame(commands.Cog):

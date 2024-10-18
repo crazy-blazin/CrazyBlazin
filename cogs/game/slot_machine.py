@@ -35,7 +35,7 @@ class SlotMachineGame(commands.Cog):
         aliases=["slots", "pull"],
         brief="Play the slot machine game and win coins."
     )
-    async def slot(self, ctx: commands.Context, bet: int):
+    async def slot(self, ctx: commands.Context, bet: int | str):
         """Allows a user to play the slot machine with a specified bet amount."""
         user = ctx.author
         logger.debug(f"{user.name} initiated a slot machine game with a bet of {bet} coins.")
@@ -49,6 +49,10 @@ class SlotMachineGame(commands.Cog):
         # Check if user has enough coins
         user_coins = db_handler.get_coins(user_id=user.id)[0]
         logger.debug(f"{user.name} has {user_coins} coins.")
+
+        if isinstance(bet, str):
+            if bet.lower() == "all":
+                bet = user_coins
 
         if user_coins < bet:
             logger.warning(f"{user.name} does not have enough coins to bet {bet}.")
