@@ -2,22 +2,24 @@ import random
 import discord
 from discord.ext import commands
 from discord.ui import Button, View, Modal, TextInput
+from loguru import logger
 import asyncio
+import os
 
 # Roulette colors and numbers
 ROULETTE_NUMBERS = {
-    0: 'green', 
-    1: 'red', 2: 'black', 3: 'red', 4: 'black', 5: 'red', 6: 'black', 7: 'red', 8: 'black', 9: 'red', 10: 'black', 
-    11: 'black', 12: 'red', 13: 'black', 14: 'red', 15: 'black', 16: 'red', 17: 'black', 18: 'red', 19: 'red', 
-    20: 'black', 21: 'red', 22: 'black', 23: 'red', 24: 'black', 25: 'red', 26: 'black', 27: 'red', 28: 'black', 
+    0: 'green',
+    1: 'red', 2: 'black', 3: 'red', 4: 'black', 5: 'red', 6: 'black', 7: 'red', 8: 'black', 9: 'red', 10: 'black',
+    11: 'black', 12: 'red', 13: 'black', 14: 'red', 15: 'black', 16: 'red', 17: 'black', 18: 'red', 19: 'red',
+    20: 'black', 21: 'red', 22: 'black', 23: 'red', 24: 'black', 25: 'red', 26: 'black', 27: 'red', 28: 'black',
     29: 'black', 30: 'red', 31: 'black', 32: 'red', 33: 'black', 34: 'red', 35: 'black', 36: 'red'
 }
 
-# Emoji representations for colors
+# Mapping of colors to emojis
 COLOR_EMOJIS = {
     'red': '🔴',
     'black': '⚫',
-    'green': '🟢',
+    'green': '🟢'
 }
 
 class BetTypeView(View):
@@ -137,44 +139,58 @@ class SpinWheelView(View):
     async def spin_wheel(self, interaction: discord.Interaction):
         # Acknowledge the interaction and defer
         await interaction.response.defer(ephemeral=False)
-        message = await interaction.followup.send("The wheel is spinning...")
+        message = await interaction.followup.send("The dealer is spinning the wheel...")
 
-        spin_sequence = random.choices(list(ROULETTE_NUMBERS.keys()), k=10)
-        for number in spin_sequence:
-            color = ROULETTE_NUMBERS[number]
-            emoji = COLOR_EMOJIS[color]
-            await message.edit(content=f"The wheel is spinning... {emoji} {number}")
-            await asyncio.sleep(0.5)  # Adjust the sleep time for effect
+        # Wait for 2 seconds
+        await asyncio.sleep(2)
+        await message.edit(content="The dealer is throwing the ball into the roulette...")
 
-        # Final result
+        # Wait another 1 second
+        await asyncio.sleep(1)
+
+        # Generate the spin result
         spin_result = random.choice(list(ROULETTE_NUMBERS.keys()))
         result_color = ROULETTE_NUMBERS[spin_result]
-        result_emoji = COLOR_EMOJIS[result_color]
+        logger.info(f"Roulette spin result: {spin_result} ({result_color})")
+
+        # Use the user's GIF file
+        file_path = r".\resources\game\roulette\roulette.gif"
+        if not os.path.exists(file_path):
+            await interaction.followup.send("Error: Spinning wheel GIF not found.")
+            return
+
+        # Create a Discord file
+        file = discord.File(fp=file_path, filename="roulette.gif")
+
+        # Send the GIF as a new message
+        gif_message = await interaction.followup.send(content="The wheel is spinning...", file=file)
+
+        # Wait for the GIF duration (approximate)
+        await asyncio.sleep(3)
+
+        # Get the color emoji
+        color_emoji = COLOR_EMOJIS.get(result_color, '')
 
         # Determine win or loss
         if self.parent_view.bet_type == 'number':
             if spin_result == self.parent_view.bet_value:
-                result_message = f"The wheel landed on {result_emoji} **{spin_result}**! You win with an exact number match!"
-                win = True
+                result_message = f"The wheel landed on **{spin_result}** {color_emoji} ({result_color.upper()})! You win with an exact number match!"
             else:
-                result_message = f"The wheel landed on {result_emoji} **{spin_result}**! You lost this round!"
-                win = False
+                result_message = f"The wheel landed on **{spin_result}** {color_emoji} ({result_color.upper()})! You lost this round!"
         elif self.parent_view.bet_type == 'color':
             if result_color == self.parent_view.bet_value:
-                result_message = f"The wheel landed on {result_emoji} **{spin_result}**! You win with a color match!"
-                win = True
+                result_message = f"The wheel landed on **{spin_result}** {color_emoji} ({result_color.upper()})! You win with a color match!"
             else:
-                result_message = f"The wheel landed on {result_emoji} **{spin_result}**! You lost this round!"
-                win = False
+                result_message = f"The wheel landed on **{spin_result}** {color_emoji} ({result_color.upper()})! You lost this round!"
         else:
             result_message = "An error occurred."
-            win = False
 
-        await message.edit(content=result_message)
+        # Send the final result
+        await interaction.followup.send(result_message)
         self.stop()
 
 class RouletteGame(commands.Cog):
-    """Roulette game with a visual representation of the wheel using buttons."""
+    """Roulette game with a visual representation of the wheel using a pre-made GIF."""
 
     def __init__(self, bot):
         self.bot = bot
@@ -182,7 +198,7 @@ class RouletteGame(commands.Cog):
     @commands.command(
         help="""
         Start a roulette game and place your bet! Use `!roulette <bet amount>` to start a game.
-    
+
         Example usage:
         `!roulette 100` - Place a bet of 100 coins and spin the wheel!
         """,
@@ -195,7 +211,6 @@ class RouletteGame(commands.Cog):
             await ctx.send("Bet must be a positive amount!")
             return
 
-        # Add a debug message to check if the command is triggered
         await ctx.send(f"Roulette game started with bet {bet}!")
 
         view = BetTypeView(ctx, bet)
