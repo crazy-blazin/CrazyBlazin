@@ -1,9 +1,12 @@
 import asyncio
+
 import discord
 from discord.ext import commands
 from loguru import logger
+
 from config import config
-from utils.signal_handler import setup_signal_handlers  # Import the signal handler
+from utils.signal_handler import \
+    setup_signal_handlers  # Import the signal handler
 
 # Initialize bot with intents
 intents = discord.Intents.default()

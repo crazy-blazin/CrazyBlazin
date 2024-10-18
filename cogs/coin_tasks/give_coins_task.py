@@ -1,14 +1,18 @@
-from discord.ext import tasks, commands
-from utils.dbhandler import DataBaseHandler
+from dataclasses import dataclass
+
+from discord.ext import commands, tasks
+
 from config import config
+from utils.dbhandler import DataBaseHandler
 
-db_handler = DataBaseHandler()
 
+@dataclass
 class GiveCoinsTask(commands.Cog):
     """Task to give coins to users in voice channels."""
+    bot: commands.Bot
+    db_handler: DataBaseHandler = DataBaseHandler()
 
-    def __init__(self, bot: commands.Bot):
-        self.bot = bot
+    def __post_init__(self):
         self.give_coins.start()
 
     @tasks.loop(minutes=config.GRACIOUS_DELAY / 60)
@@ -19,7 +23,7 @@ class GiveCoinsTask(commands.Cog):
                 for member in vc.members:
                     if not member.bot:  # Skip bots
                         coins_to_give = config.PAY_AMOUNT
-                        db_handler.add_coins(user_id=member.id, username=member.display_name, amount=coins_to_give)
+                        self.db_handler.add_coins(user_id=member.id, username=member.display_name, amount=coins_to_give)
 
     @give_coins.before_loop
     async def before_give_coins(self):

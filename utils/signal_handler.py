@@ -1,6 +1,8 @@
-import signal
 import asyncio
+import signal
+
 from loguru import logger
+
 
 def setup_signal_handlers(bot, on_exit):
     """Set up signal handlers for graceful bot shutdown."""

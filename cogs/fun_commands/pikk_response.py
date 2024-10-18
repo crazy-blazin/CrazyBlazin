@@ -1,5 +1,9 @@
+from dataclasses import dataclass
+
 from discord.ext import commands
 
+
+@dataclass
 class PikkResponse(commands.Cog):
     """Respond to 'Pikk' with 'Hello beautiful!'"""
 

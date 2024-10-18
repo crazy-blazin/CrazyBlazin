@@ -1,15 +1,20 @@
 import asyncio
 import random
+from dataclasses import dataclass
 from datetime import datetime, timedelta
+
 from discord.ext import commands, tasks
 from loguru import logger
+
 from config import config
 
+
+@dataclass
 class ManageMultiplierTask(commands.Cog):
     """Background task to manage random coin multipliers."""
+    bot: commands.Bot
 
-    def __init__(self, bot: commands.Bot):
-        self.bot = bot
+    def __post_init__(self):
         self.manage_multiplier_task.start()
 
     @tasks.loop(hours=24)
