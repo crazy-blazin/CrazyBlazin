@@ -5,3 +5,4 @@ async def setup(bot: commands.Bot):
     await bot.load_extension("cogs.game.tic_tac_toe")
     await bot.load_extension("cogs.game.roulette")
     await bot.load_extension("cogs.game.lotto")
+    await bot.load_extension("cogs.game.slot_machine")

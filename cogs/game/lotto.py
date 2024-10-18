@@ -24,11 +24,15 @@ class LottoView(View):
     @discord.ui.button(label="Buy Lotto Tickets", style=discord.ButtonStyle.primary)
     async def buy_tickets(self, interaction: discord.Interaction, button: discord.ui.Button):
         # Show the ticket input modal
-        modal = TicketInputModal()
+        modal = TicketInputModal(view=self)  # Pass the current view instance to the modal
         await interaction.response.send_modal(modal)
 
-class TicketInputModal(discord.ui.Modal, title="Buy Lotto Tickets"):
+class TicketInputModal(discord.ui.Modal, title="Buy Lotto Tickets - 💵150💵 per ticket"):
     ticket_count = discord.ui.TextInput(label="Number of Tickets", placeholder="Enter number of tickets", min_length=1)
+
+    def __init__(self, view):
+        super().__init__()
+        self.view = view  # Keep a reference to the parent view
 
     async def on_submit(self, interaction: discord.Interaction):
         user = interaction.user
@@ -53,11 +57,10 @@ class TicketInputModal(discord.ui.Modal, title="Buy Lotto Tickets"):
             return
         
         # Deduct coins and update the lottery data
-        db_handler.add_coins(user_id=user_id, username=user.name, amount=-total_cost)
         global total_lotto_sum
-        total_lotto_sum += total_cost
-        
-        # Add tickets
+        total_lotto_sum += total_cost  # Update total pot
+
+        # Add tickets to the user
         if user_id not in lotto_tickets:
             lotto_tickets[user_id] = []
 
@@ -65,15 +68,18 @@ class TicketInputModal(discord.ui.Modal, title="Buy Lotto Tickets"):
             ticket_number = random.randint(1000, 9999)
             lotto_tickets[user_id].append(ticket_number)
 
-        # Update the message with ticket info
+        # Update the existing message with ticket info
         tickets_info = "\n".join(
             [f"{interaction.guild.get_member(uid).name}: {len(tickets)} tickets" for uid, tickets in lotto_tickets.items()]
         )
+        
+        # Update the original message instead of sending a new one
         await interaction.response.send_message(f"🎟️ {user.name} bought {number_of_tickets} lotto tickets! Total Cost: {total_cost} coins.", ephemeral=True)
 
-        # Update the existing message with the current draw info
-        await interaction.channel.send(
-            f"🎲 Current Draw:\n{tickets_info}\nCurrent Pot: :dollar: {total_lotto_sum} CBC"
+        # Update the message with the view
+        await self.view.msg.edit(
+            content=f"🎲 Current Draw:\n{tickets_info}\nCurrent Pot: 💰 {total_lotto_sum} CBC",
+            view=self.view
         )
         logger.info(f"{user.name} bought {number_of_tickets} tickets.")
 
