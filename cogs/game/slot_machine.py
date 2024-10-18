@@ -41,10 +41,11 @@ class SlotMachineGame(commands.Cog):
         logger.debug(f"{user.name} initiated a slot machine game with a bet of {bet} coins.")
 
         # Validate bet amount
-        if bet <= 0:
-            logger.warning(f"{user.name} attempted to bet an invalid amount: {bet}.")
-            await ctx.send("The bet amount must be a positive number.")
-            return
+        if isinstance(bet, int):
+            if bet <= 0:
+                logger.warning(f"{user.name} attempted to bet an invalid amount: {bet}.")
+                await ctx.send("The bet amount must be a positive number.")
+                return
 
         # Check if user has enough coins
         user_coins = db_handler.get_coins(user_id=user.id)[0]
