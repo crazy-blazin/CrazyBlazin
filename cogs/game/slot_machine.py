@@ -54,6 +54,10 @@ class SlotMachineGame(commands.Cog):
         if isinstance(bet, str):
             if bet.lower() == "all":
                 bet = user_coins
+                if bet == 0:
+                    logger.warning(f"{user.name} tried to bet all coins but has none.")
+                    await ctx.send("You don't have any coins to bet.")
+                    return
 
         if user_coins < bet:
             logger.warning(f"{user.name} does not have enough coins to bet {bet}.")
