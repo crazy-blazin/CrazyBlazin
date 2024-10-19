@@ -44,8 +44,8 @@ SLOT_PAYOUTS: Dict[str, int] = {
 
 # Add settings for the grid size
 SLOT_MACHINE_CONFIG: Dict[str, int] = {
-    "num_rows": 4,
-    "num_cols": 4,  # You can change this to make it a larger or smaller grid
+    "num_rows": 3,
+    "num_cols": 3,  # You can change this to make it a larger or smaller grid
     "num_spins": 7  # Number of times the reels will spin
 }
 ##---------------------------------------------------------------##
