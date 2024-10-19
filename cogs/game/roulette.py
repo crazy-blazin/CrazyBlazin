@@ -154,7 +154,7 @@ class SpinWheelView(View):
         logger.info(f"Roulette spin result: {spin_result} ({result_color})")
 
         # Use the user's GIF file
-        file_path = r".\resources\game\roulette\roulette.gif"
+        file_path = "/app/resources/game/roulette/roulette.gif"
         if not os.path.exists(file_path):
             await interaction.followup.send("Error: Spinning wheel GIF not found.")
             return
