@@ -1,6 +1,6 @@
-# Mafia RPG specific queries
+# Mafia RPG SQL Queries
 
-# Initialize tables for players, towns, and facilities
+# Initialize the database
 INIT_MAFIA_DB = '''
 CREATE TABLE IF NOT EXISTS mafia_players (
     player_id INTEGER PRIMARY KEY,
@@ -29,7 +29,7 @@ ADD_MAFIA_PLAYER = '''INSERT INTO mafia_players (player_id, username, cash, infl
 UPDATE_PLAYER_CASH = '''UPDATE mafia_players SET cash=? WHERE player_id=?'''
 GET_PLAYER_INFO = '''SELECT * FROM mafia_players WHERE player_id=?'''
 
-# Queries to manage towns and resources
+# Town and resource queries
 UPDATE_TOWN_FACILITY = '''UPDATE mafia_towns SET {facility}_level=? WHERE player_id=?'''
 GET_TOWN_INFO = '''SELECT * FROM mafia_towns WHERE player_id=?'''
 

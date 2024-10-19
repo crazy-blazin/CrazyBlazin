@@ -1,19 +1,78 @@
 import discord
 from discord.ext import commands, tasks
-from utils.dbhandler import MafiaDBHandler
-import random
+from cogs.game.mafia_rpg.dbhandler import MafiaDBHandler
+from cogs.game.mafia_rpg.mafia_config import config as mafia_config
+# import random  # Commented out because it's not used
 
 db_handler = MafiaDBHandler()
 
-class MafiaGame(commands.Cog):
-    """Mafia RPG Game where players build a criminal empire."""
+# Define a view with buttons for player actions
+class MafiaActionsView(discord.ui.View):
+    def __init__(self, player_id, mafia_game, ctx):
+        super().__init__(timeout=None)
+        self.player_id = player_id
+        self.mafia_game = mafia_game
+        self.ctx = ctx
 
+    @discord.ui.button(label="Build", style=discord.ButtonStyle.primary)
+    async def build(self, interaction: discord.Interaction):
+        """Button to start building/upgrade a facility."""
+        if interaction.user.id != self.player_id:
+            await interaction.response.send_message("This is not your game!", ephemeral=True)
+            return
+        
+        build_view = BuildFacilityView(self.player_id, self.mafia_game, self.ctx)
+        await interaction.response.send_message("Choose a facility to build/upgrade:", view=build_view, ephemeral=True)
+
+    @discord.ui.button(label="Rob", style=discord.ButtonStyle.success)
+    async def rob(self, interaction: discord.Interaction):
+        """Button to rob a rival."""
+        if interaction.user.id != self.player_id:
+            await interaction.response.send_message("This is not your game!", ephemeral=True)
+            return
+        await interaction.response.send_message("Who do you want to rob?", ephemeral=True)
+        # Use modals for selecting targets or implement dropdowns
+
+    @discord.ui.button(label="View Status", style=discord.ButtonStyle.secondary)
+    async def view_status(self, interaction: discord.Interaction):
+        """Button to view the player's status."""
+        if interaction.user.id != self.player_id:
+            await interaction.response.send_message("This is not your game!", ephemeral=True)
+            return
+        
+        await self.mafia_game.display_status(self.ctx, self.player_id)
+
+class BuildFacilityView(discord.ui.View):
+    def __init__(self, player_id, mafia_game, ctx):
+        super().__init__(timeout=None)
+        self.player_id = player_id
+        self.mafia_game = mafia_game
+        self.ctx = ctx
+
+    @discord.ui.button(label="Upgrade Drug Lab", style=discord.ButtonStyle.primary)
+    async def upgrade_drug_lab(self, interaction: discord.Interaction):
+        await self.mafia_game.upgrade_facility(self.ctx, self.player_id, "drug_lab")
+        await interaction.response.send_message("Upgrading Drug Lab...", ephemeral=True)
+
+    @discord.ui.button(label="Upgrade Weapons Warehouse", style=discord.ButtonStyle.primary)
+    async def upgrade_weapons_warehouse(self, interaction: discord.Interaction):
+        await self.mafia_game.upgrade_facility(self.ctx, self.player_id, "weapons_warehouse")
+        await interaction.response.send_message("Upgrading Weapons Warehouse...", ephemeral=True)
+
+    @discord.ui.button(label="Upgrade Gang Hideout", style=discord.ButtonStyle.primary)
+    async def upgrade_gang_hideout(self, interaction: discord.Interaction):
+        await self.mafia_game.upgrade_facility(self.ctx, self.player_id, "gang_hideout")
+        await interaction.response.send_message("Upgrading Gang Hideout...", ephemeral=True)
+
+class MafiaGame(commands.Cog):
+    """Mafia RPG Game with enhanced Discord UI."""
+    
     def __init__(self, bot):
         self.bot = bot
         self.players = {}
         self.game_tick.start()  # Start the tick system
 
-    @tasks.loop(minutes=3)
+    @tasks.loop(minutes=10)
     async def game_tick(self):
         """Every tick (e.g., every 10 minutes), progress the game for all players."""
         for player_id in self.players.keys():
@@ -21,12 +80,10 @@ class MafiaGame(commands.Cog):
 
     async def process_tick(self, player_id):
         """Handle the game's tick updates for a player."""
-        try:
-            town_info, resources = self.get_player_town_and_resources(player_id)
-            drugs, weapons, gang_members = self.update_production(player_id, town_info, resources)
-            await self.notify_player(player_id, drugs, weapons, gang_members)
-        except Exception as e:
-            print(f"Error processing tick for player {player_id}: {e}")
+        town_info, resources = self.get_player_town_and_resources(player_id)
+        drugs, weapons, gang_members = self.update_production(player_id, town_info, resources)
+        player = self.bot.get_user(player_id)
+        await player.send(f"Tick Update: Drugs: {drugs}, Weapons: {weapons}, Gang Members: {gang_members}")
 
     def get_player_town_and_resources(self, player_id):
         """Retrieve both town and resource data for a player."""
@@ -50,43 +107,45 @@ class MafiaGame(commands.Cog):
 
         return drugs, weapons, gang_members
 
-    async def notify_player(self, player_id, drugs, weapons, gang_members):
-        """Notify the player of updated resources."""
-        player = self.bot.get_user(player_id)
-        await player.send(f"Tick Update: Drugs: {drugs}, Weapons: {weapons}, Gang Members: {gang_members}")
+    async def display_status(self, ctx, player_id):
+        """Show the current status of the player's town and resources."""
+        player_info = db_handler.get_player_info(player_id)
+        town_info = db_handler.get_town_info(player_id)
+        resources = db_handler.get_resources(player_id)
 
-    @commands.command()
-    async def build(self, ctx, facility: str):
-        """Build or upgrade a facility in your town."""
-        player_id = ctx.author.id
+        status_message = (
+            f"🏙️ **{ctx.author.name}'s Town Status** 🏙️\n"
+            f"💊 Drug Lab: Level {town_info[1]}\n"
+            f"🔫 Weapons Warehouse: Level {town_info[2]}\n"
+            f"🏚️ Gang Hideout: Level {town_info[3]}\n"
+            f"\n💰 Cash: {player_info[2]}\n"
+            f"🌿 Drugs: {resources[0]}\n"
+            f"🔫 Weapons: {resources[1]}\n"
+            f"🧑‍🤝‍🧑 Gang Members: {resources[2]}"
+        )
+        await ctx.send(status_message)
 
-        facility_info = self.get_facility_info(facility)
-        if not facility_info:
-            await ctx.send("Invalid facility name. Choose from: drug_lab, weapons_warehouse, gang_hideout.")
-            return
-
+    async def upgrade_facility(self, ctx, player_id, facility):
+        """Handle upgrading a facility."""
         facility_level = self.get_facility_level(player_id, facility)
-        cost = self.calculate_upgrade_cost(facility_info, facility_level)
+        cost = self.calculate_upgrade_cost(facility, facility_level)
 
         if not self.has_enough_cash(player_id, cost):
             await ctx.send(f"You don't have enough cash to upgrade {facility}. You need {cost} coins.")
             return
 
-        self.perform_upgrade(player_id, facility, facility_level, cost)
+        db_handler.update_cash(player_id, -cost)
+        db_handler.update_facility(player_id, facility, facility_level + 1)
         await ctx.send(f"Upgraded {facility} to level {facility_level + 1}!")
 
-    def get_facility_info(self, facility):
-        """Retrieve the facility information from config."""
-        facilities = {
-            "drug_lab": {"emoji": "💊", "base_cost": 100, "cost_multiplier": 1.5},
-            "weapons_warehouse": {"emoji": "🔫", "base_cost": 200, "cost_multiplier": 1.6},
-            "gang_hideout": {"emoji": "🏚️", "base_cost": 150, "cost_multiplier": 1.4},
-        }
-        return facilities.get(facility)
-
-    def calculate_upgrade_cost(self, facility_info, facility_level):
+    def calculate_upgrade_cost(self, facility, facility_level):
         """Calculate the cost for upgrading a facility."""
-        return facility_info["base_cost"] * (facility_info["cost_multiplier"] ** facility_level)
+        facility_config = {
+            "drug_lab": {"base_cost": 100, "cost_multiplier": 1.5},
+            "weapons_warehouse": {"base_cost": 200, "cost_multiplier": 1.6},
+            "gang_hideout": {"base_cost": 150, "cost_multiplier": 1.4},
+        }
+        return facility_config[facility]["base_cost"] * (facility_config[facility]["cost_multiplier"] ** facility_level)
 
     def get_facility_level(self, player_id, facility):
         """Retrieve the current level of a facility."""
@@ -99,57 +158,6 @@ class MafiaGame(commands.Cog):
         player_info = db_handler.get_player_info(player_id)
         return player_info[2] >= cost
 
-    def perform_upgrade(self, player_id, facility, current_level, cost):
-        """Deduct cash and upgrade the facility."""
-        db_handler.update_cash(player_id, -cost)
-        db_handler.update_facility(player_id, facility, current_level + 1)
-
-    @commands.command()
-    async def rob(self, ctx, target: discord.Member):
-        """Plan a robbery on a rival's town."""
-        attacker_id = ctx.author.id
-        defender_id = target.id
-
-        if not self.can_rob(attacker_id, defender_id):
-            await ctx.send("This player has no resources to rob.")
-            return
-
-        loot = self.perform_robbery(attacker_id, defender_id)
-        await ctx.send(f"Robbery successful! {ctx.author.mention} stole: {loot} from {target.mention}!")
-
-    def can_rob(self, attacker_id, defender_id):
-        """Check if a player can rob another player."""
-        defender_resources = db_handler.get_resources(defender_id)
-        return sum(defender_resources) > 0
-
-    def perform_robbery(self, attacker_id, defender_id):
-        """Handle the robbery logic and resource transfer."""
-        defender_resources = db_handler.get_resources(defender_id)
-        loot = {
-            "drugs": random.randint(0, defender_resources[0] // 2),
-            "weapons": random.randint(0, defender_resources[1] // 2),
-            "gang_members": random.randint(0, defender_resources[2] // 2),
-        }
-
-        self.update_player_resources(attacker_id, loot, add=True)
-        self.update_player_resources(defender_id, loot, add=False)
-        return loot
-
-    def update_player_resources(self, player_id, loot, add=True):
-        """Update player resources based on the loot."""
-        resources = db_handler.get_resources(player_id)
-        factor = 1 if add else -1
-
-        new_drugs = resources[0] + factor * loot["drugs"]
-        new_weapons = resources[1] + factor * loot["weapons"]
-        new_gang_members = resources[2] + factor * loot["gang_members"]
-
-        db_handler.update_resource(player_id, "drugs", new_drugs)
-        db_handler.update_resource(player_id, "weapons", new_weapons)
-        db_handler.update_resource(player_id, "gang_members", new_gang_members)
-
-    # Similar refactoring for the hit, grow, and other commands...
-
-# The setup function to add the cog to the bot
+# Setup function to add the cog to the bot
 async def setup(bot):
     await bot.add_cog(MafiaGame(bot))

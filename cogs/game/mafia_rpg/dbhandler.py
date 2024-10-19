@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from beartype import beartype
 from beartype.typing import Tuple, Union
 import utils.queries as queries
-from config import config
+from cogs.game.mafia_rpg.mafia_config import config
 
 @dataclass
 class MafiaDBHandler:
