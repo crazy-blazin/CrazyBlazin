@@ -42,15 +42,16 @@ SLOT_PAYOUTS: Dict[str, int] = {
         "🍒": 5
 }
 SLOT_WEIGHTS: Dict[str, float] = {
-    "7️⃣": 0.05,   # Rare symbol
-    "⭐": 0.1,     # Mid-range symbol
-    "🔔": 0.15,    # Mid-range symbol
-    "🍇": 0.2,     # Common fruit symbols
-    "🍉": 0.15,    # Common fruit symbols
-    "🍊": 0.15,    # Common fruit symbols
-    "🍋": 0.1,     # Common fruit symbols
-    "🍒": 0.1      # Common fruit symbols
+    "7️⃣": 0.01,   # Rare symbol (high payout)
+    "⭐": 0.05,     # Mid-range symbol (medium payout)
+    "🔔": 0.07,    # Mid-range symbol (medium payout)
+    "🍇": 0.12,    # Common fruit symbol (medium payout)
+    "🍉": 0.10,    # Common fruit symbol (medium payout)
+    "🍊": 0.18,    # Common fruit symbol (low payout, higher chance)
+    "🍋": 0.18,    # Common fruit symbol (low payout, higher chance)
+    "🍒": 0.18     # Common fruit symbol (low payout, higher chance)
 }
+
 
 
 # Add settings for the grid size
