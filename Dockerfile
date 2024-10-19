@@ -5,7 +5,8 @@ FROM python:3.10-slim
 WORKDIR /app
 
 # Copy the current directory contents into the container
-COPY . /app
+COPY pyproject.toml poetry.lock /app/
+COPY crazybot /app
 
 # Install any needed packages
 RUN pip install poetry
