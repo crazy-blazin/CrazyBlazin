@@ -8,9 +8,11 @@ WORKDIR /app
 COPY pyproject.toml poetry.lock /app/
 COPY crazybot /app
 
+EXPOSE 5000
+
 # Install any needed packages
 RUN pip install poetry
 RUN poetry install
 
 # Run app.py when the container launches
-ENTRYPOINT [ "poetry", "run", "python", "main.py" ]
+ENTRYPOINT [ "poetry", "run", "python", "main.py", "&", "poetry", "run", "python", "webservice.py" ]
