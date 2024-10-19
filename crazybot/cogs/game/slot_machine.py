@@ -3,7 +3,7 @@ import discord
 from discord.ext import commands
 from loguru import logger
 from utils.dbhandler import DataBaseHandler
-from config.config import SLOT_PAYOUTS, SLOT_MACHINE_CONFIG  # Import settings from config.py
+from config.config import SLOT_PAYOUTS, SLOT_MACHINE_CONFIG, SLOT_WEIGHTS  # Import settings from config.py
 import asyncio
 
 db_handler = DataBaseHandler()
@@ -129,6 +129,7 @@ class SlotMachineGame(commands.Cog):
 
         # Define slot machine emojis
         emojis = list(SLOT_PAYOUTS.keys())
+        weights = list(SLOT_WEIGHTS.values())
 
         # Send initial message with placeholder emojis
         placeholder = "🔳"
@@ -139,7 +140,7 @@ class SlotMachineGame(commands.Cog):
         # Animate the spinning reels
         for _ in range(num_spins):
             # Randomly select emojis for each cell in the grid
-            grid_display = [[random.choice(emojis) for _ in range(num_cols)] for _ in range(num_rows)]
+            grid_display = [[random.choices(emojis, weights=weights, k=1)[0] for _ in range(num_cols)] for _ in range(num_rows)]
             # Update the message
             grid_message = self.format_grid_message(user, grid_display)
             await result_message.edit(content=grid_message)
@@ -147,7 +148,7 @@ class SlotMachineGame(commands.Cog):
             await asyncio.sleep(0.3)
 
         # Final spin to determine the outcome
-        final_grid = [[random.choice(emojis) for _ in range(num_cols)] for _ in range(num_rows)]
+        final_grid = grid_display
         final_message_content = self.format_grid_message(user, final_grid, final=True)
 
         # Determine winnings
