@@ -30,7 +30,7 @@ class SlotMachineView(discord.ui.View):
             return
 
         # Deduct the bet amount again and re-spin
-        db_handler.add_coins(user_id=self.user.id, username=self.user.name, amount=-self.bet)
+        db_handler.add_coins(user_id=self.user.id, username=self.user.name, amount=-int(self.bet))
         logger.info(f"Deducted {self.bet} coins from {self.user.name} for the slot machine bet.")
 
         await self.slot_machine_game.play_slot(self.ctx, self.bet, interaction)
@@ -113,7 +113,7 @@ class SlotMachineGame(commands.Cog):
             return
 
         # Deduct the bet amount from user's coins
-        db_handler.add_coins(user_id=user.id, username=user.name, amount=-bet)
+        db_handler.add_coins(user_id=user.id, username=user.name, amount=-int(bet))
         logger.info(f"Deducted {bet} coins from {user.name} for the slot machine bet.")
 
         await self.play_slot(ctx, bet)
@@ -155,7 +155,7 @@ class SlotMachineGame(commands.Cog):
         payout, winning_lines = self.calculate_payout(final_grid, bet, num_rows, num_cols)
         if payout > 0:
             # Add winnings to user's coins
-            db_handler.add_coins(user_id=user.id, username=user.name, amount=payout)
+            db_handler.add_coins(user_id=user.id, username=user.name, amount=int(payout))
             logger.info(f"Awarded {payout} coins to {user.name} from the slot machine.")
             final_message_content += f"\n\n🎉 You won **{payout}** coins! 🎉\n"
             final_message_content += f"Winning lines: {', '.join(winning_lines)}"
