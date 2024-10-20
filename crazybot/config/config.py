@@ -35,21 +35,21 @@ SLOT_PAYOUTS: Dict[str, int] = {
         "7️⃣": 1000,
         "⭐": 150,
         "🔔": 50,
-        "🍇": 6,
-        "🍉": 5,
-        "🍊": 4,
+        "🍇": 15,
+        "🍉": 7,
+        "🍊": 5,
         "🍋": 3,
-        "🍒": 1
+        "🍒": 1.2
 }
 SLOT_WEIGHTS: Dict[str, float] = {
     "7️⃣": 0.01,   # Rare symbol (high payout)
     "⭐": 0.05,     # Mid-range symbol (medium payout)
-    "🔔": 0.07,    # Mid-range symbol (medium payout)
+    "🔔": 0.05,    # Mid-range symbol (medium payout)
     "🍇": 0.10,    # Common fruit symbol (medium payout)
-    "🍉": 0.12,    # Common fruit symbol (medium payout)
-    "🍊": 0.16,    # Common fruit symbol (low payout, higher chance)
-    "🍋": 0.18,    # Common fruit symbol (low payout, higher chance)
-    "🍒": 0.30     # Common fruit symbol (low payout, higher chance)
+    "🍉": 0.10,    # Common fruit symbol (medium payout)
+    "🍊": 0.20,    # Common fruit symbol (low payout, higher chance)
+    "🍋": 0.20,    # Common fruit symbol (low payout, higher chance)
+    "🍒": 0.29     # Common fruit symbol (low payout, higher chance)
 }
 
 
