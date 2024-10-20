@@ -3,6 +3,7 @@ from dataclasses import dataclass
 
 from beartype import beartype
 from beartype.typing import Tuple, Union
+from loguru import logger
 
 import utils.queries as queries
 from config import config
@@ -23,6 +24,8 @@ class DataBaseHandler:
         """Initialize the database tables."""
         conn, c = self._get_connection()
         c.execute(queries.INIT_DB_TABLE)
+        c.execute(queries.INIT_LOTTO_TABLE)
+        c.execute(queries.INIT_LOTTO_SUM_TABLE)
         conn.commit()
         conn.close()
 
@@ -81,6 +84,62 @@ class DataBaseHandler:
         """Retrieve the top users with the most coins."""
         conn, c = self._get_connection()
         c.execute(f'SELECT * FROM users ORDER BY coins DESC LIMIT {limit}')
+        result = c.fetchall()
+        conn.close()
+        return result
+
+    @beartype
+    def add_lotto_ticket(self, user_id: int, ticket_number: int) -> None:
+        """Add a lotto ticket for the user."""
+        logger.info('Adding lotto ticket...')
+        conn, c = self._get_connection()
+        c.execute('INSERT INTO lotto (user_id, ticket_number) VALUES (?, ?)', (user_id, ticket_number))
+        conn.commit()
+        conn.close()
+    
+    @beartype
+    def add_lotto_sum(self, added_value: int) -> None:
+        """Add a lotto ticket for the user."""
+        logger.info('Adding lotto sum...')
+        conn, c = self._get_connection()
+        c.execute('SELECT total_sum FROM lotto_sum')
+        result = c.fetchone()
+        if result is None:
+            c.execute('INSERT INTO lotto_sum (total_sum) VALUES (?)', (added_value,))
+        else:
+            new_value = result[0] + added_value
+            c.execute('UPDATE lotto_sum SET total_sum = ?', (new_value,))
+        conn.commit()
+        conn.close()
+    
+
+    @beartype
+    def get_lotto_sum(self) -> int:
+        """Get the total sum of the lotto."""
+        logger.info('Getting total lotto sum...')
+        conn, c = self._get_connection()
+        c.execute('SELECT total_sum FROM lotto_sum')
+        result = c.fetchone()
+        conn.close()
+        return result[0] if result else 0
+
+    @beartype
+    def reset_lotto_tickets(self) -> None:
+        """Reset all lotto tickets."""
+        logger.info('Resetting lotto tickets...')
+        conn, c = self._get_connection()
+        c.execute('DELETE FROM lotto')
+        c.execute('DELETE FROM lotto_sum')
+        c.execute(f'INSERT INTO lotto_sum (total_sum) VALUES ({config.LOTTO_BASELINE})')
+        conn.commit()
+        conn.close()
+    
+    @beartype
+    def find_finner(self, winning_ticket: int) -> int:
+        """Find the winner of the lotto."""
+        conn, c = self._get_connection()
+        c.execute('SELECT user_id FROM lotto WHERE ticket_number = ?', (winning_ticket,))
+        # fetch all winners
         result = c.fetchall()
         conn.close()
         return result
