@@ -32,32 +32,31 @@ LOTTO_BASELINE = 50000
 
 ##---------------------- Slot Machine settings ---------------##
 SLOT_PAYOUTS: Dict[str, int] = {
-        "7️⃣": 500,
-        "⭐": 100,
+        "7️⃣": 1000,
+        "⭐": 150,
         "🔔": 50,
-        "🍇": 25,
-        "🍉": 15,
-        "🍊": 10,
-        "🍋": 8,
-        "🍒": 5
+        "🍇": 6,
+        "🍉": 5,
+        "🍊": 4,
+        "🍋": 3,
+        "🍒": 1
 }
 SLOT_WEIGHTS: Dict[str, float] = {
     "7️⃣": 0.01,   # Rare symbol (high payout)
     "⭐": 0.05,     # Mid-range symbol (medium payout)
     "🔔": 0.07,    # Mid-range symbol (medium payout)
-    "🍇": 0.12,    # Common fruit symbol (medium payout)
-    "🍉": 0.10,    # Common fruit symbol (medium payout)
-    "🍊": 0.18,    # Common fruit symbol (low payout, higher chance)
+    "🍇": 0.10,    # Common fruit symbol (medium payout)
+    "🍉": 0.12,    # Common fruit symbol (medium payout)
+    "🍊": 0.16,    # Common fruit symbol (low payout, higher chance)
     "🍋": 0.18,    # Common fruit symbol (low payout, higher chance)
-    "🍒": 0.18     # Common fruit symbol (low payout, higher chance)
+    "🍒": 0.30     # Common fruit symbol (low payout, higher chance)
 }
-
 
 
 # Add settings for the grid size
 SLOT_MACHINE_CONFIG: Dict[str, int] = {
     "num_rows": 3,
     "num_cols": 3,  # You can change this to make it a larger or smaller grid
-    "num_spins": 7  # Number of times the reels will spin
+    "num_spins": 4  # Number of times the reels will spin
 }
 ##---------------------------------------------------------------##
