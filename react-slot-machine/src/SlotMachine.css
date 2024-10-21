@@ -1,0 +1,75 @@
+/* Center the slot machine on the page */
+.slot-machine-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    text-align: center;
+    background-color: #f0f0f0;
+}
+
+/* Title of the slot machine */
+.slot-title {
+    font-family: 'Arial', sans-serif;
+    font-size: 2rem;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+/* Grid layout for the 3x3 reels */
+.reels-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-gap: 10px;
+    margin-bottom: 20px;
+}
+
+/* Each reel slot */
+.reel {
+    padding: 20px;
+    border: 2px solid #333;
+    border-radius: 10px;
+    background-color: white;
+    font-size: 2rem;
+    font-family: 'Arial', sans-serif;
+    color: #333;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Spin button */
+.spin-button {
+    padding: 10px 20px;
+    font-size: 1.2rem;
+    font-family: 'Arial', sans-serif;
+    background-color: #4caf50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+/* Disabled button state while spinning */
+.spin-button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+/* Button hover effect */
+.spin-button:hover:not(:disabled) {
+    background-color: #45a049;
+}
+
+/* Result message */
+.result-message {
+    font-family: 'Arial', sans-serif;
+    font-size: 1.2rem;
+    margin-top: 15px;
+    color: #333;
+}
