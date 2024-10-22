@@ -74,6 +74,8 @@ const SlotMachine = () => {
         slowDownSpin();
     };
 
+    const checkLine = (line) => line.every((symbol) => symbol === line[0]);
+
     const calculateResult = () => {
         const finalReels = [
             [getRandomSymbol(SLOT_WEIGHTS), getRandomSymbol(SLOT_WEIGHTS), getRandomSymbol(SLOT_WEIGHTS)],
@@ -82,14 +84,39 @@ const SlotMachine = () => {
         ];
         setReels(finalReels);
 
-        if (
-            (finalReels[0][0] === finalReels[0][1] && finalReels[0][1] === finalReels[0][2]) ||
-            (finalReels[1][0] === finalReels[1][1] && finalReels[1][1] === finalReels[1][2]) ||
-            (finalReels[2][0] === finalReels[2][1] && finalReels[2][1] === finalReels[2][2])
-        ) {
-            setMessage("🎉 You won! 🎉");
+        let isWin = false;
 
-            // Play win sound if the user wins
+        // Check horizontal rows
+        for (let row = 0; row < finalReels.length; row++) {
+            if (checkLine(finalReels[row])) {
+                isWin = true;
+                break;
+            }
+        }
+
+        // Check vertical columns
+        for (let col = 0; col < finalReels[0].length; col++) {
+            const column = finalReels.map(row => row[col]);
+            if (checkLine(column)) {
+                isWin = true;
+                break;
+            }
+        }
+
+        // Check diagonal (top-left to bottom-right)
+        const diagonal1 = [finalReels[0][0], finalReels[1][1], finalReels[2][2]];
+        if (checkLine(diagonal1)) {
+            isWin = true;
+        }
+
+        // Check diagonal (top-right to bottom-left)
+        const diagonal2 = [finalReels[0][2], finalReels[1][1], finalReels[2][0]];
+        if (checkLine(diagonal2)) {
+            isWin = true;
+        }
+
+        if (isWin) {
+            setMessage("🎉 You won! 🎉");
             winSound.play();
         } else {
             setMessage("Try again!");
