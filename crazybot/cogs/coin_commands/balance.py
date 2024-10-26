@@ -16,7 +16,7 @@ class Balance(commands.Cog):
         Use `!balance` or `!bal` to check your balance. 
         Optionally, you can mention a user (e.g., `!balance @username`) to check their balance instead.
         """,
-        aliases=["bal"],
+        aliases=["bal","ball","ballance","baance","balanc","all"],
         brief="Check your coin balance."
     )
     async def balance(self, ctx, member: discord.Member = None):

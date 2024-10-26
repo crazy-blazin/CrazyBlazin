@@ -14,7 +14,7 @@ intents.voice_states = True
 intents.message_content = True
 intents.guilds = True
 
-bot = commands.Bot(command_prefix='!', intents=intents, help_command=None)
+bot = commands.Bot(command_prefix='!', intents=intents, help_command=None, case_insensitive=True)
 
 
 async def load_all_cogs():
@@ -61,10 +61,12 @@ async def on_ready():
     logger.info("Bot started successfully.")
 
 
+
 # On exit event cleanup and save data
 @bot.event
 async def on_exit():
     logger.info("Bot is exiting...")
+
     # Close the bot
     await bot.close()
 
