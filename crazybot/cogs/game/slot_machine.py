@@ -87,7 +87,6 @@ class SlotMachineGame(commands.Cog):
         """Allows a user to play the slot machine with a specified bet amount."""
         user = ctx.author
         bet_all: bool = False
-        logger.debug(f"{user.name} initiated a slot machine game with a bet of {bet} coins, betting all: {bet_all}.")
 
         if isinstance(bet, str):
             if bet.lower() == "all":
@@ -103,6 +102,7 @@ class SlotMachineGame(commands.Cog):
                 return
 
         # Check if user has enough coins
+        logger.debug(f"{user.name} initiated a slot machine game with a bet of {bet} coins, betting all: {bet_all}.")
         user_coins = db_handler.get_coins(user_id=user.id)[0]
         logger.debug(f"{user.name} has {user_coins} coins.")
 
