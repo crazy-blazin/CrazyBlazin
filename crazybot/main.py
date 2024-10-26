@@ -59,18 +59,14 @@ async def load_cog(cog_name: str):
 @bot.event
 async def on_ready():
     logger.info("Bot started successfully.")
-    # Message the channel saying the bot is online
-    channel = bot.get_channel(config.CHAT_CHANNEL_ID)
-    await channel.send("🚀 **Bedre CrazyBlazin Bot is now online**")
+
 
 
 # On exit event cleanup and save data
 @bot.event
 async def on_exit():
     logger.info("Bot is exiting...")
-    # Message the channel saying the bot is offline
-    channel = bot.get_channel(config.CHAT_CHANNEL_ID)
-    await channel.send("🧨🖥️🔥 **Bedre CrazyBlazin Bot is now offline** 🧨🖥️🔥")
+
     # Close the bot
     await bot.close()
 
