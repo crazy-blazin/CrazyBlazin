@@ -2,6 +2,7 @@ import asyncio
 import discord
 from discord.ext import commands
 from loguru import logger
+import re
 import Levenshtein  # Import the Levenshtein module
 from config import config
 from utils.signal_handler import setup_signal_handlers
@@ -59,33 +60,36 @@ async def on_exit():
 async def on_command_error(ctx, error):
     """Handle command errors and run similar commands if found."""
     if isinstance(error, commands.CommandNotFound):
-        # Get the command name that was entered
-        command_name = ctx.invoked_with
+        # Extract the input command and its arguments
+        user_input = ctx.message.content
+        match = re.match(r'(!\w+)(.*)', user_input)  # Regex to separate command and arguments
+        if match:
+            command_part = match.group(1).strip('!')  # Extract command without '!'
+            args_part = match.group(2).strip()  # Extract arguments
+            print(args_part)
+            # Get a list of all available command names
+            command_names = [cmd.name for cmd in bot.commands] + [alias for cmd in bot.commands for alias in cmd.aliases]
 
-        # Get a list of all available command names
-        command_names = [cmd.name for cmd in bot.commands] + [alias for cmd in bot.commands for alias in cmd.aliases]
-        
-        # Find the closest command names using Levenshtein distance
-        closest_commands = get_closest_commands(command_name, command_names)
+            # Find the closest command names using Levenshtein distance
+            closest_commands = get_closest_commands(command_part, command_names)
 
-        # If there's only one suggestion, attempt to invoke that command
-        if len(closest_commands) == 1:
-            command_to_invoke = bot.get_command(closest_commands[0])
-            if command_to_invoke:  # Check if the command exists
-                try:
-                    # Invoke the command with the original context and arguments
-                    await ctx.invoke(command_to_invoke, *ctx.args, **ctx.kwargs)
-                except Exception as e:
-                    logger.error(f"Failed to invoke command '{closest_commands[0]}': {e}")
-        elif closest_commands:
-            # Log if there are multiple similar commands found
-            logger.warning(f"Multiple commands found that are similar to '{command_name}': {', '.join(closest_commands)}")
+            # If there's only one suggestion, attempt to invoke that command
+            if len(closest_commands) == 1:
+                command_to_invoke = bot.get_command(closest_commands[0])
+                if command_to_invoke:  # Check if the command exists
+                    try:
+                        # Split the arguments into a list (handle numbers and strings)
+                        args_list = args_part.split() if args_part else []
+                        await ctx.invoke(command_to_invoke, *args_list)
+                    except Exception as e:
+                        logger.error(f"Failed to invoke command '{closest_commands[0]}': {e}")
+            elif closest_commands:
+                # Log if there are multiple similar commands found
+                logger.warning(f"Multiple commands found that are similar to '{command_part}': {', '.join(closest_commands)}")
 
 def get_closest_commands(command_name, command_names, threshold=2):
     """Get a list of closest command names based on Levenshtein distance."""
     suggestions = []
-    
-    
     for name in command_names:
         distance = Levenshtein.distance(command_name, name)
         if distance <= threshold:

@@ -106,14 +106,14 @@ class SlotMachineGame(commands.Cog):
                     logger.warning(f"{user.name} tried to bet all coins but has none.")
                     await ctx.send("You don't have any coins to bet.")
                     return
-
+        bet = int(bet)
         if user_coins < bet:
             logger.warning(f"{user.name} does not have enough coins to bet {bet}.")
             await ctx.send(f"{user.mention}, you don't have enough coins to bet {bet}.")
             return
 
         # Deduct the bet amount from user's coins
-        db_handler.add_coins(user_id=user.id, username=user.name, amount=-int(bet))
+        db_handler.add_coins(user_id=user.id, username=user.name, amount=-bet)
         logger.info(f"Deducted {bet} coins from {user.name} for the slot machine bet.")
 
         await self.play_slot(ctx, bet)
