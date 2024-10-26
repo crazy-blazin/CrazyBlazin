@@ -86,8 +86,14 @@ class SlotMachineGame(commands.Cog):
     async def slot(self, ctx: commands.Context, bet: int | str):
         """Allows a user to play the slot machine with a specified bet amount."""
         user = ctx.author
-        logger.debug(f"{user.name} initiated a slot machine game with a bet of {bet} coins.")
+        bet_all: bool = False
 
+        if isinstance(bet, str):
+            if bet.lower() == "all":
+                bet_all = True
+            else:
+                bet = int(bet)
+        
         # Validate bet amount
         if isinstance(bet, int):
             if bet <= 0:
@@ -96,16 +102,11 @@ class SlotMachineGame(commands.Cog):
                 return
 
         # Check if user has enough coins
+        logger.debug(f"{user.name} initiated a slot machine game with a bet of {bet} coins, betting all: {bet_all}.")
         user_coins = db_handler.get_coins(user_id=user.id)[0]
         logger.debug(f"{user.name} has {user_coins} coins.")
 
-        if isinstance(bet, str):
-            if bet.lower() == "all":
-                bet = user_coins
-                if bet == 0:
-                    logger.warning(f"{user.name} tried to bet all coins but has none.")
-                    await ctx.send("You don't have any coins to bet.")
-                    return
+        bet = user_coins if bet_all else bet # Bet all coins if the user specifies "all"
 
         if user_coins < bet:
             logger.warning(f"{user.name} does not have enough coins to bet {bet}.")
@@ -113,7 +114,7 @@ class SlotMachineGame(commands.Cog):
             return
 
         # Deduct the bet amount from user's coins
-        db_handler.add_coins(user_id=user.id, username=user.name, amount=-int(bet))
+        db_handler.add_coins(user_id=user.id, username=user.name, amount=-bet)
         logger.info(f"Deducted {bet} coins from {user.name} for the slot machine bet.")
 
         await self.play_slot(ctx, bet)
