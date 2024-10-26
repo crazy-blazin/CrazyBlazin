@@ -66,7 +66,6 @@ async def on_command_error(ctx, error):
         if match:
             command_part = match.group(1).strip('!')  # Extract command without '!'
             args_part = match.group(2).strip()  # Extract arguments
-            print(args_part)
             # Get a list of all available command names
             command_names = [cmd.name for cmd in bot.commands] + [alias for cmd in bot.commands for alias in cmd.aliases]
 
@@ -94,8 +93,6 @@ def get_closest_commands(command_name, command_names, threshold=2):
         distance = Levenshtein.distance(command_name, name)
         if distance <= threshold:
             suggestions.append(name)
-        print(command_name, distance, name)
-    print (suggestions)
     return suggestions
 
 if __name__ == "__main__":
