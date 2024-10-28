@@ -14,7 +14,7 @@ PAY_INTERVAL = 5
 
 # Database settings
 
-DB_NAME =  '/data/coins.db'
+DB_NAME =  'C:/Users/Moh/Documents/GitHub/CrazyBlazin/data/coins.db'
 
 # Multiplier settings
 RANDOM_TIME_WITHIN = 23 * 60 + 30 # 23 hours and 30 minutes
@@ -33,24 +33,24 @@ LOTTO_BASELINE = 50000
 
 ##---------------------- Slot Machine settings ---------------##
 SLOT_PAYOUTS: Dict[str, int] = {
-        "7️⃣": 1000,
-        "⭐": 150,
-        "🔔": 50,
-        "🍇": 15,
-        "🍉": 7,
-        "🍊": 5,
-        "🍋": 3,
-        "🍒": 1.2
+    "7️⃣": 100,  # 3x "7️⃣" - High payout
+    "⭐": 20,     # 3x "⭐" - Moderate payout
+    "🔔": 20,     # 3x "🔔" - Moderate payout
+    "🍇": 10,    # 3x "🍇" - Smaller payout
+    "🍉": 10,    # 3x "🍉" - Smaller payout
+    "🍊": 5,     # 3x "🍊" - Small payout
+    "🍋": 5,     # 3x "🍋" - Small payout
+    "🍒": 5      # 3x "🍒" - Small payout
 }
 SLOT_WEIGHTS: Dict[str, float] = {
-    "7️⃣": 0.01,   # Rare symbol (high payout)
-    "⭐": 0.05,     # Mid-range symbol (medium payout)
-    "🔔": 0.05,    # Mid-range symbol (medium payout)
-    "🍇": 0.10,    # Common fruit symbol (medium payout)
-    "🍉": 0.10,    # Common fruit symbol (medium payout)
+    "7️⃣": 0.02,   # Rare symbol (high payout)
+    "⭐": 0.10,     # Mid-range symbol (medium payout)
+    "🔔": 0.10,     # Mid-range symbol (medium payout)
+    "🍇": 0.15,    # Common fruit symbol (medium payout)
+    "🍉": 0.15,    # Common fruit symbol (medium payout)
     "🍊": 0.20,    # Common fruit symbol (low payout, higher chance)
     "🍋": 0.20,    # Common fruit symbol (low payout, higher chance)
-    "🍒": 0.29     # Common fruit symbol (low payout, higher chance)
+    "🍒": 0.18     # Common fruit symbol (low payout, higher chance)
 }
 
 
