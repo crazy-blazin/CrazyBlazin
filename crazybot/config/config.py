@@ -14,7 +14,7 @@ PAY_INTERVAL = 5
 
 # Database settings
 
-DB_NAME = 'C:/Users/Moh/Documents/GitHub/CrazyBlazin/data/coins.db'
+DB_NAME = DB_NAME = '/data/coins.db'
 
 # Multiplier settings
 RANDOM_TIME_WITHIN = 23 * 60 + 30 # 23 hours and 30 minutes
