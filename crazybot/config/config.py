@@ -31,26 +31,28 @@ CHAT_CHANNEL_ID = 803982821923356773
 LOTTO_TICKET_PRICE = 150
 LOTTO_BASELINE = 50000
 
-##---------------------- Slot Machine settings ---------------##
-SLOT_PAYOUTS: Dict[str, int] = {
-        "7️⃣": 1000,
-        "⭐": 150,
-        "🔔": 50,
-        "🍇": 15,
-        "🍉": 7,
-        "🍊": 5,
-        "🍋": 3,
-        "🍒": 1.2
-}
 SLOT_WEIGHTS: Dict[str, float] = {
-    "7️⃣": 0.01,   # Rare symbol (high payout)
-    "⭐": 0.05,     # Mid-range symbol (medium payout)
+    "7️⃣": 0.01,    # Rare symbol (high payout)
+    "⭐": 0.05,    # Mid-range symbol (medium payout)
     "🔔": 0.05,    # Mid-range symbol (medium payout)
     "🍇": 0.10,    # Common fruit symbol (medium payout)
     "🍉": 0.10,    # Common fruit symbol (medium payout)
     "🍊": 0.20,    # Common fruit symbol (low payout, higher chance)
     "🍋": 0.20,    # Common fruit symbol (low payout, higher chance)
     "🍒": 0.29     # Common fruit symbol (low payout, higher chance)
+}
+
+# Define the payouts for each symbol
+SLOT_PAYOUTS: Dict[str, int] = {
+    "7️⃣": 1000,     # High payout
+    "⭐": 150,      # Medium payout
+    "🔔": 50,       # Medium payout
+    "🍇": 15,       # Medium payout
+    "🍉": 7,        # Smaller payout
+    "🍊": 5,        # Small payout
+    "🍋": 3,        # Small payout
+    "🍒": 1.2         # Smallest payout
+
 }
 
 
