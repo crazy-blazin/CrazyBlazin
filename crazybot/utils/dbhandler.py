@@ -123,6 +123,8 @@ class DataBaseHandler:
         conn.close()
         return result[0] if result else 0
 
+
+
     @beartype
     def reset_lotto_tickets(self) -> None:
         """Reset all lotto tickets."""
@@ -143,3 +145,24 @@ class DataBaseHandler:
         result = c.fetchall()
         conn.close()
         return result
+    
+    @beartype
+    def transfer_coins(self, sender_id: int, receiver_id: int, amount: int) -> bool:
+        """Transfer coins from one user to another if sender has sufficient balance."""
+        conn, c = self._get_connection()
+        
+        # Check sender's balance
+        c.execute("SELECT coins FROM users WHERE user_id = ?", (sender_id,))
+        sender_balance = c.fetchone()
+        
+        if sender_balance is None or sender_balance[0] < amount:
+            conn.close()
+            return False  # Insufficient funds or sender not in DB
+
+        # Deduct coins from sender and add to receiver
+        c.execute("UPDATE users SET coins = coins - ? WHERE user_id = ?", (amount, sender_id))
+        c.execute("UPDATE users SET coins = coins + ? WHERE user_id = ?", (amount, receiver_id))
+        
+        conn.commit()
+        conn.close()
+        return True  # Transfer successful  
