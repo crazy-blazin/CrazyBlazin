@@ -24,6 +24,7 @@ async def load_all_cogs():
         "cogs.fun_commands",
         "cogs.utility",
         "cogs.game",
+        "cogs.transfer_commands"       
     ]
     
     for cog in cogs:
