@@ -14,7 +14,7 @@ PAY_INTERVAL = 5
 
 # Database settings
 
-DB_NAME =  'C:/Users/Moh/Documents/GitHub/CrazyBlazin/data/coins.db'
+DB_NAME =  '/data/coins.db'
 
 # Multiplier settings
 RANDOM_TIME_WITHIN = 23 * 60 + 30 # 23 hours and 30 minutes
@@ -44,12 +44,12 @@ SLOT_WEIGHTS: Dict[str, float] = {
 
 # Define the payouts for each symbol
 SLOT_PAYOUTS: Dict[str, int] = {
-    "7️⃣": 75.0,    # Reduced high payout
-    "⭐": 50.0,      # Reduced medium payout
-    "🔔": 25.0,     # Reduced medium payout
-    "🍇": 8.0,      # Lowered medium payout
-    "🍉": 4.0,      # Lowered small payout
-    "🍊": 2.0,      # Lowered small payout
+    "7️⃣": 100.0,    # Reduced high payout
+    "⭐": 75.0,      # Reduced medium payout
+    "🔔": 50.0,     # Reduced medium payout
+    "🍇": 10.0,      # Lowered medium payout
+    "🍉": 5.0,      # Lowered small payout
+    "🍊": 3.0,      # Lowered small payout
     "🍋": 1.5,      # Lowered small payout
     "🍒": 1.2       # Lowest payout
 
