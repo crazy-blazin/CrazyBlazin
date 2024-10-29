@@ -31,26 +31,26 @@ LOTTO_TICKET_PRICE = 150
 LOTTO_BASELINE = 50000
 
 SLOT_WEIGHTS: Dict[str, float] = {
-    "7️⃣": 0.01,    # Rare symbol (high payout)
-    "⭐": 0.05,    # Mid-range symbol (medium payout)
-    "🔔": 0.05,    # Mid-range symbol (medium payout)
-    "🍇": 0.10,    # Common fruit symbol (medium payout)
-    "🍉": 0.10,    # Common fruit symbol (medium payout)
-    "🍊": 0.20,    # Common fruit symbol (low payout, higher chance)
-    "🍋": 0.20,    # Common fruit symbol (low payout, higher chance)
-    "🍒": 0.29     # Common fruit symbol (low payout, higher chance)
+    "7️⃣": 0.0002,   # Very rare symbol (high payout)
+    "⭐": 0.0003,     # Rare symbol (reduced frequency)
+    "🔔": 0.002,      # Mid-range symbol (reduced frequency)
+    "🍇": 0.075,      # Common fruit symbol (medium payout)
+    "🍉": 0.10,       # Common fruit symbol (medium payout)
+    "🍊": 0.15,       # Common fruit symbol (low payout, higher chance)
+    "🍋": 0.25,       # Common fruit symbol (low payout, higher chance)
+    "🍒": 0.40        # Most common symbol (lowest payout)
 }
 
 # Define the payouts for each symbol
 SLOT_PAYOUTS: Dict[str, int] = {
-    "7️⃣": 1000,     # High payout
-    "⭐": 150,      # Medium payout
-    "🔔": 50,       # Medium payout
-    "🍇": 15,       # Medium payout
-    "🍉": 7,        # Smaller payout
-    "🍊": 5,        # Small payout
-    "🍋": 3,        # Small payout
-    "🍒": 1.2         # Smallest payout
+    "7️⃣": 100.0,    # Reduced high payout
+    "⭐": 75.0,      # Reduced medium payout
+    "🔔": 50.0,     # Reduced medium payout
+    "🍇": 10.0,      # Lowered medium payout
+    "🍉": 5.0,      # Lowered small payout
+    "🍊": 3.0,      # Lowered small payout
+    "🍋": 1.5,      # Lowered small payout
+    "🍒": 1.2       # Lowest payout
 
 }
 

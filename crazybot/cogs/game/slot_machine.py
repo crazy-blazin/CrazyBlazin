@@ -235,7 +235,7 @@ class SlotMachineGame(commands.Cog):
             paylines["Diagonal Bottom-Left to Top-Right"] = [(i, num_cols - 1 - i) for i in range(num_rows)]
 
         return paylines
-    """"
+    """
     # Optional: Handle errors globally within the cog
     @slot.error
     async def slot_error(self, ctx, error):
