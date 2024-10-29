@@ -5,6 +5,7 @@ from loguru import logger
 from utils.dbhandler import DataBaseHandler
 from config.config import SLOT_PAYOUTS, SLOT_MACHINE_CONFIG, SLOT_WEIGHTS  # Import settings from config.py
 import asyncio
+from beartype import beartype
 
 db_handler = DataBaseHandler()
 
@@ -83,16 +84,28 @@ class SlotMachineGame(commands.Cog):
         aliases=["slots", "pull"],
         brief="Play the slot machine game and win coins."
     )
-    async def slot(self, ctx: commands.Context, bet: int | str):
+    
+    async def slot(self, ctx: commands.Context, bet: int | str = None):
         """Allows a user to play the slot machine with a specified bet amount."""
         user = ctx.author
         bet_all: bool = False
-
+        
+        if bet is None:
+                
+            logger.warning(f"{user.name} did not specify a bet amount. Setting bet to 50.")
+            bet = 50  # Default bet if no amount is specified
+            await ctx.send(f"{user.mention}, No bet specified, betting 50.")
+            
+            
+            
         if isinstance(bet, str):
             if bet.lower() == "all":
                 bet_all = True
             else:
                 bet = int(bet)
+            
+        
+
         
         # Validate bet amount
         if isinstance(bet, int):
@@ -222,7 +235,7 @@ class SlotMachineGame(commands.Cog):
             paylines["Diagonal Bottom-Left to Top-Right"] = [(i, num_cols - 1 - i) for i in range(num_rows)]
 
         return paylines
-
+    """"
     # Optional: Handle errors globally within the cog
     @slot.error
     async def slot_error(self, ctx, error):
@@ -231,7 +244,7 @@ class SlotMachineGame(commands.Cog):
         else:
             logger.error(f"An error occurred: {error}")
             await ctx.send("An unexpected error occurred. Please try again later.")
-
+    """
 # The setup function to load the cog
 async def setup(bot):
     await bot.add_cog(SlotMachineGame(bot))
