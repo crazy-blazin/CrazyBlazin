@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "discordbb"
-version = "1.6.2"
+version = "1.6.3"
 description = ""
 authors = ["Martin Røvang <martinrovang@gmail.com>"]
 readme = "README.md"
@@ -23,3 +23,27 @@ pytest = "^8.3.3"
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+
+[tool.pdm]
+distribution = false
+
+[project]
+name = "CrazyBlazin"
+version = "0.1.0"
+description = "Default template for PDM package"
+authors = [
+    {name = "Carbonade", email = "rn6jwnfz@duck.com"},
+]
+dependencies = [
+    "discord>=2.3.2",
+    "beartype>=0.19.0",
+    "toml>=0.10.2",
+    "loguru>=0.7.2",
+    "matplotlib>=3.9.2",
+    "levenshtein>=0.26.1",
+]
+requires-python = "==3.10.*"
+readme = "README.md"
+license = {text = "MIT"}
+
