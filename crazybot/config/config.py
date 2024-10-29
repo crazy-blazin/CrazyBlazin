@@ -14,7 +14,7 @@ PAY_INTERVAL = 5
 
 # Database settings
 
-DB_NAME =  '/data/coins.db'
+DB_NAME = os.path.join(os.path.dirname(file), '..', '..', 'data', 'coins.db')
 
 # Multiplier settings
 RANDOM_TIME_WITHIN = 23 * 60 + 30 # 23 hours and 30 minutes
