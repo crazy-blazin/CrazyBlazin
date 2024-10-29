@@ -5,6 +5,7 @@ from loguru import logger
 from utils.dbhandler import DataBaseHandler
 from config.config import SLOT_PAYOUTS, SLOT_MACHINE_CONFIG, SLOT_WEIGHTS  # Import settings from config.py
 import asyncio
+from beartype import beartype
 
 db_handler = DataBaseHandler()
 
@@ -30,7 +31,7 @@ class SlotMachineView(discord.ui.View):
             return
 
         # Deduct the bet amount again and re-spin
-        db_handler.add_coins(user_id=self.user.id, username=self.user.name, amount=-self.bet)
+        db_handler.add_coins(user_id=self.user.id, username=self.user.name, amount=-int(self.bet))
         logger.info(f"Deducted {self.bet} coins from {self.user.name} for the slot machine bet.")
 
         await self.slot_machine_game.play_slot(self.ctx, self.bet, interaction)
@@ -83,11 +84,29 @@ class SlotMachineGame(commands.Cog):
         aliases=["slots", "pull"],
         brief="Play the slot machine game and win coins."
     )
-    async def slot(self, ctx: commands.Context, bet: int | str):
+    
+    async def slot(self, ctx: commands.Context, bet: int | str = None):
         """Allows a user to play the slot machine with a specified bet amount."""
         user = ctx.author
-        logger.debug(f"{user.name} initiated a slot machine game with a bet of {bet} coins.")
+        bet_all: bool = False
+        
+        if bet is None:
+                
+            logger.warning(f"{user.name} did not specify a bet amount. Setting bet to 50.")
+            bet = 50  # Default bet if no amount is specified
+            await ctx.send(f"{user.mention}, No bet specified, betting 50.")
+            
+            
+            
+        if isinstance(bet, str):
+            if bet.lower() == "all":
+                bet_all = True
+            else:
+                bet = int(bet)
+            
+        
 
+        
         # Validate bet amount
         if isinstance(bet, int):
             if bet <= 0:
@@ -96,16 +115,11 @@ class SlotMachineGame(commands.Cog):
                 return
 
         # Check if user has enough coins
+        logger.debug(f"{user.name} initiated a slot machine game with a bet of {bet} coins, betting all: {bet_all}.")
         user_coins = db_handler.get_coins(user_id=user.id)[0]
         logger.debug(f"{user.name} has {user_coins} coins.")
 
-        if isinstance(bet, str):
-            if bet.lower() == "all":
-                bet = user_coins
-                if bet == 0:
-                    logger.warning(f"{user.name} tried to bet all coins but has none.")
-                    await ctx.send("You don't have any coins to bet.")
-                    return
+        bet = user_coins if bet_all else bet # Bet all coins if the user specifies "all"
 
         if user_coins < bet:
             logger.warning(f"{user.name} does not have enough coins to bet {bet}.")
@@ -155,7 +169,7 @@ class SlotMachineGame(commands.Cog):
         payout, winning_lines = self.calculate_payout(final_grid, bet, num_rows, num_cols)
         if payout > 0:
             # Add winnings to user's coins
-            db_handler.add_coins(user_id=user.id, username=user.name, amount=payout)
+            db_handler.add_coins(user_id=user.id, username=user.name, amount=int(payout))
             logger.info(f"Awarded {payout} coins to {user.name} from the slot machine.")
             final_message_content += f"\n\n🎉 You won **{payout}** coins! 🎉\n"
             final_message_content += f"Winning lines: {', '.join(winning_lines)}"
@@ -221,7 +235,7 @@ class SlotMachineGame(commands.Cog):
             paylines["Diagonal Bottom-Left to Top-Right"] = [(i, num_cols - 1 - i) for i in range(num_rows)]
 
         return paylines
-
+    """"
     # Optional: Handle errors globally within the cog
     @slot.error
     async def slot_error(self, ctx, error):
@@ -230,7 +244,7 @@ class SlotMachineGame(commands.Cog):
         else:
             logger.error(f"An error occurred: {error}")
             await ctx.send("An unexpected error occurred. Please try again later.")
-
+    """
 # The setup function to load the cog
 async def setup(bot):
     await bot.add_cog(SlotMachineGame(bot))

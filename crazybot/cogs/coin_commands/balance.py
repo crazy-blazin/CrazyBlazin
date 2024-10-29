@@ -1,5 +1,7 @@
 from dataclasses import dataclass, field
 
+import Levenshtein
+
 import discord
 from discord.ext import commands
 
