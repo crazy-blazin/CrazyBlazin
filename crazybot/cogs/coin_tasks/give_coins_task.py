@@ -22,7 +22,14 @@ class GiveCoinsTask(commands.Cog):
             for vc in guild.voice_channels:
                 for member in vc.members:
                     if not member.bot:  # Skip bots
-                        coins_to_give = config.PAY_AMOUNT
+                        global multiplier_active
+                        if multiplier_active:
+                            coins_to_give = config.PAY_AMOUNT * config.EVENT_MULTIPLIER
+                        else:
+                            coins_to_give = config.PAY_AMOUNT
+                        # Add bonus coins if the member is streaming
+                        if member.voice.self_stream:
+                            coins_to_give += config.STREAM_BONUS
                         self.db_handler.add_coins(user_id=member.id, username=member.display_name, amount=coins_to_give)
 
     @give_coins.before_loop
