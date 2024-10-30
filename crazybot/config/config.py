@@ -13,7 +13,6 @@ BONUS_TIMER_MINUTES = 30
 PAY_INTERVAL = 5
 
 # Database settings
-
 DB_NAME = os.path.join(os.path.dirname(__file__), '..', '..', 'data', 'coins.db')
 
 # Multiplier settings
