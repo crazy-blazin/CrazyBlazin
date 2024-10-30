@@ -14,7 +14,7 @@ PAY_INTERVAL = 5
 
 # Database settings
 
-DB_NAME = os.path.join(os.path.dirname(file), '..', '..', 'data', 'coins.db')
+DB_NAME = os.path.join(os.path.dirname(__file__), '..', '..', 'data', 'coins.db')
 
 # Multiplier settings
 RANDOM_TIME_WITHIN = 23 * 60 + 30 # 23 hours and 30 minutes
@@ -32,26 +32,26 @@ LOTTO_TICKET_PRICE = 150
 LOTTO_BASELINE = 50000
 
 SLOT_WEIGHTS: Dict[str, float] = {
-    "7️⃣": 0.0002,   # Very rare symbol (high payout)
-    "⭐": 0.0003,     # Rare symbol (reduced frequency)
-    "🔔": 0.002,      # Mid-range symbol (reduced frequency)
+    "7️⃣": 0.02,   # Very rare symbol (high payout)
+    "⭐": 0.03,     # Rare symbol (reduced frequency)
+    "🔔": 0.05,      # Mid-range symbol (reduced frequency)
     "🍇": 0.075,      # Common fruit symbol (medium payout)
     "🍉": 0.10,       # Common fruit symbol (medium payout)
     "🍊": 0.15,       # Common fruit symbol (low payout, higher chance)
     "🍋": 0.25,       # Common fruit symbol (low payout, higher chance)
-    "🍒": 0.40        # Most common symbol (lowest payout)
+    "🍒": 0.30        # Most common symbol (lowest payout)
 }
 
 # Define the payouts for each symbol
 SLOT_PAYOUTS: Dict[str, int] = {
-    "7️⃣": 100.0,    # Reduced high payout
-    "⭐": 75.0,      # Reduced medium payout
+    "7️⃣": 1000.0,    # Reduced high payout
+    "⭐": 150.0,      # Reduced medium payout
     "🔔": 50.0,     # Reduced medium payout
     "🍇": 10.0,      # Lowered medium payout
     "🍉": 5.0,      # Lowered small payout
     "🍊": 3.0,      # Lowered small payout
-    "🍋": 1.5,      # Lowered small payout
-    "🍒": 1.2       # Lowest payout
+    "🍋": 2.5,      # Lowered small payout
+    "🍒": 2       # Lowest payout
 
 }
 
