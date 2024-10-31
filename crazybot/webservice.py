@@ -14,5 +14,5 @@ if __name__ == "__main__":
         "-w", "1",  # Number of workers
         "-k", "uvicorn.workers.UvicornWorker",  # Use Uvicorn worker
         "-b", "0.0.0.0:80",  # Bind to host and port
-        "main:app"
+        "webservice:app"
     ])
