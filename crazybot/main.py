@@ -7,6 +7,8 @@ import Levenshtein  # Import the Levenshtein module
 from config import config
 from utils.signal_handler import setup_signal_handlers
 
+ALLOWED_CHANNEL_ID = 803982821923356773
+
 # Initialize bot with intents
 intents = discord.Intents.default()
 intents.voice_states = True
@@ -14,6 +16,19 @@ intents.message_content = True
 intents.guilds = True
 
 bot = commands.Bot(command_prefix='!', intents=intents, help_command=None, case_insensitive=True)
+
+
+@bot.check
+async def globally_check_channel(ctx):
+    # Only allow commands if they are invoked in the allowed channel
+    if ctx.channel.id != ALLOWED_CHANNEL_ID:
+        await ctx.send("This command can only be used in the designated channel.")
+        return False  # Prevents the command from executing
+    return True
+
+
+
+
 
 async def load_all_cogs():
     """Load all cogs from different categories."""
@@ -30,7 +45,13 @@ async def load_all_cogs():
     
     for cog in cogs:
         await load_cog(cog)
+    
 
+    
+    
+     
+
+    
 async def main():
     """Main entry point to start the bot and load cogs."""
     logger.info("Starting the bot and adding cogs...")
@@ -57,6 +78,8 @@ async def on_ready():
 async def on_exit():
     logger.info("Bot is exiting...")
     await bot.close()
+    
+
 
 @bot.event
 async def on_command_error(ctx, error):
@@ -96,6 +119,11 @@ def get_closest_commands(command_name, command_names, threshold=2):
         if distance <= threshold:
             suggestions.append(name)
     return suggestions
+
+
+
+
+
 
 if __name__ == "__main__":
     setup_signal_handlers(bot, on_exit)
