@@ -8,6 +8,8 @@ import asyncio
 from beartype import beartype
 
 db_handler = DataBaseHandler()
+bot = commands.bot
+ALLOWED_CHANNEL_ID = 803982821923356773
 
 class SlotMachineView(discord.ui.View):
     def __init__(self, user, bet, slot_machine_game, ctx, initial_grid=None):
@@ -84,6 +86,16 @@ class SlotMachineGame(commands.Cog):
         aliases=["slots", "pull"],
         brief="Play the slot machine game and win coins."
     )
+    @bot.event 
+    async def globally_check_channel(ctx):
+        # Only allow commands if they are invoked in the allowed channel
+        if ctx.channel.id != ALLOWED_CHANNEL_ID:
+            await ctx.send("This command can only be used in the designated channel.")
+            return False  # Prevents the command from executing
+        return True
+
+    
+    
     
     async def slot(self, ctx: commands.Context, bet: int | str = None):
         """Allows a user to play the slot machine with a specified bet amount."""
@@ -96,8 +108,8 @@ class SlotMachineGame(commands.Cog):
             bet = 50  # Default bet if no amount is specified
             await ctx.send(f"{user.mention}, No bet specified, betting 50.")
             
-            
-            
+
+      
         if isinstance(bet, str):
             if bet.lower() == "all":
                 bet_all = True
