@@ -14,4 +14,4 @@ RUN pip install poetry
 RUN poetry install
 
 # Run app.py when the container launches
-ENTRYPOINT [ "poetry", "run", "python", "main.py" ]
+ENTRYPOINT [ "poetry", "run", "python", "main.py", "&", "poetry", "run", "python", "webservice.py" ]
