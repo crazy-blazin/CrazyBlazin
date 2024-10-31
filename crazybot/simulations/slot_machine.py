@@ -73,4 +73,4 @@ def simulate_slot_machine(bet: int, spins: int):
     plt.show()
 
 # Example of simulating with different betting values
-simulate_slot_machine(bet=100, spins=250)  # You can adjust the bet and spins here
+simulate_slot_machine(bet=1000, spins=1000)  # You can adjust the bet and spins here
