@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "discordbb"
-version = "1.6.9"
+version = "1.7.0"
 description = ""
 authors = ["Martin Røvang <martinrovang@gmail.com>"]
 readme = "README.md"
@@ -14,7 +14,9 @@ toml = "^0.10.2"
 loguru = "^0.7.2"
 matplotlib = "^3.9.2"
 levenshtein = "^0.26.0"
-
+gunicorn = "^23.0.0"
+uvicorn = "^0.32.0"
+fastapi = "^0.115.2"
 
 [tool.poetry.group.dev.dependencies]
 nox = "^2024.4.15"
