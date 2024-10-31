@@ -11,7 +11,11 @@ COPY crazybot /app
 
 # Install any needed packages
 RUN pip install poetry
+RUN poetry lock
 RUN poetry install
 
+COPY run.sh .
+RUN chmod a+x run.sh
+
 # Run app.py when the container launches
-ENTRYPOINT [ "poetry", "run", "python", "main.py", "&", "poetry", "run", "python", "webservice.py" ]
+ENTRYPOINT ["./run.sh"]
