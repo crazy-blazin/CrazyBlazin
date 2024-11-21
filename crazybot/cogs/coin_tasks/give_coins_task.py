@@ -12,6 +12,8 @@ class GiveCoinsTask(commands.Cog):
     bot: commands.Bot
     db_handler: DataBaseHandler = field(default_factory=DataBaseHandler)
 
+    global multiplier_active
+
     def __post_init__(self):
         self.give_coins.start()
 
